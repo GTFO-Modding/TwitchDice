@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ChainedPuzzles;
 using GameData;
 using Player;
 using TwitchDice.Util;
@@ -34,7 +35,7 @@ namespace TwitchDice.Twitch.Events.D100
             var errorAlarms = new List<ChainedPuzzleDataBlock>();
             foreach (var chainedPuzzle in ChainedPuzzleDataBlock.GetAllBlocks())
             {
-                if (!chainedPuzzle.DisableSurvivalWaveOnComplete)
+                if (chainedPuzzle.PublicAlarmName.Contains("ERROR"))
                 {
                     errorAlarms.Add(chainedPuzzle);
                 }
@@ -44,12 +45,11 @@ namespace TwitchDice.Twitch.Events.D100
 
             var alarm = errorAlarms.GetRandomElement<ChainedPuzzleDataBlock>();
 
-            Log.Debug($"Chose alarm {alarm.persistentID}, name {alarm.name}...");
+            Log.Debug($"Chose alarm '{alarm.name}' with persistenID {alarm.persistentID}");
 
             var localPlayer = PlayerManager.GetLocalPlayerAgent();
-
-            var soundPlayer = new CellSoundPlayer(localPlayer.Position);
-            soundPlayer.Post(alarm.AlarmSoundStop);
+            var node = localPlayer.CourseNode;
+            var pos = node.GetRandomPositionInside();
 
             Mastermind.Current.TriggerSurvivalWave(
                 localPlayer.CourseNode, 
@@ -57,7 +57,7 @@ namespace TwitchDice.Twitch.Events.D100
                 alarm.SurvivalWavePopulation, 
                 out _, 
                 SurvivalWaveSpawnType.InRelationToClosestAlivePlayer, 
-                5, 
+                5,
                 true, 
                 false);
             
