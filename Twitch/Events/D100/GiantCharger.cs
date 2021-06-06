@@ -52,8 +52,7 @@ namespace TwitchDice.Twitch.Events.D100
                 spawnPosition, 
                 default);
 
-            enemy.Damage.HealthMax = float.MaxValue;
-            enemy.Damage.Health = float.MaxValue;
+            enemy.Damage.IsImortal = true;
 
             return new NoNetworkData();
         }
