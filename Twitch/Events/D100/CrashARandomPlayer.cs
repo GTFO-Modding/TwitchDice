@@ -8,6 +8,7 @@ namespace TwitchDice.Twitch.Events.D100
 {
     public class CrashARandomPlayer : DiceEvent<PCrashARandomPlayer>
     {
+        private static bool CrashedPlayer = false;
         public override bool RequireNetworking => true;
 
         public override bool HasNetworkData => true;
@@ -20,8 +21,9 @@ namespace TwitchDice.Twitch.Events.D100
 
         public override bool CanBeTriggered()
         {
-            if (PlayerUtil.PlayerCount > 1)
+            if (PlayerUtil.PlayerCount > 1 && CrashedPlayer == false)
             {
+                CrashedPlayer = true;
                 return true;
             }
             return false;
