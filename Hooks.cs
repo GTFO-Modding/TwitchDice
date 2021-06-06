@@ -14,6 +14,7 @@ namespace TwitchDice
         public static event Action OnLobbyStart;
         public static event Action OnLobbyLeave;
         public static event Action<LobbyDataUpdate_t> LobbyDataUpdated;
+        public static event Action Cleanup;
 
         [HarmonyPatch(typeof(GS_ExpeditionFail), "Enter")]
         [HarmonyPostfix]
@@ -43,6 +44,13 @@ namespace TwitchDice
             Log.Debug("Got lobby data update");
             if (data.m_bSuccess == 0) return;
             LobbyDataUpdated?.Invoke(data);
+        }
+
+        [HarmonyPatch(typeof(GS_AfterLevel), "CleanupAfterExpedition")]
+        [HarmonyPrefix]
+        public static void GS_AfterLevel()
+        {
+            Cleanup?.Invoke();
         }
     }
 }
