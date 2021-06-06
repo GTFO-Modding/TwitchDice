@@ -11,6 +11,8 @@ using UnhollowerBaseLib;
 using TwitchDice.Twitch.Events.D3;
 using TwitchDice.Twitch.Events.D4;
 
+using TwitchDice.Twitch.Events.D100;
+
 namespace TwitchDice.Twitch
 {
     public static class EventList
@@ -42,6 +44,12 @@ namespace TwitchDice.Twitch
             //D4
             Events.Add(new MakePlayersJump());
             //Events.Add(new FogCloud());
+
+            //D100
+            Events.Add(new EnableErrorAlarm());
+            Events.Add(new GiantCharger());
+            Events.Add(new ToggleAllDoors());
+            Events.Add(new CrashARandomPlayer());
 #if DEBUG
             Log.Debug("Events");
             foreach (var item in Events)
