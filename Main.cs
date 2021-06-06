@@ -4,6 +4,7 @@ using BepInEx.IL2CPP;
 using BepInEx.Logging;
 using CellMenu;
 using HarmonyLib;
+using TwitchDice.Components;
 using TwitchDice.Twitch;
 using TwitchDice.Util;
 using UnhollowerRuntimeLib;
@@ -32,8 +33,8 @@ namespace TwitchDice
         {
             CrashReportHandler.SetUserMetadata("Modded", "true");
             log = Log;
-            ClassInjector.RegisterTypeInIl2Cpp<DiceMaster>();
-            ClassInjector.RegisterTypeInIl2Cpp<ChatManager>();
+
+            RegisterMono();
 
             var harmony = new Harmony(GUID);
 
@@ -48,6 +49,13 @@ namespace TwitchDice
         private void Hooks_OnLobbyStart()
         {
             CreateDiceMaster();
+        }
+
+        public static void RegisterMono()
+        {
+            ClassInjector.RegisterTypeInIl2Cpp<DiceMaster>();
+            ClassInjector.RegisterTypeInIl2Cpp<ChatManager>();
+            ClassInjector.RegisterTypeInIl2Cpp<DestroyOnCleanUp>();
         }
 
         public static void CreateDiceMaster()
