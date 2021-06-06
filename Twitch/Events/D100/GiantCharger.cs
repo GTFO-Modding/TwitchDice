@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AIGraph;
+using Enemies;
+using Player;
+using TwitchDice.Util;
 
 namespace TwitchDice.Twitch.Events.D100
 {
@@ -28,6 +32,28 @@ namespace TwitchDice.Twitch.Events.D100
 
         protected override NoNetworkData TriggerHost()
         {
+            var localPlayer = PlayerManager.GetLocalPlayerAgent();
+            var spawnCenter = localPlayer.CourseNode;
+
+            var potentialSpawns = new List<AIG_CourseNode>();
+            foreach (var item in spawnCenter.m_portals)
+            {
+                potentialSpawns.Add(item.GetOppositeNode(spawnCenter));
+            }
+            
+            var spawnNode = potentialSpawns.GetRandomElement<AIG_CourseNode>();
+            var spawnPosition = spawnNode.GetRandomPositionInside();
+
+
+            var enemy = EnemyAllocator.Current.SpawnEnemy(
+                Config.GIANT_CHARGER_ID,
+                spawnNode,
+                Agents.AgentMode.Agressive,
+                spawnPosition, 
+                default);
+
+            enemy.Damage.HealthMax = float.MaxValue;
+            enemy.Damage.Health = float.MaxValue;
 
             return new NoNetworkData();
         }
