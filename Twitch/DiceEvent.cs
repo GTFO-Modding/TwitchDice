@@ -11,6 +11,9 @@ namespace TwitchDice.Twitch
     {
         public abstract bool RequireNetworking { get; }
         public abstract bool HasNetworkData { get; }
+        /// <summary>
+        /// {User} rolled a {DiceTier} :: {EventName}
+        /// </summary>
         public abstract string EventName { get; }
         public abstract string EventId { get; }
         public abstract DiceTier Tier { get; }
