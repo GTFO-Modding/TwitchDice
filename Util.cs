@@ -62,9 +62,14 @@ namespace TwitchDice.Util
         }
     }
 
-    public static class GOUtil
+    public static class SpawnUtil
     {
-
+        public static GameObject CreateEmpty(Vector3 position)
+        {
+            var go = new GameObject();
+            go.transform.position = position;
+            return go;
+        }
     }
 
     public static class NetworkUtil
@@ -179,6 +184,11 @@ namespace TwitchDice.Util
         {
             MessageQueue.Enqueue(new MessageQueueInfo() { message = message, chatLogType = chatLogType });
         }
+    }
+
+    public static class NodeUtil
+    {
+
     }
 
     public static class Extensions
