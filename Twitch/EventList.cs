@@ -43,6 +43,7 @@ namespace TwitchDice.Twitch
 
             //D4
             Events.Add(new MakePlayersJump());
+            Events.Add(new FireShooterProjectile());
             //Events.Add(new FogCloud());
 
             //D100
@@ -50,6 +51,7 @@ namespace TwitchDice.Twitch
             Events.Add(new GiantCharger());
             Events.Add(new ToggleAllDoors());
             Events.Add(new CrashARandomPlayer());
+
 #if DEBUG
             Log.Debug("Events");
             foreach (var item in Events)
