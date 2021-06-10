@@ -17,8 +17,6 @@
   
   <ItemGroup>
     <Folder Include="Twitch\Events\D6\" />
-    <Folder Include="Twitch\Events\D8\" />
-    <Folder Include="Twitch\Events\D12\" />
     <Folder Include="Twitch\Events\D20\" />
     <Folder Include="Twitch\Events\D50\" />
   </ItemGroup>
