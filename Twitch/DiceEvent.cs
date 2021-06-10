@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
+using Player;
 using SNetwork;
 using TwitchLib.Client.Models;
 
@@ -29,6 +30,18 @@ namespace TwitchDice.Twitch
                 return false;
             }
         }
+
+        public PlayerAgent LocalPlayer
+        {
+            get
+            {
+                return PlayerManager.GetLocalPlayerAgent();
+            }
+        }
+
+        protected NoNetworkData NoNetworkData = new NoNetworkData();
+        protected NetworkedNoData NetworkedNoData = new NetworkedNoData();
+
 
         public string Activate(EventInfo eventInfo)
         {
@@ -94,6 +107,16 @@ namespace TwitchDice.Twitch
     {
         public string EventNetworkData;
         public ChatMessage ChatMessage;
+    }
+
+    public struct TargetPlayer
+    {
+        public int TargetedPlayer;
+
+        public TargetPlayer(PlayerAgent target)
+        {
+            TargetedPlayer = target.PlayerSlotIndex;
+        }
     }
 
     public struct NetworkedNoData
