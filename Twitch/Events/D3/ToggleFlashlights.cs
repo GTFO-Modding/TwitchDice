@@ -37,7 +37,7 @@ namespace TwitchDice.Twitch.Events.D3
         {
             if (PlayerManager.TryGetLocalPlayerAgent(out PlayerAgent agent))
             {
-                agent.Inventory.ReceiveSetFlashlightStatus(!agent.Inventory.FlashlightEnabled, true);
+                agent.Sync.WantsToSetFlashlightEnabled(!agent.Inventory.FlashlightEnabled, false);
             }
         }
     }
