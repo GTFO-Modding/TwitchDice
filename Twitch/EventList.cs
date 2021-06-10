@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using TwitchDice.Util;
+using TwitchDice.Utilities;
 using TwitchDice.Twitch.Events;
 using TwitchLib.Client.Models;
 using Steamworks;

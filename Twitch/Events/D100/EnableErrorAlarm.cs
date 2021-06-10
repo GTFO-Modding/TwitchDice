@@ -4,7 +4,7 @@ using System.Text;
 using ChainedPuzzles;
 using GameData;
 using Player;
-using TwitchDice.Util;
+using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D100
 {

@@ -8,7 +8,7 @@ using UnityEngine;
 using SNetwork;
 using Player;
 
-namespace TwitchDice.Util
+namespace TwitchDice.Utilities
 {
     public class ChatManager : MonoBehaviour
     {
@@ -69,6 +69,27 @@ namespace TwitchDice.Util
             var go = new GameObject();
             go.transform.position = position;
             return go;
+        }
+
+        public static List<RaycastHit> GetRandomScatterAround(Vector3 org, int count)
+        {
+            var list = new List<RaycastHit>();
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 direction = UnityEngine.Random.insideUnitSphere.normalized;
+                Ray ray = new Ray(org, direction);
+                RaycastHit hit;
+                int iterations = 0;
+                while (!Physics.Raycast(ray, out hit, 100000, LayerManager.MASK_CAMERA_RAY) && iterations < 100)
+                {
+                    direction = UnityEngine.Random.insideUnitSphere.normalized;
+                    ray = new Ray(org, direction);
+                    iterations++;
+                }
+                list.Add(hit);
+            }
+
+            return list;
         }
     }
 

@@ -3,7 +3,7 @@ using Player;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TwitchDice.Util;
+using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events
 {

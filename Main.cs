@@ -6,7 +6,7 @@ using CellMenu;
 using HarmonyLib;
 using TwitchDice.Components;
 using TwitchDice.Twitch;
-using TwitchDice.Util;
+using TwitchDice.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.CrashReportHandler;

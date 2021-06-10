@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TwitchDice.Util;
+using TwitchDice.Utilities;
 using Player;
 
 namespace TwitchDice.Twitch.Events.D100

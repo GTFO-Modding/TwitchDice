@@ -4,7 +4,7 @@ using System.Text;
 using AIGraph;
 using Enemies;
 using Player;
-using TwitchDice.Util;
+using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D100
 {

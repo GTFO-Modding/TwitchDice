@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TwitchDice.Util;
+using TwitchDice.Utilities;
 using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D4
