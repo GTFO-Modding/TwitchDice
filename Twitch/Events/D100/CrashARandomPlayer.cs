@@ -31,7 +31,7 @@ namespace TwitchDice.Twitch.Events.D100
 
         protected override void TriggerClient(PCrashARandomPlayer NetworkInfo)
         {
-            if (NetworkInfo.PlayerName == PlayerManager.GetLocalPlayerAgent().PlayerName)
+            if (NetworkInfo.PlayerSlot == LocalPlayer.PlayerSlotIndex)
             {
                 //LOL
                 UnityEngine.Diagnostics.Utils.ForceCrash(UnityEngine.Diagnostics.ForcedCrashCategory.Abort);
@@ -42,7 +42,7 @@ namespace TwitchDice.Twitch.Events.D100
         {
             if (PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent player, false))
             {
-                return new PCrashARandomPlayer() { PlayerName = player.PlayerName  };
+                return new PCrashARandomPlayer() { PlayerSlot = player.PlayerSlotIndex  };
             }
 
             return new PCrashARandomPlayer();
@@ -51,6 +51,6 @@ namespace TwitchDice.Twitch.Events.D100
 
     public struct PCrashARandomPlayer
     {
-        public string PlayerName;
+        public int PlayerSlot;
     }
 }
