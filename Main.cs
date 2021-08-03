@@ -33,14 +33,12 @@ namespace TwitchDice
         {
             CrashReportHandler.SetUserMetadata("Modded", "true");
             log = Log;
-
-            RegisterMono();
+            RegisterMonobehavior();
 
             var harmony = new Harmony(GUID);
-
-            var hotReloadInjectPoint = typeof(GS_Offline).GetMethod("Enter");
-            var diceMaster = typeof(Main).GetMethod("CreateChatManager");
-            harmony.Patch(hotReloadInjectPoint, null, new HarmonyMethod(diceMaster));
+            var chatManagerEntryPoint = typeof(GS_Offline).GetMethod("Enter");
+            var chatManager = typeof(Main).GetMethod("CreateChatManager");
+            harmony.Patch(chatManagerEntryPoint, null, new HarmonyMethod(chatManager));
 
             harmony.PatchAll();
             Hooks.OnLobbyStart += Hooks_OnLobbyStart;
@@ -51,7 +49,7 @@ namespace TwitchDice
             CreateDiceMaster();
         }
 
-        public static void RegisterMono()
+        public static void RegisterMonobehavior()
         {
             ClassInjector.RegisterTypeInIl2Cpp<DiceMaster>();
             ClassInjector.RegisterTypeInIl2Cpp<ChatManager>();
