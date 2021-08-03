@@ -37,14 +37,16 @@ namespace TwitchDice.Twitch.Events.D12
             {
                 EnemyGroupDataBlock data = GameDataBlockBase<EnemyGroupDataBlock>.GetBlock(37U);
                 CellSound.Post(EVENTS.BIRTHER_BABY_DROP, target.Position);
-                Mastermind.Current.SpawnGroup(
-                    target.Position, 
-                    target.CourseNode, 
-                    EnemyGroupType.Hunters, 
-                    eEnemyGroupSpawnType.Birther,
-                    data, 
-                    20, 
-                    target.Position);
+                for (int i = 0; i < 20; i++)
+                {
+                    Mastermind.Current.SpawnGroup(
+                    target.Position,
+                    target.CourseNode,
+                    EnemyGroupType.Hunters,
+                    eEnemyGroupSpawnType.Position,
+                    data,
+                    0);
+                }
             }
 
 
