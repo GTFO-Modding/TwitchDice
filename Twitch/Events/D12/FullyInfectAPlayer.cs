@@ -26,13 +26,7 @@ namespace TwitchDice.Twitch.Events.D12
 
         protected override void TriggerClient(TargetPlayer NetworkInfo)
         {
-            if (NetworkInfo.TargetedPlayer == LocalPlayer.PlayerSlotIndex)
-            {
-                if (ScreenLiquidManager.TryApply(ScreenLiquidSettingName.spitterJizz, LocalPlayer.Position, 2))
-                {
-                    LocalPlayer.Sound.Post(EVENTS.VISOR_SPLATTER_INFECTION);
-                }
-            }
+            PlaySplat(NetworkInfo);
         }
 
         protected override TargetPlayer TriggerHost()
@@ -42,7 +36,21 @@ namespace TwitchDice.Twitch.Events.D12
                 target.Damage.ModifyInfection(new pInfection() { amount = 10, mode = pInfectionMode.Add }, true, true);
             }
 
-            return new TargetPlayer(target);
+            TargetPlayer targetedPlayer = new TargetPlayer(target);
+            PlaySplat(targetedPlayer);
+
+            return targetedPlayer;
+        }
+
+        private void PlaySplat(TargetPlayer NetworkInfo)
+        {
+            if (NetworkInfo.TargetedPlayer == LocalPlayer.PlayerSlotIndex)
+            {
+                if (ScreenLiquidManager.TryApply(ScreenLiquidSettingName.spitterJizz, LocalPlayer.Position, 10))
+                {
+                    LocalPlayer.Sound.Post(EVENTS.VISOR_SPLATTER_INFECTION);
+                }
+            }
         }
     }
 }
