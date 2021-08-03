@@ -37,12 +37,14 @@ namespace TwitchDice.Twitch.Events.D8
             {
                 itemID_gearCRC = 125U
             };
-            var hits = SpawnUtil.GetRandomScatterAround(LocalPlayer.Position, MineCount);
 
+            var hits = SpawnUtil.GetRandomScatterAround(LocalPlayer.EyePosition, MineCount);
 
             foreach (var hit in hits)
             {
-                ItemReplicationManager.SpawnItem(mine, null, ItemMode.Instance, hit.point, Quaternion.Euler(hit.normal), LocalPlayer.CourseNode, LocalPlayer);
+                Vector3 direction = (hit.point - LocalPlayer.EyePosition).normalized;
+                var rot = Quaternion.LookRotation(direction, Vector3.up);
+                ItemReplicationManager.SpawnItem(mine, null, ItemMode.Instance, hit.point, rot, LocalPlayer.CourseNode, LocalPlayer);
             }
             
             return NoNetworkData;
