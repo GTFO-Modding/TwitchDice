@@ -68,7 +68,7 @@ namespace TwitchDice.Twitch
             }
         }
 
-private readonly Queue<ChatMessage> MessageQueue = new Queue<ChatMessage>();
+        private readonly Queue<EventInfo> EventQueue = new Queue<EventInfo>();
 
         void Awake()
         {
@@ -100,7 +100,7 @@ private readonly Queue<ChatMessage> MessageQueue = new Queue<ChatMessage>();
             PlayerChatManager.add_OnIncomingChatMessage((Action<SNetwork.SNet_Player, string>)((player, data) =>
             {
                 if (State != DiceMasterState.InLevel || !IsHost) return;
-                EventList.TryActivateEvent(data, "");
+                EventManager.TryActivateEvent(data, "");
             }));
 #endif
             #endregion
@@ -115,13 +115,13 @@ private readonly Queue<ChatMessage> MessageQueue = new Queue<ChatMessage>();
                 string id = SteamMatchmaking.GetLobbyData(lobby, Main.EVENT_ID_KEY);
                 string networkInfo = SteamMatchmaking.GetLobbyData(lobby, Main.EVENT_INFO_KEY);
 
-                EventList.TryActivateEvent(id, networkInfo);
+                EventManager.TryActivateEvent(id, networkInfo);
             }
         }
 
         private void Hooks_OnFail()
         {
-            MessageQueue.Clear();
+            EventQueue.Clear();
             State = DiceMasterState.InLobby;
         }
 
@@ -134,14 +134,11 @@ private readonly Queue<ChatMessage> MessageQueue = new Queue<ChatMessage>();
                     break;
 
                 case DiceMasterState.InLevel:
-                    if (MessageQueue.TryDequeue(out ChatMessage message))
+                    if (EventQueue.TryDequeue(out EventInfo info))
                     {
-                        if (Enum.TryParse(message.Message, out DiceTier tier))
+                        if (!EventManager.TryActivateEventOfTier(info))
                         {
-                            if (!EventList.TryActivateEventOfTier(tier, message))
-                            {
-                                Log.Warning("Failed to activate event!");
-                            }
+                            Log.Warning("Failed to activate event!");
                         }
                     }
                     break;
@@ -185,8 +182,18 @@ private readonly Queue<ChatMessage> MessageQueue = new Queue<ChatMessage>();
 
         private void TwitchManager_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
         {
-            if (e.ChatMessage.Username == Main.OVERRIDE_NAME)
-                MessageQueue.Enqueue(e.ChatMessage);
+            if (e.ChatMessage.Username != Main.OVERRIDE_NAME) return;
+
+            if (Enum.TryParse(e.ChatMessage.Message, out DiceTier tier))
+            {
+                EventInfo info = new EventInfo()
+                {
+                    ActivatorUsername = e.ChatMessage.Username,
+                    Tier = tier
+                };
+
+                EventQueue.Enqueue(info);
+            }
         }
 
         enum DiceMasterState

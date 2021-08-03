@@ -106,7 +106,8 @@ namespace TwitchDice.Twitch
     public struct EventInfo
     {
         public string EventNetworkData;
-        public ChatMessage ChatMessage;
+        public string ActivatorUsername;
+        public DiceTier Tier;
     }
 
     public struct TargetPlayer

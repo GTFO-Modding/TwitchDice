@@ -30,6 +30,22 @@ namespace TwitchDice.Utilities
 
     public static class PlayerUtil
     {
+        private static bool? _isHost;
+        public static bool IsHost
+        {
+            get
+            {
+                if (_isHost.HasValue) return _isHost.Value;
+                if (SNet.Core.TryGetLobbyOwner(out SNet_Player player))
+                {
+                    _isHost = player.IsLocal;
+                    return _isHost.Value;
+                }
+                Log.Error("Couldn't get lobby host :(");
+                return false;
+            }
+        }
+
         public static int PlayerCount
         {
             get
@@ -37,6 +53,7 @@ namespace TwitchDice.Utilities
                 return PlayerManager.PlayerAgentsInLevel.Count;
             }
         }
+
         public static bool TryGetRandomPlayerAgent(out PlayerAgent playerAgent, bool IncludeHost = true)
         {
             playerAgent = null;
@@ -164,10 +181,10 @@ namespace TwitchDice.Utilities
             Log.Debug($"DiceMasterSpeak :: {formattedMessage}");
         }
 
-        public static void EventSpeak(DiceTier tier, string user, string eventName = "UNKNOWN") 
+        public static void EventSpeak(EventInfo eventInfo, string eventName) 
         {
             string tierName = "NO TIER";
-            switch(tier)
+            switch(eventInfo.Tier)
             {
                 case DiceTier.D3:
                     tierName = "<color=white>D3</color>";
@@ -196,7 +213,7 @@ namespace TwitchDice.Utilities
             }
 
 
-            string formattredMessage = $"<size=150%><color=white>>> {user}</color> rolled a {tierName} :: <color=orange>{eventName}</color></size>";
+            string formattredMessage = $"<size=150%><color=white>>> {eventInfo.ActivatorUsername}</color> rolled a {tierName} :: <color=orange>{eventName}</color></size>";
             Send(formattredMessage, eGameEventChatLogType.Alert);
             Log.Debug($"EventSpeak :: {formattredMessage}");
         }
