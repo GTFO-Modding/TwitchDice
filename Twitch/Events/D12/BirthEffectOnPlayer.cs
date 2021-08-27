@@ -26,6 +26,8 @@ namespace TwitchDice.Twitch.Events.D12
             return true;
         }
 
+        private int birthCount = 10;
+
         protected override void TriggerClient(NoNetworkData NetworkInfo)
         {
             
@@ -37,7 +39,7 @@ namespace TwitchDice.Twitch.Events.D12
             {
                 EnemyGroupDataBlock data = GameDataBlockBase<EnemyGroupDataBlock>.GetBlock(37U);
                 CellSound.Post(EVENTS.BIRTHER_BABY_DROP, target.Position);
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < birthCount; i++)
                 {
                     Mastermind.Current.SpawnGroup(
                     target.Position,

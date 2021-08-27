@@ -25,6 +25,8 @@ namespace TwitchDice
             EVENT_ID_KEY = "eventId",
             EVENT_INFO_KEY = "eventInfo";
 
+        public const bool DEBUG = true;
+
         public static ManualLogSource log;
         public static GameObject DiceMasterObject;
         public static System.Random rnd = new System.Random();

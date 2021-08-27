@@ -28,6 +28,7 @@ namespace TwitchDice.Twitch
             Events.Add(new RandomizeZoneLighting());
             Events.Add(new ToggleRandomWeakDoor());
             Events.Add(new ToggleFlashlights());
+            Events.Add(new EnemyPulse());
 
             //D4
             Events.Add(new MakePlayersJump());
@@ -35,7 +36,7 @@ namespace TwitchDice.Twitch
             //Events.Add(new FogCloud());
 
             //D6
-            Events.Add(new RandomFireWeapon());
+            //Events.Add(new RandomFireWeapon());
 
             //D8
             Events.Add(new MineScatterShot());

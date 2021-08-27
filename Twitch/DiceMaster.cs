@@ -96,13 +96,14 @@ namespace TwitchDice.Twitch
             #endregion
 
             #region Debug
-#if DEBUG
+//#if DEBUG
             PlayerChatManager.add_OnIncomingChatMessage((Action<SNetwork.SNet_Player, string>)((player, data) =>
             {
-                if (State != DiceMasterState.InLevel || !IsHost) return;
+                Log.Debug("Incoming chat message");
+                if (State != DiceMasterState.InLevel || !IsHost || !Main.DEBUG) return;
                 EventManager.TryActivateEvent(data, "");
             }));
-#endif
+//#endif
             #endregion
 
         }
