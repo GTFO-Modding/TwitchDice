@@ -10,10 +10,12 @@ using TwitchDice.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.CrashReportHandler;
+using Nidhogg;
 
 namespace TwitchDice
 {
     [BepInPlugin(GUID, NAME, VERSION)]
+    [BepInDependency("com.kasuromi.nidhogg", BepInDependency.DependencyFlags.HardDependency)]
     public class Main : BasePlugin
     {
         public const string
@@ -46,16 +48,17 @@ namespace TwitchDice
             Hooks.OnLobbyStart += Hooks_OnLobbyStart;
         }
 
-        private void Hooks_OnLobbyStart()
-        {
-            CreateDiceMaster();
-        }
-
-        public static void RegisterMonobehavior()
+        private static void RegisterMonobehavior()
         {
             ClassInjector.RegisterTypeInIl2Cpp<DiceMaster>();
             ClassInjector.RegisterTypeInIl2Cpp<ChatManager>();
             ClassInjector.RegisterTypeInIl2Cpp<DestroyOnCleanUp>();
+        }
+
+
+        private void Hooks_OnLobbyStart()
+        {
+            CreateDiceMaster();
         }
 
         public static void CreateDiceMaster()
