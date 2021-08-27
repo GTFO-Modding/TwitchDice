@@ -6,7 +6,7 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D3
 {
-    public class EnemyPulse : DiceEvent<NoNetworkData>
+    public class EnemyPulse : OldDiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 

@@ -8,7 +8,7 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D100
 {
-    public class GiantCharger : DiceEvent<NoNetworkData>
+    public class GiantCharger : OldDiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 

@@ -8,7 +8,7 @@ using TwitchLib.Client.Models;
 
 namespace TwitchDice.Twitch
 {
-    public abstract class DiceEvent<T> : IDiceEvent where T : struct
+    public abstract class OldDiceEvent<T> : IDiceEvent where T : struct
     {
         public abstract bool RequireNetworking { get; }
         public abstract bool HasNetworkData { get; }
@@ -129,4 +129,6 @@ namespace TwitchDice.Twitch
     {
 
     }
+
+    
 }

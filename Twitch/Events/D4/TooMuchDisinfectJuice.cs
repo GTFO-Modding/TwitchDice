@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D4
 {
-    public class TooMuchDisinfectJuice : DiceEvent<TargetPlayer>
+    public class TooMuchDisinfectJuice : OldDiceEvent<TargetPlayer>
     {
         public override bool RequireNetworking => true;
 

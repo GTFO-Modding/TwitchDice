@@ -9,7 +9,7 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D12
 {
-    public class BirthEffectOnPlayer : DiceEvent<NoNetworkData>
+    public class BirthEffectOnPlayer : OldDiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 

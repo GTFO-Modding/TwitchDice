@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D4
 {
-    class FireShooterProjectile : DiceEvent<NoNetworkData>
+    class FireShooterProjectile : OldDiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TwitchDice.Twitch.Events.D3
 {
-    public class ToggleFlashlights : DiceEvent<NetworkedNoData>
+    public class ToggleFlashlights : OldDiceEvent<NetworkedNoData>
     {
         public override bool RequireNetworking => true;
 

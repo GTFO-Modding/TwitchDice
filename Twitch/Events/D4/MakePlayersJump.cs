@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TwitchDice.Twitch.Events.D4
 {
-    public class MakePlayersJump : DiceEvent<NetworkedNoData>
+    public class MakePlayersJump : OldDiceEvent<NetworkedNoData>
     {
         public override bool RequireNetworking => true;
 

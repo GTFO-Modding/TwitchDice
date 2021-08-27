@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TwitchDice.Twitch.Events.D100
 {
-    public class ToggleAllDoors : DiceEvent<NoNetworkData>
+    public class ToggleAllDoors : OldDiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 

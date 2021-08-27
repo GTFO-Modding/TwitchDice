@@ -9,7 +9,7 @@ using SNetwork;
 
 namespace TwitchDice.Twitch.Events.D6
 {
-    public class RandomFireWeapon : DiceEvent<TargetPlayer>
+    public class RandomFireWeapon : OldDiceEvent<TargetPlayer>
     {
         public override bool RequireNetworking => true;
     

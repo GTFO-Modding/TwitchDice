@@ -7,7 +7,7 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D12
 {
-    public class FullyInfectAPlayer : DiceEvent<TargetPlayer>
+    public class FullyInfectAPlayer : OldDiceEvent<TargetPlayer>
     {
         public override bool RequireNetworking => false;
 

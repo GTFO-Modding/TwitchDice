@@ -7,7 +7,7 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D8
 {
-    public class MineScatterShot : DiceEvent<NoNetworkData>
+    public class MineScatterShot : OldDiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 

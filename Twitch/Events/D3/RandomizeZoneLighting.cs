@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace TwitchDice.Twitch.Events
 {
-    public class RandomizeZoneLighting : DiceEvent<PRandomZoneLighting>
+    public class RandomizeZoneLighting : OldDiceEvent<PRandomZoneLighting>
     {
         public override bool RequireNetworking => true;
 

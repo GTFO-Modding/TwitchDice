@@ -7,7 +7,7 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events
 {
-    public class ToggleRandomWeakDoor : DiceEvent<NoNetworkData>
+    public class ToggleRandomWeakDoor : OldDiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 

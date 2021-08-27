@@ -8,7 +8,7 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D100
 {
-    public class EnableErrorAlarm : DiceEvent<NoNetworkData>
+    public class EnableErrorAlarm : OldDiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 

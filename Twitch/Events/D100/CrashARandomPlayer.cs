@@ -6,7 +6,7 @@ using Player;
 
 namespace TwitchDice.Twitch.Events.D100
 {
-    public class CrashARandomPlayer : DiceEvent<PCrashARandomPlayer>
+    public class CrashARandomPlayer : OldDiceEvent<PCrashARandomPlayer>
     {
         private static bool CrashedPlayer = false;
         public override bool RequireNetworking => true;

@@ -8,7 +8,7 @@ using LevelGeneration;
 
 namespace TwitchDice.Twitch.Events.D4
 {
-    public class FogCloud : DiceEvent<PFogCloud>
+    public class FogCloud : OldDiceEvent<PFogCloud>
     {
         public override bool RequireNetworking => true;
 
