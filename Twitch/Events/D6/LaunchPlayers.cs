@@ -20,6 +20,7 @@ namespace TwitchDice.Twitch.Events.D6
         public override void TriggerHost()
         {
             Jump();
+            TriggerClient(new D6.Jump());
         }
 
         public override void ReceiveClient(ulong sender, Jump packet)
@@ -29,7 +30,7 @@ namespace TwitchDice.Twitch.Events.D6
 
         private void Jump()
         {
-            PlayerUtil.LocalPlayerAgent.Locomotion.m_verticalVelocity = Vector3.up * Magnitude;
+            PlayerUtil.LocalPlayerAgent.PlayerCharacterController.Move(Vector3.up * Magnitude);
         }
     }
 
