@@ -61,7 +61,7 @@ namespace TwitchDice.Twitch
         public override void Register()
         {
             if (_registered) return;
-            NetworkingManager.RegisterEvent<T>(typeof(T).Name, ReceiveClient);
+            NetworkingManager.RegisterEvent<T>($"{GetType().Name}_{typeof(T).Name}", ReceiveClient);
             _registered = true;
             Log.Debug($"Registered {EventName} with ID {EventID}");
         }
