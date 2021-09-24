@@ -7,7 +7,65 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events
 {
-    public class ToggleRandomWeakDoor : OldDiceEvent<NoNetworkData>
+    public class ToggleRandomWeakDoor : DiceEvent
+    {
+        public override string EventName => "Poltergeist";
+
+        public override string EventID => "weakOpen";
+
+        protected override DiceTier DiceTier => DiceTier.D3;
+
+        public override bool CanBeTriggered()
+        {
+            if (PlayerManager.GetLocalPlayerAgent().m_courseNode.m_portals == null) return false;
+            try
+            {
+                foreach (var portal in PlayerManager.GetLocalPlayerAgent().m_courseNode.m_portals)
+                {
+                    if (portal.m_hasGate)
+                    {
+                        if (portal.m_door == null) continue;
+                        if (portal.m_door.DoorType == LevelGeneration.eLG_DoorType.Weak && portal.m_door.LastStatus != LevelGeneration.eDoorStatus.Closed_BrokenCantOpen)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
+            }
+
+            return false;
+        }
+
+        public override void TriggerHost()
+        {
+            List<AIG_CoursePortal> cards = new List<AIG_CoursePortal>();
+            foreach (var item in PlayerManager.GetLocalPlayerAgent().m_courseNode.m_portals)
+            {
+                cards.Add(item);
+            }
+            cards.Shuffle();
+
+            foreach (var card in cards)
+            {
+                if (card.m_hasGate)
+                {
+                    if (card.m_door == null) continue;
+                    if (card.m_door.DoorType == LevelGeneration.eLG_DoorType.Weak && card.m_door.LastStatus != LevelGeneration.eDoorStatus.Closed_BrokenCantOpen)
+                    {
+                        card.m_door.AttemptOpenCloseInteraction(false);
+                        Log.Debug("Opened weak door");
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    /*public class ToggleRandomWeakDoor : global::DiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 
@@ -72,5 +130,5 @@ namespace TwitchDice.Twitch.Events
         {
             
         }
-    }
+    }*/
 }

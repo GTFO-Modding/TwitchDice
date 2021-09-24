@@ -5,7 +5,40 @@ using System.Text;
 
 namespace TwitchDice.Twitch.Events.D3
 {
-    public class ToggleFlashlights : OldDiceEvent<NetworkedNoData>
+    public class ToggleFlashlights : DiceEvent<Flashlight>
+    {
+        public override string EventName => "Toggle Flashlights";
+
+        public override string EventID => "toggleF";
+
+        protected override DiceTier DiceTier => DiceTier.D3;
+
+        public override void ReceiveClient(ulong sender, Flashlight packet)
+        {
+            ToggleFlashlight();
+        }
+
+        public override void TriggerHost()
+        {
+            ToggleFlashlight();
+            TriggerClient(new Flashlight());
+        }
+
+        private void ToggleFlashlight()
+        {
+            if (PlayerManager.TryGetLocalPlayerAgent(out PlayerAgent agent))
+            {
+                agent.Sync.WantsToSetFlashlightEnabled(!agent.Inventory.FlashlightEnabled, false);
+            }
+        }
+    }
+
+    public struct Flashlight
+    {
+
+    }
+
+    /*public class ToggleFlashlights : global::DiceEvent<NetworkedNoData>
     {
         public override bool RequireNetworking => true;
 
@@ -40,5 +73,5 @@ namespace TwitchDice.Twitch.Events.D3
                 agent.Sync.WantsToSetFlashlightEnabled(!agent.Inventory.FlashlightEnabled, false);
             }
         }
-    }
+    }*/
 }

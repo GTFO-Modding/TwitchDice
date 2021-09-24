@@ -7,6 +7,9 @@ using TwitchDice.Twitch;
 using UnityEngine;
 using SNetwork;
 using Player;
+using Nidhogg.Managers;
+using System.Reflection;
+using System.Linq;
 
 namespace TwitchDice.Utilities
 {
@@ -25,6 +28,9 @@ namespace TwitchDice.Utilities
             GuiManager.PlayerLayer.m_gameEventLog.AddLogItem(message, chatLogType);
             CM_PageLoadout.Current.m_gameEventLog.AddLogItem(message, chatLogType);
             CM_PageMap.Current.m_gameEventLog.AddLogItem(message, chatLogType);
+
+            ChatMsg chatMsg = new ChatMsg() { Message = message, LogType = (int)chatLogType };
+            if (PlayerUtil.IsHost) NetworkingManager.InvokeEvent(typeof(ChatMsg).Name, chatMsg);
         }
     }
 
@@ -43,6 +49,22 @@ namespace TwitchDice.Utilities
                 }
                 Log.Error("Couldn't get lobby host :(");
                 return false;
+            }
+        }
+
+        public static PlayerAgent LocalPlayerAgent
+        {
+            get
+            {
+                return PlayerManager.GetLocalPlayerAgent();
+            }
+        }
+
+        public static SNet_Player LocalNetAgent
+        {
+            get
+            {
+                return LocalPlayerAgent.Owner;
             }
         }
 
@@ -181,10 +203,10 @@ namespace TwitchDice.Utilities
             Log.Debug($"DiceMasterSpeak :: {formattedMessage}");
         }
 
-        public static void EventSpeak(EventInfo eventInfo, string eventName) 
+        public static void EventSpeak(IDiceEvent diceEvent, string activator) 
         {
             string tierName = "NO TIER";
-            switch(eventInfo.Tier)
+            switch(diceEvent.Tier)
             {
                 case DiceTier.D3:
                     tierName = "<color=white>D3</color>";
@@ -213,7 +235,7 @@ namespace TwitchDice.Utilities
             }
 
 
-            string formattredMessage = $"<size=150%><color=white>>> {eventInfo.ActivatorUsername}</color> rolled a {tierName} :: <color=orange>{eventName}</color></size>";
+            string formattredMessage = $"<size=150%><color=white>>> {activator}</color> rolled a {tierName} :: <color=orange>{diceEvent.EventName}</color></size>";
             Send(formattredMessage, eGameEventChatLogType.Alert);
             Log.Debug($"EventSpeak :: {formattredMessage}");
         }

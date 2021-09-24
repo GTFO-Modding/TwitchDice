@@ -6,7 +6,36 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D3
 {
-    public class EnemyPulse : OldDiceEvent<NoNetworkData>
+    public class EnemyPulse : DiceEvent
+    {
+        public override string EventName => "Pulse";
+
+        public override string EventID => "pulse";
+
+        protected override DiceTier DiceTier => DiceTier.D3;
+
+        private readonly int range = 200;
+
+        public override void TriggerHost()
+        {
+            PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent target);
+
+            var noiseData = new NM_NoiseData
+            {
+                position = target.EyePosition,
+                radiusMin = 0,
+                radiusMax = range,
+                node = target.CourseNode,
+                type = NM_NoiseType.PulseOnly,
+                raycastFirstNode = false,
+                includeToNeightbourAreas = true
+            };
+
+            NoiseManager.MakeNoise(noiseData);
+        }
+    }
+
+    /*public class EnemyPulse : global::DiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 
@@ -49,5 +78,5 @@ namespace TwitchDice.Twitch.Events.D3
 
             return new NoNetworkData();
         }
-    }
+    }*/
 }

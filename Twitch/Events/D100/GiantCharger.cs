@@ -8,7 +8,72 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D100
 {
-    public class GiantCharger : OldDiceEvent<NoNetworkData>
+    public class Bob : DiceEvent<BobData>
+    {
+        public override string EventName => "Bob";
+
+        public override string EventID => "bob";
+
+        protected override DiceTier DiceTier => DiceTier.D100;
+
+        public override void ReceiveClient(ulong sender, BobData packet)
+        {
+            ushort enemyID = packet.GlobalID;
+            int nodeID = packet.NodeID;
+
+            foreach (var player in PlayerManager.PlayerAgentsInLevel)
+            {
+                var spawnCenter = player.CourseNode;
+                foreach (var portal in spawnCenter.m_portals)
+                {
+                    if (portal.GetOppositeNode(spawnCenter).NodeID == nodeID)
+                    {
+                        foreach (var enemy in portal.GetOppositeNode(spawnCenter).m_enemiesInNode)
+                        {
+                            if (enemy.GlobalID == enemyID)
+                            {
+                                enemy.Damage.Health = float.MaxValue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public override void TriggerHost()
+        {
+            PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent localPlayer);
+            var spawnCenter = localPlayer.CourseNode;
+
+            var potentialSpawns = new List<AIG_CourseNode>();
+            foreach (var item in spawnCenter.m_portals)
+            {
+                potentialSpawns.Add(item.GetOppositeNode(spawnCenter));
+            }
+
+            var spawnNode = potentialSpawns.GetRandomElement<AIG_CourseNode>();
+            var spawnPosition = spawnNode.GetRandomPositionInside();
+
+
+            var enemy = EnemyAllocator.Current.SpawnEnemy(
+                Config.GIANT_CHARGER_ID,
+                spawnNode,
+                Agents.AgentMode.Agressive,
+                spawnPosition,
+                default);
+
+            enemy.Damage.Health = float.MaxValue;
+
+            TriggerClient(new BobData() { GlobalID = enemy.GlobalID, NodeID = spawnNode.NodeID });
+        }
+    }
+
+    public struct BobData
+    {
+        public ushort GlobalID;
+        public int NodeID; 
+    }
+    /*public class GiantCharger : global::DiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 
@@ -56,5 +121,5 @@ namespace TwitchDice.Twitch.Events.D100
 
             return new NoNetworkData();
         }
-    }
+    }*/
 }

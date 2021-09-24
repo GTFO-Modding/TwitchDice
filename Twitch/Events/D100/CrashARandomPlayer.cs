@@ -6,51 +6,86 @@ using Player;
 
 namespace TwitchDice.Twitch.Events.D100
 {
-    public class CrashARandomPlayer : OldDiceEvent<PCrashARandomPlayer>
+    public class Crash : DiceEvent<CrashPlayer>
     {
-        private static bool CrashedPlayer = false;
-        public override bool RequireNetworking => true;
+        public override string EventName => "Unity Moment";
 
-        public override bool HasNetworkData => true;
+        public override string EventID => "crashPlayer";
 
-        public override string EventName => "Crash Player";
+        protected override DiceTier DiceTier => DiceTier.D100;
 
-        public override string EventId => "d100_crashPlayer";
+        private bool Activated = false;
 
-        public override DiceTier Tier => DiceTier.D100;
+        public override bool CanBeTriggered() => !Activated && PlayerUtil.PlayerCount > 1;
 
-        public override bool CanBeTriggered()
+        public override void TriggerHost()
         {
-            if (PlayerUtil.PlayerCount > 1 && CrashedPlayer == false)
-            {
-                CrashedPlayer = true;
-                return true;
-            }
-            return false;
+            PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent player, false);
+            Activated = true;
+            TriggerClient(new CrashPlayer() { Slot = player.PlayerSlotIndex });
         }
 
-        protected override void TriggerClient(PCrashARandomPlayer NetworkInfo)
+        private void CrashPlayer()
         {
-            if (NetworkInfo.PlayerSlot == LocalPlayer.PlayerSlotIndex)
-            {
-                //LOL
-                UnityEngine.Diagnostics.Utils.ForceCrash(UnityEngine.Diagnostics.ForcedCrashCategory.Abort);
-            }
+            UnityEngine.Diagnostics.Utils.ForceCrash(UnityEngine.Diagnostics.ForcedCrashCategory.Abort);
         }
 
-        protected override PCrashARandomPlayer TriggerHost()
+        public override void ReceiveClient(ulong sender, CrashPlayer packet)
         {
-            if (PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent player, false))
-            {
-                return new PCrashARandomPlayer() { PlayerSlot = player.PlayerSlotIndex  };
-            }
-
-            return new PCrashARandomPlayer();
+            CrashPlayer();
         }
     }
 
-    public struct PCrashARandomPlayer
+    public struct CrashPlayer
     {
-        public int PlayerSlot;
+        public int Slot;
     }
+
+    /*    public class CrashARandomPlayer : global::DiceEvent<PCrashARandomPlayer>
+        {
+            private static bool CrashedPlayer = false;
+            public override bool RequireNetworking => true;
+
+            public override bool HasNetworkData => true;
+
+            public override string EventName => "Crash Player";
+
+            public override string EventId => "d100_crashPlayer";
+
+            public override DiceTier Tier => DiceTier.D100;
+
+            public override bool CanBeTriggered()
+            {
+                if (PlayerUtil.PlayerCount > 1 && CrashedPlayer == false)
+                {
+                    CrashedPlayer = true;
+                    return true;
+                }
+                return false;
+            }
+
+            protected override void TriggerClient(PCrashARandomPlayer NetworkInfo)
+            {
+                if (NetworkInfo.PlayerSlot == LocalPlayer.PlayerSlotIndex)
+                {
+                    //LOL
+                    UnityEngine.Diagnostics.Utils.ForceCrash(UnityEngine.Diagnostics.ForcedCrashCategory.Abort);
+                }
+            }
+
+            protected override PCrashARandomPlayer TriggerHost()
+            {
+                if (PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent player, false))
+                {
+                    return new PCrashARandomPlayer() { PlayerSlot = player.PlayerSlotIndex  };
+                }
+
+                return new PCrashARandomPlayer();
+            }
+        }
+
+        public struct PCrashARandomPlayer
+        {
+            public int PlayerSlot;
+        }*/
 }

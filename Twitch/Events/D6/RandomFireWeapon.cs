@@ -9,7 +9,7 @@ using SNetwork;
 
 namespace TwitchDice.Twitch.Events.D6
 {
-    public class RandomFireWeapon : OldDiceEvent<TargetPlayer>
+    /*public class RandomFireWeapon : global::DiceEvent<TargetPlayer>
     {
         public override bool RequireNetworking => true;
     
@@ -67,5 +67,5 @@ namespace TwitchDice.Twitch.Events.D6
                 //    break;
             }
         }
-    }
+    }*/
 }

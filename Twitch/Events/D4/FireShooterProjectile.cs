@@ -7,7 +7,25 @@ using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D4
 {
-    class FireShooterProjectile : OldDiceEvent<NoNetworkData>
+    public class FireShooterProjectile : DiceEvent
+    {
+        public override string EventName => "Shooter!";
+
+        public override string EventID => "shooterP";
+
+        protected override DiceTier DiceTier => DiceTier.D4;
+
+        public override void TriggerHost()
+        {
+            PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent localPlayer);
+            if (PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent target, false))
+            {
+                ProjectileManager.WantToFireTargeting(ProjectileType.TargetingSmall, target, localPlayer.CamPos, localPlayer.Rotation * Vector3.forward, 1, 0f);
+            }
+        }
+    }
+
+    /*class FireShooterProjectile : global::DiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 
@@ -38,5 +56,5 @@ namespace TwitchDice.Twitch.Events.D4
             }
             return new NoNetworkData();
         }
-    }
+    }*/
 }

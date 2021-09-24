@@ -8,7 +8,7 @@ using LevelGeneration;
 
 namespace TwitchDice.Twitch.Events.D4
 {
-    public class FogCloud : OldDiceEvent<PFogCloud>
+/*    public class FogCloud : global::DiceEvent<PFogCloud>
     {
         public override bool RequireNetworking => true;
 
@@ -60,5 +60,5 @@ namespace TwitchDice.Twitch.Events.D4
     public struct PFogCloud
     {
         public JsonVector Position;
-    }
+    }*/
 }

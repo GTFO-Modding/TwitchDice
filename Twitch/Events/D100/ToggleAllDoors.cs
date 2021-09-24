@@ -5,7 +5,24 @@ using System.Text;
 
 namespace TwitchDice.Twitch.Events.D100
 {
-    public class ToggleAllDoors : OldDiceEvent<NoNetworkData>
+    public class ToggleAllDoors : DiceEvent
+    {
+        public override string EventName => "Toggle All Doors";
+
+        public override string EventID => "toggleAll";
+
+        protected override DiceTier DiceTier => DiceTier.D100;
+
+        public override void TriggerHost()
+        {
+            foreach (iLG_Door_Core doorCore in Builder.Current.m_currentFloor.GetComponentsInChildren<iLG_Door_Core>())
+            {
+                doorCore.AttemptOpenCloseInteraction(false);
+            }
+        }
+    }
+
+    /*public class ToggleAllDoors : global::DiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 
@@ -35,5 +52,5 @@ namespace TwitchDice.Twitch.Events.D100
             }
             return new NoNetworkData();
         }
-    }
+    }*/
 }

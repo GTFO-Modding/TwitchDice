@@ -20,7 +20,7 @@ namespace TwitchDice.Utilities
 
     internal static class EEA_MelonCoroutines
     {
-        const string Credit = "Shamelessly stolen from MelonLoader lmao";
+        public const string Credit = "Shamelessly stolen from MelonLoader lmao";
         private struct CoroTuple
         {
             public object WaitCondition;

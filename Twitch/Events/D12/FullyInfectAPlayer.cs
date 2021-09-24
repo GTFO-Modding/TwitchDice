@@ -7,7 +7,49 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D12
 {
-    public class FullyInfectAPlayer : OldDiceEvent<TargetPlayer>
+    public class FullyInfectAPlayer : DiceEvent<Splat>
+    {
+        public override string EventName => "Fully Infect A Player";
+
+        public override string EventID => "infect";
+
+        protected override DiceTier DiceTier => DiceTier.D12;
+
+        public override void ReceiveClient(ulong sender, Splat packet)
+        {
+            PlaySplat();
+        }
+
+        public override void TriggerHost()
+        {
+            if (PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent target))
+            {
+                target.Damage.ModifyInfection(new pInfection() { amount = 10, mode = pInfectionMode.Add }, true, true);
+            }
+
+            if (target.IsLocallyOwned)
+                PlaySplat();
+            else
+                TriggerClient(new Splat(), target.Owner);
+        }
+
+        private void PlaySplat()
+        {
+            if (ScreenLiquidManager.TryApply(ScreenLiquidSettingName.spitterJizz, PlayerUtil.LocalPlayerAgent.Position, 10))
+            {
+                PlayerUtil.LocalPlayerAgent.Sound.Post(EVENTS.VISOR_SPLATTER_INFECTION);
+            }
+        }
+    }
+    public struct Splat
+    {
+
+    }
+
+
+
+    /*
+    public class FullyInfectAPlayer : global::DiceEvent<TargetPlayer>
     {
         public override bool RequireNetworking => false;
 
@@ -52,5 +94,5 @@ namespace TwitchDice.Twitch.Events.D12
                 }
             }
         }
-    }
+    }*/
 }

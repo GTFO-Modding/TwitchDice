@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Reflection;
 using BepInEx;
 using BepInEx.IL2CPP;
 using BepInEx.Logging;
-using CellMenu;
 using HarmonyLib;
 using TwitchDice.Components;
 using TwitchDice.Twitch;
@@ -10,7 +10,10 @@ using TwitchDice.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.CrashReportHandler;
-using Nidhogg;
+using System.Collections.Generic;
+using System.Linq;
+using Nidhogg.Managers;
+using System.Runtime.InteropServices;
 
 namespace TwitchDice
 {
@@ -25,30 +28,45 @@ namespace TwitchDice
             GUID = "com." + AUTHOR + "." + NAME,
             OVERRIDE_NAME = "dakkhuza",
             EVENT_ID_KEY = "eventId",
-            EVENT_INFO_KEY = "eventInfo";
+            EVENT_INFO_KEY = "eventInfo",
+            CONFIG_TWITCH_SECTION = "Twitch",
+            CONFIG_DICE_SECTION = "Dice Tiers"
+            ;
 
         public const bool DEBUG = true;
 
         public static ManualLogSource log;
+        public static Main Instance;
         public static GameObject DiceMasterObject;
+        public static EventManager EventManager;
         public static System.Random rnd = new System.Random();
 
         public override void Load()
         {
             CrashReportHandler.SetUserMetadata("Modded", "true");
+            Instance = this;
             log = Log;
             RegisterMonobehavior();
 
             var harmony = new Harmony(GUID);
-            var chatManagerEntryPoint = typeof(GS_Offline).GetMethod("Enter");
-            var chatManager = typeof(Main).GetMethod("CreateChatManager");
-            harmony.Patch(chatManagerEntryPoint, null, new HarmonyMethod(chatManager));
-
+            //var chatManagerEntryPoint = typeof(GS_Offline).GetMethod("Enter");
+            //var chatManager = typeof(Main).GetMethod("CreateChatManager");
+            //
+            //harmony.Patch(chatManagerEntryPoint, new HarmonyMethod(chatManager));
             harmony.PatchAll();
+
             Hooks.OnLobbyStart += Hooks_OnLobbyStart;
+
+            NetworkingManager.RegisterEvent<ChatMsg>(typeof(ChatMsg).Name, OnMessage);
+            EventManager = new EventManager();
         }
 
-        private static void RegisterMonobehavior()
+        private void OnMessage(ulong sender, ChatMsg message)
+        {
+            ChatUtil.Send(message.Message, (eGameEventChatLogType)message.LogType);
+        }
+
+        private void RegisterMonobehavior()
         {
             ClassInjector.RegisterTypeInIl2Cpp<DiceMaster>();
             ClassInjector.RegisterTypeInIl2Cpp<ChatManager>();
@@ -59,9 +77,11 @@ namespace TwitchDice
         private void Hooks_OnLobbyStart()
         {
             CreateDiceMaster();
+            CreateChatManager();
+            Hooks.OnLobbyStart -= Hooks_OnLobbyStart;
         }
 
-        public static void CreateDiceMaster()
+        public void CreateDiceMaster()
         {
             if (DiceMasterObject == null)
             {
@@ -76,12 +96,20 @@ namespace TwitchDice
             }
         }
 
-        public static void CreateChatManager()
+        public void CreateChatManager()
         {
             GameObject gameObject = new GameObject();
             gameObject.AddComponent<ChatManager>();
             UnityEngine.Object.DontDestroyOnLoad(gameObject);
             TwitchDice.Log.Message("Created Chat Manager!");
         }
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct ChatMsg
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 200)]
+        public string Message;
+        public int LogType;
     }
 }

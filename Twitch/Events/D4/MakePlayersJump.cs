@@ -5,7 +5,40 @@ using System.Text;
 
 namespace TwitchDice.Twitch.Events.D4
 {
-    public class MakePlayersJump : OldDiceEvent<NetworkedNoData>
+    public class AutoJump : DiceEvent<Jump>
+    {
+        public override string EventName => "yump";
+
+        public override string EventID => "jump";
+
+        protected override DiceTier DiceTier => DiceTier.D4;
+
+        public override void ReceiveClient(ulong sender, Jump packet)
+        {
+            MakePlayerJump();
+        }
+
+        public override void TriggerHost()
+        {
+            MakePlayerJump();
+            TriggerClient(new Jump());
+        }
+
+        private void MakePlayerJump()
+        {
+            if (PlayerManager.TryGetLocalPlayerAgent(out PlayerAgent agent))
+            {
+                if (agent.Damage.Health < 1f)
+                    agent.Locomotion.ChangeState(PlayerLocomotion.PLOC_State.Jump, true);
+            }
+        }
+    }
+
+    public struct Jump
+    {
+
+    }
+    /*public class MakePlayersJump : global::DiceEvent<NetworkedNoData>
     {
         public override bool RequireNetworking => true;
 
@@ -40,5 +73,5 @@ namespace TwitchDice.Twitch.Events.D4
                 agent.Locomotion.ChangeState(PlayerLocomotion.PLOC_State.Jump, true);
             }
         }
-    }
+    }*/
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TwitchDice.Twitch.Events.D4
 {
-    public class ShuffleResources : OldDiceEvent<NetworkedNoData>
+    /*public class ShuffleResources : global::DiceEvent<NetworkedNoData>
     {
         public override bool RequireNetworking => true;
 
@@ -36,5 +36,5 @@ namespace TwitchDice.Twitch.Events.D4
         {
 
         }
-    }
+    }*/
 }

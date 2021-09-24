@@ -12,14 +12,14 @@ namespace TwitchDice.Twitch
     public enum DiceTier
     {
         INVALID,
-        D3,
-        D4,
-        D6,
-        D8,
-        D12,
-        D20,
-        D50,
-        D100
+        D3 = 3,
+        D4 = 4,
+        D6 = 6,
+        D8 = 8,
+        D12 = 12,
+        D20 = 20,
+        D50 = 50,
+        D100 = 100
     }
 
     public class DiceMaster : MonoBehaviour
@@ -27,7 +27,7 @@ namespace TwitchDice.Twitch
         public DiceMaster(IntPtr intPtr) : base(intPtr) { }
 
         public TwitchManager TwitchManager;
-
+        private readonly Queue<EventInfo> EventQueue = new Queue<EventInfo>();
         private DiceMasterState _state = DiceMasterState.InLobbySetup;
         private DiceMasterState State
         {
@@ -68,13 +68,10 @@ namespace TwitchDice.Twitch
             }
         }
 
-        private readonly Queue<EventInfo> EventQueue = new Queue<EventInfo>();
-
         void Awake()
         {
             Hooks.OnFail += Hooks_OnFail;
             Hooks.OnLobbyLeave += Hooks_OnLobbyLeave;
-            Hooks.LobbyDataUpdated += Hooks_LobbyDataUpdated;
             RundownManager.add_OnExpeditionGameplayStarted((Il2CppSystem.Action)RundownManager_OnExpeditionGameplayStarted);
 
             #region Twitch
@@ -101,23 +98,11 @@ namespace TwitchDice.Twitch
             {
                 Log.Debug("Incoming chat message");
                 if (State != DiceMasterState.InLevel || !IsHost || !Main.DEBUG) return;
-                EventManager.TryActivateEvent(data, "");
+                Main.EventManager.TryActivateEvent(data, player.NickName);
             }));
 //#endif
             #endregion
 
-        }
-
-        private void Hooks_LobbyDataUpdated(Steamworks.LobbyDataUpdate_t obj)
-        {
-            if (State == DiceMasterState.InLevel && !IsHost)
-            {
-                var lobby = new CSteamID(obj.m_ulSteamIDLobby);
-                string id = SteamMatchmaking.GetLobbyData(lobby, Main.EVENT_ID_KEY);
-                string networkInfo = SteamMatchmaking.GetLobbyData(lobby, Main.EVENT_INFO_KEY);
-
-                EventManager.TryActivateEvent(id, networkInfo);
-            }
         }
 
         private void Hooks_OnFail()
@@ -131,13 +116,15 @@ namespace TwitchDice.Twitch
             switch(State)
             {
                 case DiceMasterState.InLobby:
+                    //Create event list
+
 
                     break;
 
                 case DiceMasterState.InLevel:
                     if (EventQueue.TryDequeue(out EventInfo info))
                     {
-                        if (!EventManager.TryActivateEventOfTier(info))
+                        if (!Main.EventManager.TryActivateEventOfTier(info.Tier, info.ActivatorUsername))
                         {
                             Log.Warning("Failed to activate event!");
                         }
@@ -203,6 +190,12 @@ namespace TwitchDice.Twitch
             InLobby,
             InLevel,
             Disconnect
+        }
+
+        struct EventInfo
+        {
+            public string ActivatorUsername;
+            public DiceTier Tier;
         }
     }
 }

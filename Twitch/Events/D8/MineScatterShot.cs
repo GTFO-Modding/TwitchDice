@@ -7,7 +7,36 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D8
 {
-    public class MineScatterShot : OldDiceEvent<NoNetworkData>
+    public class MineSS : DiceEvent
+    {
+        public override string EventName => "Mine Scatter Shot";
+
+        public override string EventID => "mineSS";
+
+        protected override DiceTier DiceTier => DiceTier.D8;
+
+        private readonly int MineCount = 10;
+
+        public override void TriggerHost()
+        {
+            var mine = new pItemData
+            {
+                itemID_gearCRC = 125U
+            };
+
+            PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent LocalPlayer, true);
+
+            var hits = SpawnUtil.GetRandomScatterAround(LocalPlayer.EyePosition, MineCount);
+
+            foreach (var hit in hits)
+            {
+                Vector3 direction = (hit.point - LocalPlayer.EyePosition).normalized;
+                var rot = Quaternion.LookRotation(direction, Vector3.up);
+                ItemReplicationManager.SpawnItem(mine, null, ItemMode.Instance, hit.point, rot, LocalPlayer.CourseNode, LocalPlayer);
+            }
+        }
+    }
+    /*public class MineScatterShot : global::DiceEvent<NoNetworkData>
     {
         public override bool RequireNetworking => false;
 
@@ -49,5 +78,5 @@ namespace TwitchDice.Twitch.Events.D8
             
             return NoNetworkData;
         }
-    }
+    }*/
 }

@@ -19,7 +19,7 @@ namespace TwitchDice
     /// </summary>
     public class TwitchManager
     {
-        private const string Credit = "Shamelessly yoinked from here https://github.com/JustDerb/RoR2-VsTwitch/blob/30ba6012074e39a8a364c89501ac4d4402dd9aab/Twitch/TwitchManager.cs";
+        public const string Credit = "Shamelessly yoinked from here https://github.com/JustDerb/RoR2-VsTwitch/blob/30ba6012074e39a8a364c89501ac4d4402dd9aab/Twitch/TwitchManager.cs";
 
         private TwitchClient TwitchClient = null;
         private TwitchAPI TwitchApi = null;
