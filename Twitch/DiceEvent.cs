@@ -66,6 +66,10 @@ namespace TwitchDice.Twitch
             Log.Debug($"Registered {EventName} with ID {EventID}");
         }
 
+        protected void TriggerClient()
+        {
+            TriggerClient(new T());
+        }
         protected void TriggerClient(T packet)
         {
             NetworkingManager.InvokeEvent(typeof(T).Name, packet);
