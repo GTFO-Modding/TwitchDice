@@ -8,7 +8,6 @@ using UnityEngine;
 
 namespace TwitchDice.Twitch.Events
 {
-    //[RegisterEvent("Randomize Zone Lighting", "randomZL", DiceTier.D3)]
     public class RandomZoneLighting : DiceEvent<RandomZLPacket>
     {
         public override string EventName => "Randomize Room Lighting";
