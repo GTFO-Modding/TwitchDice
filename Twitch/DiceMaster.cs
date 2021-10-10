@@ -78,13 +78,19 @@ namespace TwitchDice.Twitch
             if (IsHost)
             {
                 Log.Debug("Player is host, creating twitch connection...");
-                TwitchManager = new TwitchManager();
-                TwitchManager.OnMessageReceived += TwitchManager_OnMessageReceived;
-                TwitchManager.OnConnected += TwitchManager_OnConnected;
-                TwitchManager.OnDisconnected += TwitchManager_OnDisconnected;
-                TwitchManager.OnRewardRedeemed += TwitchManager_OnRewardRedeemed;
-                TwitchManager.Connect("dakkhuza", "oauth:hqw4efmrsna76m0a8pblxni5wqbcnn", "dakkhuza", "q6batx0epp608isickayubi39itsckt");
-                TwitchManager.OnConnected += TwitchManager_OnConnected;
+                if (!Main.SKIP_TWITCH)
+                {
+                    TwitchManager = new TwitchManager();
+                    TwitchManager.OnMessageReceived += TwitchManager_OnMessageReceived;
+                    TwitchManager.OnConnected += TwitchManager_OnConnected;
+                    TwitchManager.OnDisconnected += TwitchManager_OnDisconnected;
+                    TwitchManager.OnRewardRedeemed += TwitchManager_OnRewardRedeemed;
+                    TwitchManager.Connect(Main.Secrets);
+                    TwitchManager.OnConnected += TwitchManager_OnConnected;
+                } else
+                {
+                    State = DiceMasterState.InLobby;
+                }
             }
             else
             {
@@ -116,9 +122,6 @@ namespace TwitchDice.Twitch
             switch(State)
             {
                 case DiceMasterState.InLobby:
-                    //Create event list
-
-
                     break;
 
                 case DiceMasterState.InLevel:
@@ -154,7 +157,8 @@ namespace TwitchDice.Twitch
 
         private void RundownManager_OnExpeditionGameplayStarted()
         {
-            State = DiceMasterState.InLevel;
+            if (State == DiceMasterState.InLobby)
+                State = DiceMasterState.InLevel;
         }
 
         private void TwitchManager_OnRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnRewardRedeemedArgs e)

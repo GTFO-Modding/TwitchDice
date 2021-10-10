@@ -40,6 +40,11 @@ namespace TwitchDice
             DebugLogs = false;
         }
 
+        public void Connect(Secrets secrets)
+        {
+            Connect(secrets.Channel, secrets.ImplicitOAuth, secrets.Username, secrets.ClientID);
+        }
+
         public void Connect(string channel, string oauthToken, string username, string clientId)
         {
             var http = new HttpClient();

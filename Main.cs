@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nidhogg.Managers;
 using System.Runtime.InteropServices;
+using BepInEx.Configuration;
 
 namespace TwitchDice
 {
@@ -27,19 +28,32 @@ namespace TwitchDice
             VERSION = "1.0.0",
             GUID = "com." + AUTHOR + "." + NAME,
             OVERRIDE_NAME = "dakkhuza",
-            EVENT_ID_KEY = "eventId",
-            EVENT_INFO_KEY = "eventInfo",
             CONFIG_TWITCH_SECTION = "Twitch",
-            CONFIG_DICE_SECTION = "Dice Tiers"
-            ;
+            CONFIG_TWITCH_CHANNEL_KEY = "Channel",
+            CONFIG_TWITCH_CHANNEL_DESC = "The name of the twitch channel to connect to",
 
-        public const bool DEBUG = true;
+            CONFIG_TWITCH_USERNAME_KEY = "Username",
+            CONFIG_TWITCH_USERNAME_DESC = "The username to login as",
+
+            CONFIG_TWITCH_IMPLICITOAUTH_KEY = "OAuth",
+            CONFIG_TWITCH_IMPLICITOAUTH_DESC = "The OAuth token for the user",
+
+            CONFIG_DICE_SECTION = "Dice Tiers";
+
+        public static bool DEBUG = true;
+        public static bool SKIP_TWITCH = true;
 
         public static ManualLogSource log;
         public static Main Instance;
         public static GameObject DiceMasterObject;
         public static EventManager EventManager;
         public static System.Random rnd = new System.Random();
+        public static Secrets Secrets;
+
+        //Config
+        private ConfigEntry<string> configChannel;
+        private ConfigEntry<string> configUsername;
+        private ConfigEntry<string> configImplicitOAuth;
 
         public override void Load()
         {
@@ -47,18 +61,28 @@ namespace TwitchDice
             Instance = this;
             log = Log;
             RegisterMonobehavior();
+            SetupConfig();
 
             var harmony = new Harmony(GUID);
-            //var chatManagerEntryPoint = typeof(GS_Offline).GetMethod("Enter");
-            //var chatManager = typeof(Main).GetMethod("CreateChatManager");
-            //
-            //harmony.Patch(chatManagerEntryPoint, new HarmonyMethod(chatManager));
             harmony.PatchAll();
 
             Hooks.OnLobbyStart += Hooks_OnLobbyStart;
 
             NetworkingManager.RegisterEvent<ChatMsg>(typeof(ChatMsg).Name, OnMessage);
             EventManager = new EventManager();
+        }
+
+        private void SetupConfig()
+        {
+            configChannel = Config.Bind(CONFIG_TWITCH_SECTION, CONFIG_TWITCH_CHANNEL_KEY, "", CONFIG_TWITCH_CHANNEL_DESC);
+            configUsername = Config.Bind(CONFIG_TWITCH_SECTION, CONFIG_TWITCH_USERNAME_KEY, "", CONFIG_TWITCH_USERNAME_DESC);
+            configImplicitOAuth = Config.Bind(CONFIG_TWITCH_SECTION, CONFIG_TWITCH_IMPLICITOAUTH_KEY, "", CONFIG_TWITCH_IMPLICITOAUTH_DESC);
+            Secrets = new Secrets()
+            {
+                Channel = configChannel.Value,
+                Username = configUsername.Value,
+                ImplicitOAuth = configImplicitOAuth.Value
+            };
         }
 
         private void OnMessage(ulong sender, ChatMsg message)
