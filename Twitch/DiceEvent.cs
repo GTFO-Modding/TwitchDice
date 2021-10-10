@@ -96,7 +96,7 @@ namespace TwitchDice.Twitch
         public override void Register()
         {
             if (_registered) return;
-            NetworkingManager.RegisterEvent<T>($"{GetType().Name}_{typeof(T).Name}", ReceiveClient);
+            NetworkingManager.RegisterEvent<T>($"TwitchDice_DiceEvent_{typeof(T).Name}", ReceiveClient);
             _registered = true;
             Log.Debug($"Registered {EventName} with ID {EventID}");
         }
@@ -110,17 +110,17 @@ namespace TwitchDice.Twitch
         }
         protected void TriggerClient(T packet)
         {
-            NetworkingManager.InvokeEvent(typeof(T).Name, packet);
+            NetworkingManager.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet);
         }
 
         protected void TriggerClient(T packet, SNet_Player target)
         {
-            NetworkingManager.InvokeEvent(typeof(T).Name, packet, target);
+            NetworkingManager.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet, target);
         }
 
         protected void TriggerClient(T packet, List<SNet_Player> players)
         {
-            NetworkingManager.InvokeEvent(typeof(T).Name, packet, players);
+            NetworkingManager.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet, players);
         }
 
         /// <summary>
