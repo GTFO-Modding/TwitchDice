@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using HarmonyLib;
+using Player;
 using SNetwork;
 using Steamworks;
+using TwitchDice.Utilities;
 
 namespace TwitchDice
 {
@@ -51,6 +53,19 @@ namespace TwitchDice
         public static void GS_AfterLevel()
         {
             Cleanup?.Invoke();
+        }
+
+        [HarmonyPatch(typeof(PlayerLocomotion), nameof(PlayerLocomotion.CrouchInput))]
+        [HarmonyPrefix]
+        public static bool CrouchInput(PlayerAgent player, ref bool __result)
+        {
+            if ((player?.IsLocallyOwned ?? false) && CrouchingManager.ForceCrouchEnabled)
+            {
+                __result = true;
+                return false;
+            }
+
+            return true;
         }
     }
 }
