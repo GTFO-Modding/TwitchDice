@@ -30,7 +30,9 @@ namespace TwitchDice.Twitch.Events.D6
 
         private void Jump()
         {
-            PlayerUtil.LocalPlayerAgent.PlayerCharacterController.Move(Vector3.up * Magnitude);
+            var localPlayer = PlayerUtil.LocalPlayerAgent;
+            if (localPlayer.Alive)
+                PlayerUtil.LocalPlayerAgent.PlayerCharacterController.Move(Vector3.up * Magnitude);
         }
     }
 

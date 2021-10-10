@@ -28,7 +28,7 @@ namespace TwitchDice.Twitch.Events.D4
         {
             if (PlayerManager.TryGetLocalPlayerAgent(out PlayerAgent agent))
             {
-                if (agent.Locomotion.m_currentStateEnum != PlayerLocomotion.PLOC_State.Downed)
+                if (agent.Alive)
                     agent.Locomotion.ChangeState(PlayerLocomotion.PLOC_State.Jump, true);
             }
         }
