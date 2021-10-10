@@ -1,40 +1,45 @@
-﻿using System;
+﻿using Player;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D4
 {
-    /*public class ShuffleResources : global::DiceEvent<NetworkedNoData>
+    public class ShuffleResources : DiceEvent<ShuffleRes>
     {
-        public override bool RequireNetworking => true;
-
-        public override bool HasNetworkData => false;
-
         public override string EventName => "Shuffle Resources";
 
-        public override string EventId => "d4_shuffleR";
+        public override string EventID => "shuffleRes";
 
-        public override DiceTier Tier => DiceTier.D4;
+        protected override DiceTier DiceTier => DiceTier.D4;
 
-        public override bool CanBeTriggered()
-        {
-            return true;
-        }
-
-        protected override void TriggerClient(NetworkedNoData NetworkInfo)
+        public override void ReceiveClient(ulong sender, ShuffleRes packet)
         {
             Shuffle();
         }
 
-        protected override NetworkedNoData TriggerHost()
+        public override void TriggerHost()
         {
             Shuffle();
-            return new NetworkedNoData();
+            TriggerClient();
         }
 
         private void Shuffle()
         {
+            PlayerBackpack backpack = PlayerBackpackManager.LocalBackpack;
+            float main = backpack.AmmoStorage.StandardAmmo.AmmoInPack;
+            float special = backpack.AmmoStorage.SpecialAmmo.AmmoInPack;
+            float tool = backpack.AmmoStorage.ClassAmmo.AmmoInPack;
 
+            backpack.AmmoStorage.StandardAmmo.AmmoInPack = special;
+            backpack.AmmoStorage.StandardAmmo.AmmoInPack = tool;
+            backpack.AmmoStorage.ClassAmmo.AmmoInPack = main;
         }
-    }*/
+    }
+
+    public struct ShuffleRes
+    {
+
+    }
 }
