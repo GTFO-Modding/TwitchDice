@@ -22,8 +22,17 @@ namespace TwitchDice.Twitch
 
     public abstract class DiceEvent : IDiceEvent
     {
+        /// <summary>
+        /// The name of the event as displayed in chat, e.g. Explode Enemies
+        /// </summary>
         public abstract string EventName { get; }
+        /// <summary>
+        /// The ID of the event used to trigger it during testing
+        /// </summary>
         public abstract string EventID { get; }
+        /// <summary>
+        /// The default tier of this event
+        /// </summary>
         protected abstract DiceTier DiceTier { get; }
         private ConfigEntry<DiceTier> configEntry;
 
@@ -45,12 +54,22 @@ namespace TwitchDice.Twitch
             }
         }
 
+        /// <summary>
+        /// If the conditions are met for this event to be a valid event to trigger
+        /// </summary>
+        /// <returns></returns>
         public virtual bool CanBeTriggered()
         {
             return true;
         }
 
+        /// <summary>
+        /// Used internally to register this event for networking (if required)
+        /// </summary>
         public virtual void Register() { }
+        /// <summary>
+        /// Code that runs on the hosts end when this event is activated
+        /// </summary>
         public abstract void TriggerHost();
     }
 
@@ -66,6 +85,9 @@ namespace TwitchDice.Twitch
             Log.Debug($"Registered {EventName} with ID {EventID}");
         }
 
+        /// <summary>
+        /// Triggers this event on the client with an optional packet
+        /// </summary>
         protected void TriggerClient()
         {
             TriggerClient(new T());
@@ -85,6 +107,11 @@ namespace TwitchDice.Twitch
             NetworkingManager.InvokeEvent(typeof(T).Name, packet, players);
         }
 
+        /// <summary>
+        /// Code that runs on the client when it recieves a packet for this event
+        /// </summary>
+        /// <param name="sender">The host</param>
+        /// <param name="packet">The recieved packet</param>
         public abstract void ReceiveClient(ulong sender, T packet);
     }
 
