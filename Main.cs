@@ -63,7 +63,7 @@ namespace TwitchDice
             Instance = this;
             log = Log;
 
-            RegisterMonobehavior();
+            RegisterMonoBehavior();
             SetupConfig();
 
             var harmony = new Harmony(GUID);
@@ -92,7 +92,7 @@ namespace TwitchDice
             ChatUtil.Send(message.Message, (eGameEventChatLogType)message.LogType);
         }
 
-        private void RegisterMonobehavior()
+        private void RegisterMonoBehavior()
         {
             ClassInjector.RegisterTypeInIl2Cpp<DiceMaster>();
             ClassInjector.RegisterTypeInIl2Cpp<ChatManager>();
