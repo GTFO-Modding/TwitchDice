@@ -26,9 +26,10 @@ namespace TwitchDice.Twitch.Events.D100
                 var spawnCenter = player.CourseNode;
                 foreach (var portal in spawnCenter.m_portals)
                 {
-                    if (portal.GetOppositeNode(spawnCenter).NodeID == nodeID)
+                    var oppositeNode = portal.GetOppositeNode(spawnCenter);
+                    if (oppositeNode.NodeID == nodeID)
                     {
-                        foreach (var enemy in portal.GetOppositeNode(spawnCenter).m_enemiesInNode)
+                        foreach (var enemy in oppositeNode.m_enemiesInNode)
                         {
                             if (enemy.GlobalID == enemyID)
                             {
