@@ -1,6 +1,7 @@
 ﻿using AIGraph;
 using Player;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using TwitchDice.Utilities;
@@ -31,7 +32,7 @@ namespace TwitchDice.Twitch.Events.D20
         {
             AIG_CourseNode chosenNode = NodeUtil.GetReachableNodes(PlayerUtil.LocalPlayerAgent.CourseNode, 100).GetRandomElement<AIG_CourseNode>();
             Vector3 randomPosInNode = chosenNode.GetRandomPositionInside();
-            PlayerUtil.LocalPlayerAgent.PlayerCharacterController.ManualMoveTo(randomPosInNode);
+            PlayerUtil.TeleportToPosition(PlayerUtil.LocalPlayerAgent, randomPosInNode);
         }
     }
 
