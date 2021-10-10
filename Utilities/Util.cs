@@ -100,6 +100,20 @@ namespace TwitchDice.Utilities
 
             return false;
         }
+
+        public static void TeleportToPosition(PlayerAgent player, Vector3 position)
+        {
+            TimedEvents.Start(Teleport(position));
+        }
+
+        private static IEnumerator Teleport(Vector3 pos)
+        {
+            PlayerUtil.LocalPlayerAgent.PlayerCharacterController.m_updateEnabled = false;
+            PlayerUtil.LocalPlayerAgent.PlayerCharacterController.ManualMoveTo(pos);
+            yield return new WaitForSeconds(0.5f);
+            PlayerUtil.LocalPlayerAgent.PlayerCharacterController.m_updateEnabled = true;
+            yield break;
+        }
     }
 
     public static class SpawnUtil
