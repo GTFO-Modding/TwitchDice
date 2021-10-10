@@ -65,7 +65,6 @@ namespace TwitchDice
 
             RegisterMonobehavior();
             SetupConfig();
-            CreateCoroutineManager();
 
             var harmony = new Harmony(GUID);
             harmony.PatchAll();
@@ -107,14 +106,6 @@ namespace TwitchDice
             CreateDiceMaster();
             CreateChatManager();
             Hooks.OnLobbyStart -= Hooks_OnLobbyStart;
-        }
-
-        private void CreateCoroutineManager()
-        {
-            GameObject gameObject = new GameObject();
-            gameObject.AddComponent<ManagerCoroutine>();
-            UnityEngine.Object.DontDestroyOnLoad(gameObject);
-            TwitchDice.Log.Message("Created Coroutine Manager");
         }
 
         public void CreateDiceMaster()
