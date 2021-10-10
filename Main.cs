@@ -28,6 +28,7 @@ namespace TwitchDice
             VERSION = "1.0.0",
             GUID = "com." + AUTHOR + "." + NAME,
             OVERRIDE_NAME = "dakkhuza",
+
             CONFIG_TWITCH_SECTION = "Twitch",
             CONFIG_TWITCH_CHANNEL_KEY = "Channel",
             CONFIG_TWITCH_CHANNEL_DESC = "The name of the twitch channel to connect to",
@@ -38,7 +39,8 @@ namespace TwitchDice
             CONFIG_TWITCH_IMPLICITOAUTH_KEY = "OAuth",
             CONFIG_TWITCH_IMPLICITOAUTH_DESC = "The OAuth token for the user",
 
-            CONFIG_DICE_SECTION = "Dice Tiers";
+            CONFIG_EVENTS_SECTION = "Enabled Events",
+            CONFIG_DICE_SECTION = "Event Tiers";
 
         public static bool DEBUG = true;
         public static bool SKIP_TWITCH = true;

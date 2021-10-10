@@ -33,6 +33,8 @@ namespace TwitchDice.Twitch
 
                 IDiceEvent diceEvent = (diceType as IDiceEvent);
 
+                if (!diceEvent.Enabled) continue;
+
                 Events.Add(diceEvent.EventID, diceEvent);
                 diceEvent.Register();
             }

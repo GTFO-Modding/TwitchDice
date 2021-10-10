@@ -14,6 +14,7 @@ namespace TwitchDice.Twitch
     {
         string EventID { get; }
         string EventName { get; }
+        bool Enabled { get; }
         DiceTier Tier { get; }
         bool CanBeTriggered();
         void Register();
@@ -34,7 +35,8 @@ namespace TwitchDice.Twitch
         /// The default tier of this event
         /// </summary>
         protected abstract DiceTier DiceTier { get; }
-        private ConfigEntry<DiceTier> configEntry;
+        private ConfigEntry<DiceTier> tierConfig;
+        private ConfigEntry<bool> enabled;
 
         public DiceEvent()
         {
@@ -44,13 +46,27 @@ namespace TwitchDice.Twitch
         {
             get
             {
-                configEntry = Main.Instance.Config.Bind(
+                tierConfig = Main.Instance.Config.Bind(
                     Main.CONFIG_DICE_SECTION,
-                    EventID,
+                    EventName,
                     DiceTier,
                     $"Set the tier for {EventName}"
                     );
-                return configEntry.Value;
+                return tierConfig.Value;
+            }
+        }
+
+        public bool Enabled
+        {
+            get
+            {
+                enabled = Main.Instance.Config.Bind(
+                    Main.CONFIG_EVENTS_SECTION,
+                    $"Enable {EventName}",
+                    true,
+                    $"Set if {EventName} can be activated"
+                    );
+                return enabled.Value;
             }
         }
 
