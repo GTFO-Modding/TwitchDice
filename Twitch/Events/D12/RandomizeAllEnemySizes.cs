@@ -22,7 +22,7 @@ namespace TwitchDice.Twitch.Events.D12
 
             foreach (var enemy in GameObject.FindObjectsOfType<EnemyAgent>())
             {
-                enemy.transform.localScale = enemy.transform.localScale * (random.Next(20, 150) / 100f);
+                enemy.transform.localScale = enemy.transform.localScale * (random.Next(75, 125) / 100f);
             }
         }
 
