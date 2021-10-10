@@ -7,7 +7,7 @@ using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D6
 {
-    public class LaunchPlayers : DiceEvent<Jump>
+    public class LaunchPlayers : DiceEvent<Launch>
     {
         public override string EventName => "Blastoff!";
 
@@ -20,10 +20,10 @@ namespace TwitchDice.Twitch.Events.D6
         public override void TriggerHost()
         {
             Jump();
-            TriggerClient(new D6.Jump());
+            TriggerClient(new Launch());
         }
 
-        public override void ReceiveClient(ulong sender, Jump packet)
+        public override void ReceiveClient(ulong sender, Launch packet)
         {
             Jump();
         }
@@ -34,5 +34,5 @@ namespace TwitchDice.Twitch.Events.D6
         }
     }
 
-    public struct Jump { }
+    public struct Launch { }
 }
