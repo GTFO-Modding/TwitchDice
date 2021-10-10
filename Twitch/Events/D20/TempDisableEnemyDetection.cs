@@ -16,9 +16,9 @@ namespace TwitchDice.Twitch.Events.D20
 
         protected override DiceTier DiceTier => DiceTier.D20;
 
-        private static float GetRandomActivationTime() // 15sec - 1min
+        private static float GetRandomActivationTime() // 15sec - 30sec
         {
-            return (float)(Math.Floor(Main.rnd.NextDouble() * 45) + 15);
+            return (float)(Math.Floor(Main.rnd.NextDouble() * 15) + 15);
         }
 
         private IEnumerator DoTriggerEvent(float seconds)

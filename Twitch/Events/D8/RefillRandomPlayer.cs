@@ -18,7 +18,7 @@ namespace TwitchDice.Twitch.Events.D8
 
         public override void ReceiveClient(ulong sender, RRP packet)
         {
-            if (PlayerUtil.LocalPlayerAgent.GlobalID == packet.PlayerID)
+            if (PlayerUtil.LocalPlayerAgent.Owner.Lookup == packet.PlayerID)
             {
                 this.TriggerCommon();
             }
@@ -55,11 +55,11 @@ namespace TwitchDice.Twitch.Events.D8
     [StructLayout(LayoutKind.Sequential)]
     public struct RRP
     {
-        public ushort PlayerID;
+        public ulong PlayerID;
 
         public RRP(PlayerAgent player)
         {
-            this.PlayerID = player.GlobalID;
+            this.PlayerID = player.Owner.Lookup;
         }
     }
 }
