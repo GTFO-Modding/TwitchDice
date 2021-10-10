@@ -7,18 +7,7 @@ using UnityEngine;
 
 namespace TwitchDice.Utilities
 {
-    public class ManagerCoroutine : MonoBehaviour
-    {
-        public ManagerCoroutine(IntPtr intPtr) : base(intPtr)
-        {
-        }
-        public void Update()
-        {
-            Coroutines.Process();
-        }
-    }
-
-    internal static class Coroutines
+    internal static class TimedEvents
     {
         public const string Credit = "Shamelessly stolen from MelonLoader lmao";
         private struct CoroTuple
