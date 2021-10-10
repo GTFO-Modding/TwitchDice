@@ -24,12 +24,13 @@ namespace TwitchDice.Utilities
             Send(messageInfo.message, messageInfo.chatLogType);
         }
 
-        public static void Send(string message, eGameEventChatLogType chatLogType = eGameEventChatLogType.GameEvent)
+        public static void Send(string message, eGameEventChatLogType chatLogType = eGameEventChatLogType.GameEvent, bool networksync = true)
         {
             GuiManager.PlayerLayer.m_gameEventLog.AddLogItem(message, chatLogType);
             CM_PageLoadout.Current.m_gameEventLog.AddLogItem(message, chatLogType);
             CM_PageMap.Current.m_gameEventLog.AddLogItem(message, chatLogType);
 
+            if (!networksync) return;
             ChatMsg chatMsg = new ChatMsg() { Message = message, LogType = (int)chatLogType };
             if (PlayerUtil.IsHost) NetworkingManager.InvokeEvent(typeof(ChatMsg).Name, chatMsg);
         }
@@ -187,10 +188,11 @@ namespace TwitchDice.Utilities
         }
     }
 
-    public struct MessageQueueInfo
+    public class MessageQueueInfo
     {
         public string message;
         public eGameEventChatLogType chatLogType;
+        public bool networkSync = true;
     }
 
     public struct JsonVector
@@ -211,10 +213,10 @@ namespace TwitchDice.Utilities
     {
         public static Queue<MessageQueueInfo> MessageQueue = new Queue<MessageQueueInfo>();
 
-        public static void DiceMasterSpeak(string message)
+        public static void DiceMasterSpeak(string message, bool networksync = true)
         {
             string formattedMessage = $"<size=200%><color=red>DICE MASTER</color><color=white>: {message}</color></size>";
-            Send(formattedMessage, eGameEventChatLogType.Alert);
+            Send(formattedMessage, eGameEventChatLogType.Alert, networksync);
             Log.Debug($"DiceMasterSpeak :: {formattedMessage}");
         }
 
@@ -255,9 +257,9 @@ namespace TwitchDice.Utilities
             Log.Debug($"EventSpeak :: {formattredMessage}");
         }
 
-        public static void Send(string message, eGameEventChatLogType chatLogType = eGameEventChatLogType.GameEvent)
+        public static void Send(string message, eGameEventChatLogType chatLogType = eGameEventChatLogType.GameEvent, bool networksync = true)
         {
-            MessageQueue.Enqueue(new MessageQueueInfo() { message = message, chatLogType = chatLogType });
+            MessageQueue.Enqueue(new MessageQueueInfo() { message = message, chatLogType = chatLogType, networkSync = networksync });
         }
     }
 

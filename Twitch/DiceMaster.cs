@@ -42,10 +42,10 @@ namespace TwitchDice.Twitch
                 switch(value)
                 {
                     case DiceMasterState.InLobby:
-                        ChatUtil.DiceMasterSpeak($"READY // {(IsHost ? "<color=orange>HOST</color>" : "<color=orange>CLIENT</color>")} // <color=red>WAITING FOR DROP</color>");
+                        ChatUtil.DiceMasterSpeak($"READY // {(IsHost ? "<color=orange>HOST</color>" : "<color=orange>CLIENT</color>")} // <color=red>WAITING FOR DROP</color>", false);
                         break;
                     case DiceMasterState.InLevel:
-                        ChatUtil.DiceMasterSpeak("IN LEVEL // <color=red>GET READY</color> // ");
+                        ChatUtil.DiceMasterSpeak("IN LEVEL // <color=red>GET READY</color> // ", false);
                         break;
                 }
 
