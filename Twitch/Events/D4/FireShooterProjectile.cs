@@ -17,10 +17,10 @@ namespace TwitchDice.Twitch.Events.D4
 
         public override void TriggerHost()
         {
-            PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent localPlayer);
+            PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent sourcePlayer);
             if (PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent target, false))
             {
-                ProjectileManager.WantToFireTargeting(ProjectileType.TargetingSmall, target, localPlayer.CamPos, localPlayer.Rotation * Vector3.forward, 1, 0f);
+                ProjectileManager.WantToFireTargeting(ProjectileType.TargetingSmall, target, sourcePlayer.EyePosition, sourcePlayer.Rotation * Vector3.forward, 1, 0f);
             }
         }
     }
