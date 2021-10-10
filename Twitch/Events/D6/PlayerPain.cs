@@ -24,7 +24,7 @@ namespace TwitchDice.Twitch.Events.D6
         private void TriggerCommon()
         {
             var player = PlayerUtil.LocalPlayerAgent;
-            player.Damage.NoAirDamage(player.Damage.Health / 0.1f);
+            player.Damage.NoAirDamage(player.Damage.Health * 0.1f);
         }
 
         public override void TriggerHost()
