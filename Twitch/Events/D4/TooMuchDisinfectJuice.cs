@@ -4,9 +4,49 @@ using System.Collections.Generic;
 using System.Text;
 using TwitchDice.Utilities;
 using UnityEngine;
+using AK;
 
 namespace TwitchDice.Twitch.Events.D4
 {
+    public class TooMuchDisinfect : DiceEvent<TMD>
+    {
+        public override string EventName => "Too Much Juice";
+
+        public override string EventID => "juice";
+
+        protected override DiceTier DiceTier => DiceTier.D4;
+
+        const int splatAmount = 10;
+
+        public override void ReceiveClient(ulong sender, TMD packet)
+        {
+            PlaySplat();
+        }
+
+        public override void TriggerHost()
+        {
+            PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent target);
+            if (target.IsLocallyOwned)
+                PlaySplat();
+            else
+                TriggerClient(new TMD(), target.Owner);
+        }
+
+        private void PlaySplat()
+        {
+            for (int i = 0; i < splatAmount; i++)
+            {
+                if (ScreenLiquidManager.TryApply(ScreenLiquidSettingName.spitterJizz, PlayerUtil.LocalPlayerAgent.Position, 10))
+                {
+                    PlayerUtil.LocalPlayerAgent.Sound.Post(EVENTS.DISINFECTION_SPRAY_ON_VISOR);
+                }
+            }
+        }
+    }
+
+    public struct TMD
+    {
+    }
     //public class TooMuchDisinfectJuice : global::DiceEvent<TargetPlayer>
     //{
     //    public override bool RequireNetworking => true;
