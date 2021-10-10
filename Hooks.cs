@@ -57,15 +57,25 @@ namespace TwitchDice
 
         [HarmonyPatch(typeof(PlayerLocomotion), nameof(PlayerLocomotion.CrouchInput))]
         [HarmonyPrefix]
-        public static bool CrouchInput(PlayerAgent player, ref bool __result)
+        public static bool CrouchInput(PlayerAgent owner, ref bool __result)
         {
-            if ((player?.IsLocallyOwned ?? false) && CrouchingManager.ForceCrouchEnabled)
+            if ((owner?.IsLocallyOwned ?? false) && PlayerControlManager.ForceCrouchEnabled)
             {
                 __result = true;
                 return false;
             }
 
             return true;
+        }
+
+        [HarmonyPatch(typeof(InputMapper), nameof(InputMapper.GetAxisKeyMouseGamepad))]
+        [HarmonyPostfix]
+        public static void GetAxisKeyMouseGamepad(ref float __result)
+        {
+            if (PlayerControlManager.InvertControls)
+            {
+                __result = -__result;
+            }
         }
     }
 }
