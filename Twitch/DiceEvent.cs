@@ -62,7 +62,7 @@ namespace TwitchDice.Twitch
             {
                 enabled = Main.Instance.Config.Bind(
                     Main.CONFIG_EVENTS_SECTION,
-                    $"Enable {EventName}",
+                    $"Enable {EventName.Replace(" ", "")}",
                     true,
                     $"Set if {EventName} can be activated"
                     );
