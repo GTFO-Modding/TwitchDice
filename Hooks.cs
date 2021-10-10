@@ -68,6 +68,22 @@ namespace TwitchDice
             return true;
         }
 
+        [HarmonyPatch(typeof(Dam_PlayerDamageBase), nameof(Dam_PlayerDamageBase.OnIncomingDamage))]
+        [HarmonyPrefix]
+        public static void OnIncomingDamage(Dam_PlayerDamageBase __instance, float damage)
+        {
+            if (__instance.Owner.IsLocallyOwned)
+            {
+                foreach (var player in PlayerManager.PlayerAgentsInLevel)
+                {
+                    if (!player.IsLocallyOwned)
+                    {
+                        player.Damage.NoAirDamage(damage);
+                    }
+                }
+            }
+        }
+
         [HarmonyPatch(typeof(InputMapper), nameof(InputMapper.GetAxisKeyMouseGamepad))]
         [HarmonyPostfix]
         public static void GetAxisKeyMouseGamepad(InputAction action, ref float __result)
