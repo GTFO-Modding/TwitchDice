@@ -21,7 +21,7 @@ namespace TwitchDice.Twitch.Events.D100
             var errorAlarms = new List<ChainedPuzzleDataBlock>();
             foreach (var chainedPuzzle in ChainedPuzzleDataBlock.GetAllBlocks())
             {
-                if (chainedPuzzle.PublicAlarmName.Contains("ERROR"))
+                if (!chainedPuzzle.DisableSurvivalWaveOnComplete)
                 {
                     errorAlarms.Add(chainedPuzzle);
                 }
