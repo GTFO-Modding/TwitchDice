@@ -2,8 +2,10 @@
 
 using Enemies;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using TwitchDice.Utilities;
 using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D12
@@ -18,12 +20,28 @@ namespace TwitchDice.Twitch.Events.D12
 
         public override void ReceiveClient(ulong sender, RAES packet)
         {
-            var random = new System.Random(packet.Seed);
+            this.TriggerCommon(packet.Seed);
+        }
+
+        private IEnumerator ApplyScale(EnemyAgent enemy, float seconds, float multiplier)
+        {
+            enemy.transform.localScale = enemy.transform.localScale * multiplier;
+            yield return new WaitForSeconds(seconds);
+            if (enemy != null)
+            {
+                enemy.transform.localScale = enemy.transform.localScale / multiplier;
+            }
+        }
+
+        private void TriggerCommon(int seed)
+        {
+            var random = new System.Random(seed);
             var enemies = new List<EnemyAgent>(GameObject.FindObjectsOfType<EnemyAgent>());
             enemies.Sort((a, b) => a.GlobalID - b.GlobalID);
 
             foreach (var enemy in enemies)
             {
+                TimedEvents.Start(ApplyScale(enemy, 300f, random.Next(75, 125) / 100f));
                 enemy.transform.localScale = enemy.transform.localScale * (random.Next(75, 125) / 100f);
             }
         }
@@ -32,15 +50,7 @@ namespace TwitchDice.Twitch.Events.D12
         {
             int randomSeed = Main.rnd.Next(int.MinValue, int.MaxValue);
 
-            var enemies = new List<EnemyAgent>(GameObject.FindObjectsOfType<EnemyAgent>());
-            enemies.Sort((a, b) => a.GlobalID - b.GlobalID);
-
-            var random = new System.Random(randomSeed);
-
-            foreach (var enemy in enemies)
-            {
-                enemy.transform.localScale = enemy.transform.localScale * (random.Next(20, 150) / 100f);
-            }
+            this.TriggerCommon(randomSeed);
 
             this.TriggerClient(new RAES(randomSeed));
         }
