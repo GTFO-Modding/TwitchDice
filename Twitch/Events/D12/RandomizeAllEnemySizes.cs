@@ -3,6 +3,7 @@
 using Enemies;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D12
@@ -45,6 +46,7 @@ namespace TwitchDice.Twitch.Events.D12
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public struct RAES
     {
         public int Seed;
