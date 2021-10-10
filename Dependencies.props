@@ -18,17 +18,17 @@
     <BIELibsFolder>$(GameFolder)/BepInEx/core</BIELibsFolder>
     <MonoLibsFolder>$(GameFolder)/mono/Managed</MonoLibsFolder>
     <UnhollowedLibsFolder>$(GameFolder)/BepInEx/unhollowed</UnhollowedLibsFolder>
-	<PluginLibFolder>$(GameFolder)/Plugins</PluginLibFolder>
+    <PluginLibFolder>$(GameFolder)/Plugins</PluginLibFolder>
   </PropertyGroup>
 
-    <!-- Twitch Libs -->
-	<ItemGroup>
-		<!--Reference Include="../_twitchlib_2.0/*.dll"/-->
-    </ItemGroup>
+  <!-- Twitch Libs -->
+  <ItemGroup>
+    <!--Reference Include="../_twitchlib_2.0/*.dll"/-->
+  </ItemGroup>
 
-	<ItemGroup>
-		<Reference Include="$(PluginLibFolder)/*.dll" Private="false" />
-	</ItemGroup>
+  <ItemGroup>
+    <Reference Include="$(PluginLibFolder)/*.dll" Private="false" />
+  </ItemGroup>
 
   <!-- BepInEx libs -->
   <ItemGroup>
