@@ -10,11 +10,24 @@ namespace TwitchDice.Utilities
         public static bool InvertControls { get; set; }
         public static bool DisableInteractions { get; set; }
         public static bool DisableMovement { get; set; }
+        public static bool DamageAllPlayers { get; set; }
         
         private static IEnumerator _activeForceCrouch; // cache in case another force crouch is called.
         private static IEnumerator _activeInvertControls; // cache in case of another force invert controls is called.
         private static IEnumerator _activeDisableInteractions;
         private static IEnumerator _activeDisableMovement;
+        private static IEnumerator _activeEnableGlobalPlayerDamage;
+
+        public static void EnableGlobalPlayerDamage(float seconds)
+        {
+            if (_activeEnableGlobalPlayerDamage != null)
+            {
+                TimedEvents.Stop(_activeEnableGlobalPlayerDamage);
+            }
+
+            _activeEnableGlobalPlayerDamage = DoEnableGlobalPlayerDamage(seconds);
+            TimedEvents.Start(_activeEnableGlobalPlayerDamage);
+        }
 
         public static void DisableMovementForSeconds(float seconds)
         {
@@ -58,6 +71,14 @@ namespace TwitchDice.Utilities
 
             _activeForceCrouch = DoForceCrouchForSeconds(seconds);
             TimedEvents.Start(_activeForceCrouch);
+        }
+
+        private static IEnumerator DoEnableGlobalPlayerDamage(float seconds)
+        {
+            DamageAllPlayers = true;
+            yield return new WaitForSeconds(seconds);
+            DamageAllPlayers = false;
+            _activeEnableGlobalPlayerDamage = null;
         }
 
         private static IEnumerator DoDisableMovementForSeconds(float seconds)
