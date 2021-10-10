@@ -35,6 +35,8 @@ namespace TwitchDice.Twitch.Events.D4
             backpack.AmmoStorage.StandardAmmo.AmmoInPack = special;
             backpack.AmmoStorage.StandardAmmo.AmmoInPack = tool;
             backpack.AmmoStorage.ClassAmmo.AmmoInPack = main;
+
+            backpack.AmmoStorage.UpdateAllAmmoUI();
         }
     }
 
