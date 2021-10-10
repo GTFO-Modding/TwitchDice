@@ -102,22 +102,37 @@ namespace TwitchDice.Twitch
         }
 
         /// <summary>
-        /// Triggers this event on the client with an optional packet
+        /// Triggers this event on the client with a default packet
         /// </summary>
         protected void TriggerClient()
         {
             TriggerClient(new T());
         }
+
+        /// <summary>
+        /// Triggers this event on the client with a packet
+        /// </summary>
+        /// <param name="packet">The packet to send</param>
         protected void TriggerClient(T packet)
         {
             NetworkingManager.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet);
         }
 
+        /// <summary>
+        /// Triggers this event for the targeted player
+        /// </summary>
+        /// <param name="packet">The packet to send</param>
+        /// <param name="target">The target player</param>
         protected void TriggerClient(T packet, SNet_Player target)
         {
             NetworkingManager.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet, target);
         }
 
+        /// <summary>
+        /// Triggers this event for a list of players
+        /// </summary>
+        /// <param name="packet">The packet to send</param>
+        /// <param name="players">A list of players to send to</param>
         protected void TriggerClient(T packet, List<SNet_Player> players)
         {
             NetworkingManager.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet, players);
