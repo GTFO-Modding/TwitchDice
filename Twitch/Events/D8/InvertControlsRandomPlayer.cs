@@ -16,7 +16,7 @@ namespace TwitchDice.Twitch.Events.D8
 
         public override void ReceiveClient(ulong sender, ICR packet)
         {
-            if (packet.PlayerID == PlayerUtil.LocalPlayerAgent.GlobalID)
+            if (packet.PlayerID == PlayerUtil.LocalPlayerAgent.Owner.Lookup)
             {
                 PlayerControlManager.InvertControlsForSeconds(30f);
             }
@@ -41,11 +41,11 @@ namespace TwitchDice.Twitch.Events.D8
     [StructLayout(LayoutKind.Sequential)]
     public struct ICR
     {
-        public ushort PlayerID;
+        public ulong PlayerID;
 
         public ICR(PlayerAgent player)
         {
-            this.PlayerID = player.GlobalID;
+            this.PlayerID = player.Owner.Lookup;
         }
     }
 }
