@@ -2,6 +2,7 @@
 
 using Enemies;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D12
@@ -16,11 +17,11 @@ namespace TwitchDice.Twitch.Events.D12
 
         public override void ReceiveClient(ulong sender, RAES packet)
         {
-            int randomSeed = Main.rnd.Next(int.MinValue, int.MaxValue);
+            var random = new System.Random(packet.Seed);
+            var enemies = new List<EnemyAgent>(GameObject.FindObjectsOfType<EnemyAgent>());
+            enemies.Sort((a, b) => a.GlobalID - b.GlobalID);
 
-            var random = new System.Random(randomSeed);
-
-            foreach (var enemy in GameObject.FindObjectsOfType<EnemyAgent>())
+            foreach (var enemy in enemies)
             {
                 enemy.transform.localScale = enemy.transform.localScale * (random.Next(75, 125) / 100f);
             }
@@ -30,17 +31,27 @@ namespace TwitchDice.Twitch.Events.D12
         {
             int randomSeed = Main.rnd.Next(int.MinValue, int.MaxValue);
 
+            var enemies = new List<EnemyAgent>(GameObject.FindObjectsOfType<EnemyAgent>());
+            enemies.Sort((a, b) => a.GlobalID - b.GlobalID);
+
             var random = new System.Random(randomSeed);
 
-            foreach (var enemy in GameObject.FindObjectsOfType<EnemyAgent>())
+            foreach (var enemy in enemies)
             {
                 enemy.transform.localScale = enemy.transform.localScale * (random.Next(20, 150) / 100f);
             }
 
-            this.TriggerClient();
+            this.TriggerClient(new RAES(randomSeed));
         }
     }
 
     public struct RAES
-    { }
+    {
+        public int Seed;
+
+        public RAES(int seed)
+        {
+            this.Seed = seed;
+        }
+    }
 }
