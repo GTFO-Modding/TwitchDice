@@ -62,14 +62,15 @@ namespace TwitchDice
             CrashReportHandler.SetUserMetadata("Modded", "true");
             Instance = this;
             log = Log;
+
             RegisterMonobehavior();
             SetupConfig();
+            CreateCoroutineManager();
 
             var harmony = new Harmony(GUID);
             harmony.PatchAll();
 
             Hooks.OnLobbyStart += Hooks_OnLobbyStart;
-
             NetworkingManager.RegisterEvent<ChatMsg>(typeof(ChatMsg).Name, OnMessage);
             EventManager = new EventManager();
         }
@@ -97,6 +98,7 @@ namespace TwitchDice
             ClassInjector.RegisterTypeInIl2Cpp<DiceMaster>();
             ClassInjector.RegisterTypeInIl2Cpp<ChatManager>();
             ClassInjector.RegisterTypeInIl2Cpp<DestroyOnCleanUp>();
+            ClassInjector.RegisterTypeInIl2Cpp<ManagerCoroutine>();
         }
 
 
@@ -105,6 +107,14 @@ namespace TwitchDice
             CreateDiceMaster();
             CreateChatManager();
             Hooks.OnLobbyStart -= Hooks_OnLobbyStart;
+        }
+
+        private void CreateCoroutineManager()
+        {
+            GameObject gameObject = new GameObject();
+            gameObject.AddComponent<ManagerCoroutine>();
+            UnityEngine.Object.DontDestroyOnLoad(gameObject);
+            TwitchDice.Log.Message("Created Coroutine Manager");
         }
 
         public void CreateDiceMaster()
