@@ -22,6 +22,12 @@ namespace TwitchDice.Utilities
 
         private static readonly List<IEnumerator> tempList = new List<IEnumerator>();
 
+        internal static object StartTimedEvent(IEnumerator routine, string eventName, float time)
+        {
+            if (routine != null) ProcessNextOfCoroutine(routine);
+            return routine;
+        }
+
         internal static object Start(IEnumerator routine)
         {
             if (routine != null) ProcessNextOfCoroutine(routine);
