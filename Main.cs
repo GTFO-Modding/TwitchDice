@@ -97,7 +97,6 @@ namespace TwitchDice
             ClassInjector.RegisterTypeInIl2Cpp<DiceMaster>();
             ClassInjector.RegisterTypeInIl2Cpp<ChatManager>();
             ClassInjector.RegisterTypeInIl2Cpp<DestroyOnCleanUp>();
-            ClassInjector.RegisterTypeInIl2Cpp<ManagerCoroutine>();
         }
 
 
