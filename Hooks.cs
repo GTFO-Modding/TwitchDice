@@ -70,12 +70,85 @@ namespace TwitchDice
 
         [HarmonyPatch(typeof(InputMapper), nameof(InputMapper.GetAxisKeyMouseGamepad))]
         [HarmonyPostfix]
-        public static void GetAxisKeyMouseGamepad(ref float __result)
+        public static void GetAxisKeyMouseGamepad(InputAction action, ref float __result)
         {
             if (PlayerControlManager.InvertControls)
             {
                 __result = -__result;
             }
+
+            if (PlayerControlManager.DisableMovement)
+            {
+                switch (action)
+                {
+                    case InputAction.MoveHorizontal:
+                    case InputAction.MoveVertical:
+                        __result = 0;
+                        break;
+                }
+            }
         }
+
+        [HarmonyPatch(typeof(InputMapper), nameof(InputMapper.GetButtonDownKeyMouseGamepad))]
+        [HarmonyPostfix]
+        public static void GetButtonDownKeyMouseGamepad(InputAction action, ref bool __result)
+        {
+            if (PlayerControlManager.DisableMovement)
+            {
+                switch (action)
+                {
+                    case InputAction.Jump:
+                    case InputAction.Crouch:
+                        __result = false;
+                        break;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(InputMapper), nameof(InputMapper.GetButtonKeyMouseGamepad))]
+        [HarmonyPostfix]
+        public static void GetButtonKeyMouseGamepad(InputAction action, ref bool __result)
+        {
+            if (PlayerControlManager.DisableMovement)
+            {
+                switch (action)
+                {
+                    case InputAction.Jump:
+                    case InputAction.Crouch:
+                        __result = false;
+                        break;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(InputMapper), nameof(InputMapper.GetButtonUpKeyMouseGamepad))]
+        [HarmonyPostfix]
+        public static void GetButtonUpKeyMouseGamepad(InputAction action, ref bool __result)
+        {
+            if (PlayerControlManager.DisableMovement)
+            {
+                switch (action)
+                {
+                    case InputAction.Jump:
+                    case InputAction.Crouch:
+                        __result = false;
+                        break;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(PlayerInteraction), nameof(PlayerInteraction.UpdateWorldInteractions))]
+        [HarmonyPrefix]
+        public static bool UpdateWorldInteractions(PlayerInteraction __instance)
+        {
+            if (PlayerControlManager.DisableInteractions)
+            {
+                __instance.UnSelectCurrentBestInteraction();
+                return false;
+            }
+
+            return true;
+        }
+
     }
 }

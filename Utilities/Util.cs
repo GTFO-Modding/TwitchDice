@@ -301,9 +301,142 @@ namespace TwitchDice.Utilities
 
     public static class Extensions
     {
+        public static int Matches<T>(this IList<T> list, Func<T, bool> matchFN)
+        {
+            int count = 0;
+            foreach (var item in list)
+            {
+                if (matchFN(item))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        public static int Matches<T>(this Il2CppSystem.Collections.Generic.List<T> list, Func<T, bool> matchFN)
+        {
+            int count = 0;
+            for (int index = 0, length = list.Count; index < length; index++)
+            {
+                if (matchFN(list[index]))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        public static int Matches<T>(this UnhollowerBaseLib.Il2CppReferenceArray<T> array, Func<T, bool> matchFN)
+            where T : UnhollowerBaseLib.Il2CppObjectBase
+        {
+            int count = 0;
+            for (int index = 0, length = array.Length; index < length; index++)
+            {
+                if (matchFN(array[index]))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        public static int Matches<T>(this UnhollowerBaseLib.Il2CppStructArray<T> array, Func<T, bool> matchFN)
+            where T : unmanaged
+        {
+            int count = 0;
+            for (int index = 0, length = array.Length; index < length; index++)
+            {
+                if (matchFN(array[index]))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        public static int Matches(this UnhollowerBaseLib.Il2CppStringArray array, Func<string, bool> matchFN)
+        {
+            int count = 0;
+            for (int index = 0, length = array.Length; index < length; index++)
+            {
+                if (matchFN(array[index]))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        public static Il2CppSystem.Collections.Generic.List<T> Filter<T>(this Il2CppSystem.Collections.Generic.List<T> list, Func<T, bool> filterFN)
+        {
+            int index = 0;
+            while (index < list.Count)
+            {
+                if (filterFN(list[index]))
+                {
+                    index++;
+                }
+                else
+                {
+                    list.RemoveAt(index);
+                }
+            }
+
+            return list;
+        }
+
+        public static List<T> Filter<T>(this List<T> list, Func<T, bool> filterFN)
+        {
+            int index = 0;
+            while (index < list.Count)
+            {
+                if (filterFN(list[index]))
+                {
+                    index++;
+                }
+                else
+                {
+                    list.RemoveAt(index);
+                }
+            }
+
+            return list;
+        }
+
+        public static List<T> ToManaged<T>(this Il2CppSystem.Collections.Generic.List<T> list)
+        {
+            var result = new List<T>();
+            for (int index = 0, count = list.Count; index < count; index++)
+            {
+                result.Add(list[index]);
+            }
+            return result;
+        }
+
+        public static Il2CppSystem.Collections.Generic.List<T> ToUnmanaged<T>(this List<T> list)
+        {
+            var result = new Il2CppSystem.Collections.Generic.List<T>();
+            for (int index = 0, count = list.Count; index < count; index++)
+            {
+                result.Add(list[index]);
+            }
+            return result;
+        }
+
         public static T GetRandomElement<T>(this IList list)
         {
             return (T)list[Main.rnd.Next(list.Count)];
+        }
+
+        public static T GetRandomElement<T>(this Il2CppSystem.Collections.Generic.List<T> list)
+        {
+            return list[Main.rnd.Next(list.Count)];
         }
 
         public static void Shuffle<T>(this IList<T> list)
