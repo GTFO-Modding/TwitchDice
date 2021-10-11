@@ -90,6 +90,11 @@ namespace TwitchDice.Twitch
         /// Code that runs on the hosts end when this event is activated
         /// </summary>
         public abstract void TriggerHost();
+
+        protected void StartEventTimer()
+        {
+            EventTimerManager.Instance.AddTimedInstance(this);
+        }
     }
 
     public abstract class DiceEvent<T> : DiceEvent where T : struct
