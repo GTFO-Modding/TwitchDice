@@ -36,7 +36,7 @@ namespace TwitchDice.Utilities
                 while (index < this.m_routines.Count)
                 {
                     var routine = this.m_routines[index];
-                    if (routine.Tick())
+                    if (!routine.Tick())
                         this.m_routines.RemoveAt(index);
                     else
                         index++;
@@ -139,7 +139,7 @@ namespace TwitchDice.Utilities
                 {
                     var current = this.m_stack.Peek();
                     bool finished = current.MoveNext();
-                    if (finished)
+                    if (!finished)
                     {
                         this.m_stack.Pop();
                     }
