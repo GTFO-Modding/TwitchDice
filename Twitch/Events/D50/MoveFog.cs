@@ -42,7 +42,7 @@ namespace TwitchDice.Twitch.Events.D50
             while (currentFogBlend < 1.0f)
             {
                 yield return null;
-                currentFogBlend += Time.deltaTime / seconds;
+                currentFogBlend += UnityEngine.Time.deltaTime / seconds;
                 LocalPlayerAgentSettings.Current.UpdateBlendTowardsTargetFogSetting(currentFogBlend);
             }
         }
