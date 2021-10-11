@@ -15,12 +15,14 @@ namespace TwitchDice.Twitch.Events.D8
 
         protected override DiceTier DiceTier => DiceTier.D8;
 
+        private int _time;
+        public override int Time => _time;
+
         public override void ReceiveClient(ulong sender, NM packet)
         {
-            if (packet.PlayerID == PlayerUtil.LocalPlayerAgent.GlobalID)
-            {
-                PlayerControlManager.DisableMovementForSeconds(packet.seconds);
-            }
+            _time = (int)packet.seconds;
+            StartEventTimer();
+            PlayerControlManager.DisableMovementForSeconds(packet.seconds);
         }
 
         private static float GetRandomActivationTime()
@@ -30,15 +32,18 @@ namespace TwitchDice.Twitch.Events.D8
 
         public override void TriggerHost()
         {
+            float time = GetRandomActivationTime();
+            _time = (int)time;
             if (PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent player))
             {
                 if (player.Owner.IsMaster)
                 {
-                    PlayerControlManager.DisableMovementForSeconds(GetRandomActivationTime());
+                    StartEventTimer();
+                    PlayerControlManager.DisableMovementForSeconds(time);
                 }
                 else
                 {
-                    this.TriggerClient(new NM(player, GetRandomActivationTime()));
+                    TriggerClient(new NM(time), player.Owner);
                 }
             }
         }
@@ -48,12 +53,10 @@ namespace TwitchDice.Twitch.Events.D8
     public struct NM
     {
         public float seconds;
-        public ushort PlayerID;
 
-        public NM(PlayerAgent player, float seconds)
+        public NM(float seconds)
         {
             this.seconds = seconds;
-            this.PlayerID = player.GlobalID;
         }
     }
 }

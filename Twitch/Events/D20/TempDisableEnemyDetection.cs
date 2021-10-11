@@ -16,6 +16,9 @@ namespace TwitchDice.Twitch.Events.D20
 
         protected override DiceTier DiceTier => DiceTier.D20;
 
+        private int _time = 0;
+        public override int Time => base.Time;
+
         private static float GetRandomActivationTime() // 15sec - 30sec
         {
             return (float)(Math.Floor(Main.rnd.NextDouble() * 15) + 15);
@@ -30,7 +33,9 @@ namespace TwitchDice.Twitch.Events.D20
 
         public override void TriggerHost()
         {
-            TimedEvents.Start(this.DoTriggerEvent(GetRandomActivationTime()));
+            float time = GetRandomActivationTime();
+            _time = (int)time;
+            TimedEvents.StartTimedEvent(this.DoTriggerEvent(Time), this);
         }
     }
 }

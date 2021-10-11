@@ -18,6 +18,8 @@ namespace TwitchDice.Twitch.Events.D12
 
         protected override DiceTier DiceTier => DiceTier.D12;
 
+        public override int Time => 60;
+
         public override void ReceiveClient(ulong sender, RAES packet)
         {
             this.TriggerCommon(packet.Seed);
@@ -41,7 +43,7 @@ namespace TwitchDice.Twitch.Events.D12
 
             foreach (var enemy in enemies)
             {
-                TimedEvents.Start(ApplyScale(enemy, 300f, random.Next(75, 125) / 100f));
+                TimedEvents.StartTimedEvent(ApplyScale(enemy, Time, random.Next(75, 125) / 100f), this);
                 enemy.transform.localScale = enemy.transform.localScale * (random.Next(75, 125) / 100f);
             }
         }

@@ -14,11 +14,14 @@ namespace TwitchDice.Twitch.Events.D8
 
         protected override DiceTier DiceTier => DiceTier.D8;
 
+        public override int Time => 30;
+
         public override void ReceiveClient(ulong sender, ICR packet)
         {
             if (packet.PlayerID == PlayerUtil.LocalPlayerAgent.Owner.Lookup)
             {
-                PlayerControlManager.InvertControlsForSeconds(30f);
+                PlayerControlManager.InvertControlsForSeconds(Time);
+                StartEventTimer();
             }
         }
 
@@ -28,7 +31,8 @@ namespace TwitchDice.Twitch.Events.D8
             {
                 if (player.Owner.IsMaster)
                 {
-                    PlayerControlManager.InvertControlsForSeconds(30f);
+                    PlayerControlManager.InvertControlsForSeconds(Time);
+                    StartEventTimer();
                 }
                 else
                 {

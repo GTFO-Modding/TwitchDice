@@ -12,16 +12,19 @@ namespace TwitchDice.Twitch.Events.D20
 
         protected override DiceTier DiceTier => DiceTier.D20;
 
+        public override int Time => 30;
+
         public override void ReceiveClient(ulong sender, GPD packet)
         {
-            PlayerControlManager.EnableGlobalPlayerDamage(30f);
+            StartEventTimer();
+            PlayerControlManager.EnableGlobalPlayerDamage(Time);
         }
 
         public override void TriggerHost()
         {
             this.TriggerClient();
-
-            PlayerControlManager.EnableGlobalPlayerDamage(30f);
+            StartEventTimer();
+            PlayerControlManager.EnableGlobalPlayerDamage(Time);
         }
     }
 

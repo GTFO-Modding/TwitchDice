@@ -11,16 +11,19 @@ namespace TwitchDice.Twitch.Events.D8
 
         protected override DiceTier DiceTier => DiceTier.D8;
 
+        public override int Time => 10;
+
         public override void ReceiveClient(ulong sender, IC packet)
         {
-            PlayerControlManager.InvertControlsForSeconds(10f);
+            PlayerControlManager.InvertControlsForSeconds(Time);
+            StartEventTimer();
         }
 
         public override void TriggerHost()
         {
-            this.TriggerClient();
-
-            PlayerControlManager.InvertControlsForSeconds(10f);
+            TriggerClient();
+            PlayerControlManager.InvertControlsForSeconds(Time);
+            StartEventTimer();
         }
     }
 

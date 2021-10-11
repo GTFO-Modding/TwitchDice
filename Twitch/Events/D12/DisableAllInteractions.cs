@@ -12,15 +12,19 @@ namespace TwitchDice.Twitch.Events.D12
 
         protected override DiceTier DiceTier => DiceTier.D12;
 
+        public override int Time => 30;
+
         public override void ReceiveClient(ulong sender, DAI packet)
         {
-            PlayerControlManager.DisableInteractionsForSeconds(30f);
+            PlayerControlManager.DisableInteractionsForSeconds(Time);
+            StartEventTimer();
         }
 
         public override void TriggerHost()
         {
             this.TriggerClient();
-            PlayerControlManager.DisableInteractionsForSeconds(30f);
+            PlayerControlManager.DisableInteractionsForSeconds(Time);
+            StartEventTimer();
         }
     }
 
