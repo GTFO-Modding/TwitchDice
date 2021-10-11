@@ -29,6 +29,17 @@ namespace TwitchDice.Utilities
             TimedEvents.Start(_activeEnableGlobalPlayerDamage);
         }
 
+        internal static void EnableGlobalPlayerDamageEvent(float seconds, string eventName)
+        {
+            if (_activeEnableGlobalPlayerDamage != null)
+            {
+                TimedEvents.Stop(_activeEnableGlobalPlayerDamage);
+            }
+
+            _activeEnableGlobalPlayerDamage = DoEnableGlobalPlayerDamage(seconds);
+            TimedEvents.StartTimedEvent(_activeEnableGlobalPlayerDamage, eventName, seconds);
+        }
+
         public static void DisableMovementForSeconds(float seconds)
         {
             if (_activeDisableMovement != null)
@@ -38,6 +49,17 @@ namespace TwitchDice.Utilities
 
             _activeDisableMovement = DoDisableMovementForSeconds(seconds);
             TimedEvents.Start(_activeDisableMovement);
+        }
+
+        internal static void DisableMovementForSecondsEvent(float seconds, string eventName)
+        {
+            if (_activeDisableMovement != null)
+            {
+                TimedEvents.Stop(_activeDisableMovement);
+            }
+
+            _activeDisableMovement = DoDisableMovementForSeconds(seconds);
+            TimedEvents.StartTimedEvent(_activeDisableMovement, eventName, seconds);
         }
 
         public static void DisableInteractionsForSeconds(float seconds)
@@ -51,6 +73,17 @@ namespace TwitchDice.Utilities
             TimedEvents.Start(_activeDisableInteractions);
         }
 
+        internal static void DisableInteractionsForSecondsEvent(float seconds, string eventName)
+        {
+            if (_activeDisableInteractions != null)
+            {
+                TimedEvents.Stop(_activeDisableInteractions);
+            }
+
+            _activeDisableInteractions = DoDisableInteractionsForSeconds(seconds);
+            TimedEvents.StartTimedEvent(_activeDisableInteractions, eventName, seconds);
+        }
+
         public static void InvertControlsForSeconds(float seconds)
         {
             if (_activeInvertControls != null)
@@ -62,6 +95,17 @@ namespace TwitchDice.Utilities
             TimedEvents.Start(_activeInvertControls);
         }
 
+        internal static void InvertControlsForSecondsEvent(float seconds, string eventName)
+        {
+            if (_activeInvertControls != null)
+            {
+                TimedEvents.Stop(_activeInvertControls);
+            }
+
+            _activeInvertControls = DoInvertControlsForSeconds(seconds);
+            TimedEvents.StartTimedEvent(_activeInvertControls, eventName, seconds);
+        }
+
         public static void ForceCrouchForSeconds(float seconds)
         {
             if (_activeForceCrouch != null)
@@ -71,6 +115,17 @@ namespace TwitchDice.Utilities
 
             _activeForceCrouch = DoForceCrouchForSeconds(seconds);
             TimedEvents.Start(_activeForceCrouch);
+        }
+
+        internal static void ForceCrouchForSecondsEvent(float seconds, string eventName)
+        {
+            if (_activeForceCrouch != null)
+            {
+                TimedEvents.Stop(_activeForceCrouch);
+            }
+
+            _activeForceCrouch = DoForceCrouchForSeconds(seconds);
+            TimedEvents.StartTimedEvent(_activeForceCrouch, eventName, seconds);
         }
 
         private static IEnumerator DoEnableGlobalPlayerDamage(float seconds)

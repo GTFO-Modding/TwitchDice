@@ -14,13 +14,13 @@ namespace TwitchDice.Twitch.Events.D12
 
         public override void ReceiveClient(ulong sender, DAI packet)
         {
-            PlayerControlManager.DisableInteractionsForSeconds(30f);
+            PlayerControlManager.DisableInteractionsForSecondsEvent(30f, this.EventName);
         }
 
         public override void TriggerHost()
         {
             this.TriggerClient();
-            PlayerControlManager.DisableInteractionsForSeconds(30f);
+            PlayerControlManager.DisableInteractionsForSecondsEvent(30f, this.EventName);
         }
     }
 

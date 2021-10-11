@@ -13,14 +13,14 @@ namespace TwitchDice.Twitch.Events.D8
 
         public override void ReceiveClient(ulong sender, IC packet)
         {
-            PlayerControlManager.InvertControlsForSeconds(10f);
+            PlayerControlManager.InvertControlsForSecondsEvent(10f, this.EventName);
         }
 
         public override void TriggerHost()
         {
             this.TriggerClient();
 
-            PlayerControlManager.InvertControlsForSeconds(10f);
+            PlayerControlManager.InvertControlsForSecondsEvent(10f, this.EventName);
         }
     }
 
