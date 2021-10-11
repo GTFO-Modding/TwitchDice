@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TwitchDice.Twitch;
 using UnhollowerBaseLib;
 using UnityEngine;
 
@@ -22,9 +23,13 @@ namespace TwitchDice.Utilities
 
         private static readonly List<IEnumerator> tempList = new List<IEnumerator>();
 
-        internal static object StartTimedEvent(IEnumerator routine, string eventName, float time)
+        internal static object StartTimedEvent(IEnumerator routine, IDiceEvent @event)
         {
-            if (routine != null) ProcessNextOfCoroutine(routine);
+            if (routine != null)
+            {
+                ProcessNextOfCoroutine(routine);
+                EventTimerManager.Instance.AddTimedInstance(@event);
+            }
             return routine;
         }
 
