@@ -13,13 +13,13 @@ namespace TwitchDice.Twitch.Events.D8
 
         public override void ReceiveClient(ulong sender, FC packet)
         {
-            PlayerControlManager.ForceCrouchForSecondsEvent(10f, this.EventName);
+            PlayerControlManager.ForceCrouchForSeconds(10f);
         }
 
         public override void TriggerHost()
         {
             this.TriggerClient();
-            PlayerControlManager.ForceCrouchForSecondsEvent(10f, this.EventName);
+            PlayerControlManager.ForceCrouchForSeconds(10f);
         }
     }
 

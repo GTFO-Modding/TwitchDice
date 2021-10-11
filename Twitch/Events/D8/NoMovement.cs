@@ -19,7 +19,7 @@ namespace TwitchDice.Twitch.Events.D8
         {
             if (packet.PlayerID == PlayerUtil.LocalPlayerAgent.GlobalID)
             {
-                PlayerControlManager.DisableMovementForSecondsEvent(packet.seconds, this.EventName);
+                PlayerControlManager.DisableMovementForSeconds(packet.seconds);
             }
         }
 
@@ -34,7 +34,7 @@ namespace TwitchDice.Twitch.Events.D8
             {
                 if (player.Owner.IsMaster)
                 {
-                    PlayerControlManager.DisableMovementForSecondsEvent(GetRandomActivationTime(), this.EventName);
+                    PlayerControlManager.DisableMovementForSeconds(GetRandomActivationTime());
                 }
                 else
                 {
@@ -56,6 +56,4 @@ namespace TwitchDice.Twitch.Events.D8
             this.PlayerID = player.GlobalID;
         }
     }
-
-
 }

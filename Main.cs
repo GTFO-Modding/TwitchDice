@@ -108,8 +108,6 @@ namespace TwitchDice
             ClassInjector.RegisterTypeInIl2Cpp<DestroyOnCleanUp>();
             ClassInjector.RegisterTypeInIl2Cpp<EventTimerManager>();
             ClassInjector.RegisterTypeInIl2Cpp<EventTimer>();
-
-            CoroutineHandler.Init();
         }
 
 
