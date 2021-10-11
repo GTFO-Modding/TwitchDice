@@ -93,6 +93,21 @@ namespace TwitchDice
             return true;
         }
 
+        [HarmonyPatch(typeof(Dam_EnemyDamageBase), nameof(Dam_EnemyDamageBase.MeleeDamage))]
+        [HarmonyPatch(typeof(Dam_EnemyDamageBase), nameof(Dam_EnemyDamageBase.BulletDamage))]
+        [HarmonyPrefix]
+        public static void DealMeleeDamage(float dam, Agents.Agent sourceAgent)
+        {
+            if (PlayerControlManager.DoSelfDamage)
+            {
+                var player = sourceAgent?.TryCast<PlayerAgent>();
+                if (player != null && player.IsLocallyOwned)
+                {
+                    player.Damage.NoAirDamage(dam);
+                }
+            }
+        }
+
         [HarmonyPatch(typeof(Dam_PlayerDamageBase), nameof(Dam_PlayerDamageBase.OnIncomingDamage))]
         [HarmonyPrefix]
         public static void OnIncomingDamage(Dam_PlayerDamageBase __instance, ref float damage)

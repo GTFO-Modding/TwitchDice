@@ -13,6 +13,7 @@ namespace TwitchDice.Utilities
         public static bool DamageAllPlayers { get; set; }
         public static bool DisableRunning { get; set; }
         public static bool DisableCrouching { get; set; }
+        public static bool DoSelfDamage { get; set; }
         
         private static CoroutineHandler.IRoutine _activeForceCrouch; // cache in case another force crouch is called.
         private static CoroutineHandler.IRoutine _activeInvertControls; // cache in case of another force invert controls is called.
@@ -21,6 +22,14 @@ namespace TwitchDice.Utilities
         private static CoroutineHandler.IRoutine _activeEnableGlobalPlayerDamage;
         private static CoroutineHandler.IRoutine _activeDisableRunning;
         private static CoroutineHandler.IRoutine _activeNoCrouch;
+        private static CoroutineHandler.IRoutine _activeDoSelfDamage;
+
+        public static void EnableSelfDamageForSeconds(float seconds)
+        {
+            _activeDoSelfDamage?.Stop();
+
+            _activeDoSelfDamage = TimedEvents.Start(DoEnableSelfDamageForSeconds(seconds));
+        }
 
         public static void DisableCrouchingForSeconds(float seconds)
         {
@@ -69,6 +78,14 @@ namespace TwitchDice.Utilities
             _activeForceCrouch?.Stop();
 
             _activeForceCrouch = TimedEvents.Start(DoForceCrouchForSeconds(seconds));
+        }
+
+        private static IEnumerator DoEnableSelfDamageForSeconds(float seconds)
+        {
+            DoSelfDamage = true;
+            yield return new WaitForSeconds(seconds);
+            DoSelfDamage = false;
+            _activeDoSelfDamage = null;
         }
 
         private static IEnumerator DoDisableCrouchingForSeconds(float seconds)

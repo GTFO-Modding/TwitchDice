@@ -119,7 +119,6 @@ namespace TwitchDice.Twitch
 
         void Update()
         {
-            TimedEvents.Process();
             switch(State)
             {
                 case DiceMasterState.InLobby:
