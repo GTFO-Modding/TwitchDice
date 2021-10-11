@@ -13,6 +13,11 @@ namespace TwitchDice.Twitch.Events.D8
 
         public override int Time => 10;
 
+        public override bool CanBeTriggered()
+        {
+            return !PlayerControlManager.DisableCrouching;
+        }
+
         public override void ReceiveClient(ulong sender, FC packet)
         {
             PlayerControlManager.ForceCrouchForSeconds(Time);
