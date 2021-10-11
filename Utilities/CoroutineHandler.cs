@@ -138,8 +138,8 @@ namespace TwitchDice.Utilities
                 if (this.m_stack.Count > 0)
                 {
                     var current = this.m_stack.Peek();
-                    bool notFinished = current.MoveNext();
-                    if (!notFinished)
+                    bool finished = current.MoveNext();
+                    if (finished)
                     {
                         this.m_stack.Pop();
                     }
