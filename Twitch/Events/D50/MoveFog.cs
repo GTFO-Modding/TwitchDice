@@ -16,15 +16,17 @@ namespace TwitchDice.Twitch.Events.D50
         
         public override void ReceiveClient(ulong sender, MF packet)
         {
-            TimedEvents.Start(this.DoTriggerEvent(5, packet.delta));
+            TimedEvents.Start(this.DoTriggerEvent(packet.seconds, packet.delta));
         }
         
         public override void TriggerHost()
         {
+            float seconds = 5f;
             // Random height change from -10 to 10
             float delta = (float) Main.rnd.NextDouble() * 20.0f - 10.0f;
-            this.TriggerClient(new MF(delta));
-            TimedEvents.Start(this.DoTriggerEvent(5,delta));
+            
+            this.TriggerClient(new MF(seconds, delta));
+            TimedEvents.Start(this.DoTriggerEvent(seconds, delta));
         }
         
         private IEnumerator DoTriggerEvent(float seconds, float delta)
@@ -49,10 +51,12 @@ namespace TwitchDice.Twitch.Events.D50
     [StructLayout(LayoutKind.Sequential)]
     public struct MF
     {
+        public float seconds;
         public float delta;
 
-        public MF(float delta)
+        public MF(float seconds, float delta)
         {
+            this.seconds = seconds;
             this.delta = delta;
         }
     }
