@@ -33,6 +33,11 @@ namespace TwitchDice.Utilities
             return routine;
         }
 
+        internal static object Start(IEnumerator routine, IDiceEvent @event)
+        {
+            return StartTimedEvent(routine, @event);
+        }
+
         internal static object Start(IEnumerator routine)
         {
             if (routine != null) ProcessNextOfCoroutine(routine);
