@@ -18,7 +18,7 @@ namespace TwitchDice.Twitch.Events.D8
         {
             if (packet.PlayerID == PlayerUtil.LocalPlayerAgent.Owner.Lookup)
             {
-                PlayerControlManager.InvertControlsForSeconds(30f);
+                PlayerControlManager.InvertControlsForSecondsEvent(30f, this.EventName);
             }
         }
 
@@ -28,7 +28,7 @@ namespace TwitchDice.Twitch.Events.D8
             {
                 if (player.Owner.IsMaster)
                 {
-                    PlayerControlManager.InvertControlsForSeconds(30f);
+                    PlayerControlManager.InvertControlsForSecondsEvent(30f, this.EventName);
                 }
                 else
                 {
