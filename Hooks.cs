@@ -56,14 +56,38 @@ namespace TwitchDice
             Cleanup?.Invoke();
         }
 
+        [HarmonyPatch(typeof(PlayerLocomotion), nameof(PlayerLocomotion.RunInput))]
+        [HarmonyPrefix]
+        public static bool RunInput(PlayerAgent owner, ref bool __result)
+        {
+            if (owner?.IsLocallyOwned ?? false)
+            {
+                if (PlayerControlManager.DisableRunning)
+                {
+                    __result = false;
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         [HarmonyPatch(typeof(PlayerLocomotion), nameof(PlayerLocomotion.CrouchInput))]
         [HarmonyPrefix]
         public static bool CrouchInput(PlayerAgent owner, ref bool __result)
         {
-            if ((owner?.IsLocallyOwned ?? false) && PlayerControlManager.ForceCrouchEnabled)
+            if (owner?.IsLocallyOwned ?? false)
             {
-                __result = true;
-                return false;
+                if (PlayerControlManager.ForceCrouchEnabled)
+                {
+                    __result = true;
+                    return false;
+                }
+                else if (PlayerControlManager.DisableCrouching)
+                {
+                    __result = false;
+                    return false;
+                }
             }
 
             return true;

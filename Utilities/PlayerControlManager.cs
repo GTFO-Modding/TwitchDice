@@ -11,69 +11,83 @@ namespace TwitchDice.Utilities
         public static bool DisableInteractions { get; set; }
         public static bool DisableMovement { get; set; }
         public static bool DamageAllPlayers { get; set; }
+        public static bool DisableRunning { get; set; }
+        public static bool DisableCrouching { get; set; }
         
-        private static IEnumerator _activeForceCrouch; // cache in case another force crouch is called.
-        private static IEnumerator _activeInvertControls; // cache in case of another force invert controls is called.
-        private static IEnumerator _activeDisableInteractions;
-        private static IEnumerator _activeDisableMovement;
-        private static IEnumerator _activeEnableGlobalPlayerDamage;
+        private static CoroutineHandler.IRoutine _activeForceCrouch; // cache in case another force crouch is called.
+        private static CoroutineHandler.IRoutine _activeInvertControls; // cache in case of another force invert controls is called.
+        private static CoroutineHandler.IRoutine _activeDisableInteractions;
+        private static CoroutineHandler.IRoutine _activeDisableMovement;
+        private static CoroutineHandler.IRoutine _activeEnableGlobalPlayerDamage;
+        private static CoroutineHandler.IRoutine _activeDisableRunning;
+        private static CoroutineHandler.IRoutine _activeNoCrouch;
 
-        public static void EnableGlobalPlayerDamage(float seconds)
+        public static void DisableCrouchingForSeconds(float seconds)
         {
-            if (_activeEnableGlobalPlayerDamage != null)
-            {
-                TimedEvents.Stop(_activeEnableGlobalPlayerDamage);
-            }
+            _activeNoCrouch?.Stop();
 
-            _activeEnableGlobalPlayerDamage = DoEnableGlobalPlayerDamage(seconds);
-            TimedEvents.Start(_activeEnableGlobalPlayerDamage);
+            _activeNoCrouch = TimedEvents.Start(DoDisableCrouchingForSeconds(seconds));
+        }
+
+        public static void DisableRunningForSeconds(float seconds)
+        {
+            _activeDisableRunning?.Stop();
+
+            _activeDisableRunning = TimedEvents.Start(DoDisableRunningForSeconds(seconds));
+        }
+
+        public static void EnableGlobalPlayerDamageForSeconds(float seconds)
+        {
+            _activeEnableGlobalPlayerDamage?.Stop();
+
+            _activeEnableGlobalPlayerDamage = TimedEvents.Start(DoEnableGlobalPlayerDamageForSeconds(seconds));
         }
 
         public static void DisableMovementForSeconds(float seconds)
         {
-            if (_activeDisableMovement != null)
-            {
-                TimedEvents.Stop(_activeDisableMovement);
-            }
+            _activeDisableMovement?.Stop();
 
-            _activeDisableMovement = DoDisableMovementForSeconds(seconds);
-            TimedEvents.Start(_activeDisableMovement);
+            _activeDisableMovement = TimedEvents.Start(DoDisableMovementForSeconds(seconds));
         }
 
         public static void DisableInteractionsForSeconds(float seconds)
         {
-            if (_activeDisableInteractions != null)
-            {
-                TimedEvents.Stop(_activeDisableInteractions);
-            }
+            _activeDisableInteractions?.Stop();
 
-            _activeDisableInteractions = DoDisableInteractionsForSeconds(seconds);
-            TimedEvents.Start(_activeDisableInteractions);
+            _activeDisableInteractions = TimedEvents.Start(DoDisableInteractionsForSeconds(seconds));;
         }
 
         public static void InvertControlsForSeconds(float seconds)
         {
-            if (_activeInvertControls != null)
-            {
-                TimedEvents.Stop(_activeInvertControls);
-            }
+            _activeInvertControls?.Stop();
 
-            _activeInvertControls = DoInvertControlsForSeconds(seconds);
-            TimedEvents.Start(_activeInvertControls);
+            _activeInvertControls = TimedEvents.Start(DoInvertControlsForSeconds(seconds));
         }
 
         public static void ForceCrouchForSeconds(float seconds)
         {
-            if (_activeForceCrouch != null)
-            {
-                TimedEvents.Stop(_activeForceCrouch);
-            }
+            _activeForceCrouch?.Stop();
 
-            _activeForceCrouch = DoForceCrouchForSeconds(seconds);
-            TimedEvents.Start(_activeForceCrouch);
+            _activeForceCrouch = TimedEvents.Start(DoForceCrouchForSeconds(seconds));
         }
 
-        private static IEnumerator DoEnableGlobalPlayerDamage(float seconds)
+        private static IEnumerator DoDisableCrouchingForSeconds(float seconds)
+        {
+            DisableCrouching = true;
+            yield return new WaitForSeconds(seconds);
+            DisableCrouching = false;
+            _activeNoCrouch = null;
+        }
+
+        private static IEnumerator DoDisableRunningForSeconds(float seconds)
+        {
+            DisableRunning = true;
+            yield return new WaitForSeconds(seconds);
+            DisableRunning = false;
+            _activeDisableRunning = null;
+        }
+
+        private static IEnumerator DoEnableGlobalPlayerDamageForSeconds(float seconds)
         {
             DamageAllPlayers = true;
             yield return new WaitForSeconds(seconds);
