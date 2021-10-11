@@ -6,9 +6,9 @@ namespace TwitchDice.Twitch.Events.D12
 {
     public class SelfDamage : DiceEvent<SE>
     {
-        public override string EventName => throw new System.NotImplementedException();
+        public override string EventName => "Enemy Thorns";
 
-        public override string EventID => throw new System.NotImplementedException();
+        public override string EventID => "selfDamage";
 
         protected override DiceTier DiceTier => DiceTier.D12;
 

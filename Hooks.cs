@@ -56,6 +56,16 @@ namespace TwitchDice
             Cleanup?.Invoke();
         }
 
+        [HarmonyPatch(typeof(Dam_EnemyDamageBase), nameof(Dam_EnemyDamageBase.ProcessReceivedDamage))]
+        [HarmonyPrefix]
+        public static void EnemyDeath(Dam_EnemyDamageBase __instance, float damage)
+        {
+            if (__instance.Health - damage <= 0)
+            {
+                EnemyRespawnManager.AddEnemy(__instance.Owner);
+            }
+        }
+
         [HarmonyPatch(typeof(PlayerLocomotion), nameof(PlayerLocomotion.RunInput))]
         [HarmonyPrefix]
         public static bool RunInput(PlayerAgent owner, ref bool __result)
@@ -96,8 +106,13 @@ namespace TwitchDice
         [HarmonyPatch(typeof(Dam_EnemyDamageBase), nameof(Dam_EnemyDamageBase.MeleeDamage))]
         [HarmonyPatch(typeof(Dam_EnemyDamageBase), nameof(Dam_EnemyDamageBase.BulletDamage))]
         [HarmonyPrefix]
-        public static void DealMeleeDamage(float dam, Agents.Agent sourceAgent)
+        public static void DealMeleeDamage(ref float dam, Agents.Agent sourceAgent)
         {
+            if (PlayerControlManager.InstantKill)
+            {
+                dam = float.MaxValue;
+            }
+
             if (PlayerControlManager.DoSelfDamage)
             {
                 var player = sourceAgent?.TryCast<PlayerAgent>();

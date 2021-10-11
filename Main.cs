@@ -81,6 +81,8 @@ namespace TwitchDice
             Hooks.OnLobbyStart += Hooks_OnLobbyStart;
             NetworkingManager.RegisterEvent<ChatMsg>(typeof(ChatMsg).Name, OnMessage);
             EventManager = new EventManager();
+
+            EnemyRespawnManager.Init();
         }
 
         private void SetupConfig()
