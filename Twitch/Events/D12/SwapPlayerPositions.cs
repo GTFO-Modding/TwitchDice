@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TwitchDice.Utilities;
-using TwitchDice.Utilities;
 using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D12
@@ -16,7 +15,7 @@ namespace TwitchDice.Twitch.Events.D12
 
         protected override DiceTier DiceTier => DiceTier.D12;
 
-        private int offset = 0;
+        // private int offset = 0;
 
         public override bool CanBeTriggered()
         {
