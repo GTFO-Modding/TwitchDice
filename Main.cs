@@ -40,7 +40,16 @@ namespace TwitchDice
             CONFIG_TWITCH_IMPLICITOAUTH_DESC = "The OAuth token for the user",
 
             CONFIG_EVENTS_SECTION = "Enabled Events",
-            CONFIG_DICE_SECTION = "Event Tiers";
+            CONFIG_DICE_SECTION = "Event Tiers",
+            
+            COLOR_D3 = "white",
+            COLOR_D4 = "#ffe0e0",
+            COLOR_D6 = "#ffc1c1",
+            COLOR_D8 = "#ffa2a2",
+            COLOR_D12 = "#ff8383",
+            COLOR_D20 = "#ff6464",
+            COLOR_D50 = "#ff4545",
+            COLOR_D100 = "red";
 
         public static bool DEBUG = true;
         public static bool SKIP_TWITCH = true;
@@ -111,10 +120,14 @@ namespace TwitchDice
         {
             if (DiceMasterObject == null)
             {
-                GameObject gameObject = new GameObject();
-                gameObject.AddComponent<DiceMaster>();
-                UnityEngine.Object.DontDestroyOnLoad(gameObject);
-                DiceMasterObject = gameObject;
+                DiceMasterObject = new GameObject();
+                DiceMasterObject.name = "DICE MASTER";
+                UnityEngine.Object.DontDestroyOnLoad(DiceMasterObject);
+
+                DiceMasterObject.AddComponent<DiceMaster>();
+                DiceMasterObject.AddComponent<EventTimerManager>();
+
+
                 TwitchDice.Log.Message("Created DiceMaster");
             } else
             {
@@ -125,6 +138,7 @@ namespace TwitchDice
         public void CreateChatManager()
         {
             GameObject gameObject = new GameObject();
+            gameObject.name = "CHAT MANAGER";
             gameObject.AddComponent<ChatManager>();
             UnityEngine.Object.DontDestroyOnLoad(gameObject);
             TwitchDice.Log.Message("Created Chat Manager!");
