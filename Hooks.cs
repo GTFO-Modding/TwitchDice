@@ -71,16 +71,23 @@ namespace TwitchDice
 
         [HarmonyPatch(typeof(Dam_PlayerDamageBase), nameof(Dam_PlayerDamageBase.OnIncomingDamage))]
         [HarmonyPrefix]
-        public static void OnIncomingDamage(Dam_PlayerDamageBase __instance, float damage)
+        public static void OnIncomingDamage(Dam_PlayerDamageBase __instance, ref float damage)
         {
-            if (__instance.Owner.IsLocallyOwned)
+            if (PlayerControlManager.DamageAllPlayers)
             {
-                foreach (var player in PlayerManager.PlayerAgentsInLevel)
+                if (__instance.Owner.IsLocallyOwned && damage > 0)
                 {
-                    if (!player.IsLocallyOwned)
+                    foreach (var player in PlayerManager.PlayerAgentsInLevel)
                     {
-                        player.Damage.NoAirDamage(damage);
+                        if (!player.IsLocallyOwned)
+                        {
+                            player.Damage.NoAirDamage(-damage);
+                        }
                     }
+                }
+                else
+                {
+                    damage = -damage;
                 }
             }
         }
