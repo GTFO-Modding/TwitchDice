@@ -226,28 +226,28 @@ namespace TwitchDice.Utilities
             switch(diceEvent.Tier)
             {
                 case DiceTier.D3:
-                    tierName = "<color=white>D3</color>";
+                    tierName = $"<color={Main.COLOR_D3}>D3</color>";
                     break;
                 case DiceTier.D4:
-                    tierName = "<color=#ffe0e0>D4</color>";
+                    tierName = $"<color={Main.COLOR_D4}>D4</color>";
                     break;
                 case DiceTier.D6:
-                    tierName = "<color=#ffc1c1>D6</color>";
+                    tierName = $"<color={Main.COLOR_D6}>D6</color>";
                     break;
                 case DiceTier.D8:
-                    tierName = "<color=#ffa2a2>D8</color>";
+                    tierName = $"<color={Main.COLOR_D8}>D8</color>";
                     break;
                 case DiceTier.D12:
-                    tierName = "<color=#ff8383>D12</color>";
+                    tierName = $"<color={Main.COLOR_D12}>D12</color>";
                     break;
                 case DiceTier.D20:
-                    tierName = "<color=#ff6464>D20</color>";
+                    tierName = $"<color={Main.COLOR_D20}>D20</color>";
                     break;
                 case DiceTier.D50:
-                    tierName = "<color=#ff4545>D50</color>";
+                    tierName = $"<color={Main.COLOR_D50}>D50</color>";
                     break;
                 case DiceTier.D100:
-                    tierName = "<color=red>D100</color>";
+                    tierName = $"<color={Main.COLOR_D100}>D100</color>";
                     break;
             }
 
@@ -298,6 +298,26 @@ namespace TwitchDice.Utilities
                 }
             }
             return nodes;
+        }
+    }
+
+    public static class ColorUtil
+    {
+        public static string GetDiceColorForTier(DiceTier tier)
+        {
+            return tier switch
+            {
+                DiceTier.INVALID => "",
+                DiceTier.D3 => Main.COLOR_D3,
+                DiceTier.D4 => Main.COLOR_D4,
+                DiceTier.D6 => Main.COLOR_D6,
+                DiceTier.D8 => Main.COLOR_D8,
+                DiceTier.D12 => Main.COLOR_D12,
+                DiceTier.D20 => Main.COLOR_D20,
+                DiceTier.D50 => Main.COLOR_D50,
+                DiceTier.D100 => Main.COLOR_D100,
+                _ => "",
+            };
         }
     }
 
