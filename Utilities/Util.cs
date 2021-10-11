@@ -21,7 +21,7 @@ namespace TwitchDice.Utilities
         void Update()
         {
             if (!ChatUtil.MessageQueue.TryDequeue(out MessageQueueInfo messageInfo)) return;
-            Send(messageInfo.message, messageInfo.chatLogType);
+            Send(messageInfo.message, messageInfo.chatLogType, messageInfo.networkSync);
         }
 
         public static void Send(string message, eGameEventChatLogType chatLogType = eGameEventChatLogType.GameEvent, bool networksync = true)
@@ -78,19 +78,17 @@ namespace TwitchDice.Utilities
             }
         }
 
-        public static bool TryGetRandomPlayerAgent(out PlayerAgent playerAgent, bool IncludeHost = true)
+        public static bool TryGetRandomPlayerAgent(out PlayerAgent playerAgent, bool IncludeHost = true, List<PlayerAgent> exclude = null)
         {
             playerAgent = null;
             var list = new List<PlayerAgent>();
             foreach (var item in PlayerManager.PlayerAgentsInLevel)
             {
-                if (IncludeHost == true)
-                    list.Add(item);
-                else
-                {
-                    if (!item.IsLocallyOwned)
-                        list.Add(item);
-                }
+                if (!IncludeHost && item.IsLocallyOwned) continue;
+                if (exclude != null)
+                    if (exclude.Contains(item)) continue;
+
+                list.Add(item);
             }
 
             try
