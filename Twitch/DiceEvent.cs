@@ -16,6 +16,7 @@ namespace TwitchDice.Twitch
         string EventName { get; }
         bool Enabled { get; }
         DiceTier Tier { get; }
+        int Time { get; }
         bool CanBeTriggered();
         void Register();
         void TriggerHost();
@@ -69,6 +70,8 @@ namespace TwitchDice.Twitch
                 return enabled.Value;
             }
         }
+
+        virtual public int Time => 0;
 
         /// <summary>
         /// If the conditions are met for this event to be a valid event to trigger

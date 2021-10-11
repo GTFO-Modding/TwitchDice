@@ -17,6 +17,7 @@ namespace TwitchDice
         public static event Action OnLobbyLeave;
         public static event Action<LobbyDataUpdate_t> LobbyDataUpdated;
         public static event Action Cleanup;
+        public static event Action InventorySlotsUpdated;
 
         [HarmonyPatch(typeof(GS_ExpeditionFail), "Enter")]
         [HarmonyPostfix]
@@ -166,5 +167,11 @@ namespace TwitchDice
             return true;
         }
 
+        [HarmonyPatch(typeof(PUI_Inventory), nameof(PUI_Inventory.UpdateSlotPositions))]
+        [HarmonyPostfix]
+        public static void UpdateSlotPositionsPost()
+        {
+            InventorySlotsUpdated?.Invoke();
+        }
     }
 }
