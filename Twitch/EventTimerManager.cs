@@ -22,7 +22,7 @@ namespace TwitchDice.Twitch
             Hooks.InventorySlotsUpdated += RecalculateAll;
         }
 
-        private readonly List<PUI_InventoryItem> ActiveTimedEvents = new List<PUI_InventoryItem>();
+        private readonly List<EventTimer> ActiveTimedEvents = new List<EventTimer>();
 
         private void RecalculateAll()
         {
@@ -30,21 +30,25 @@ namespace TwitchDice.Twitch
             float start = CalcVanilla(inventory);
             foreach (var timer in ActiveTimedEvents)
             {
-                RecalculatePosition(inventory, timer, start);
+                RecalculatePosition(inventory, timer.Item, start);
             }
         }
 
         public void RemoveTimedInstance(EventTimer eventTimer)
         {
-            ActiveTimedEvents.Remove(eventTimer.Item);
+            ActiveTimedEvents.Remove(eventTimer);
             RecalculateAll();
         }
 
         public void AddTimedInstance(IDiceEvent diceEvent)
         {
+            if (CheckIfEventIsActive(diceEvent)) return;
+
             PUI_Inventory inventory = GuiManager.PlayerLayer.Inventory;
             PUI_InventoryItem timer = inventory.AddSlotItem();
-            ActiveTimedEvents.Add(timer);
+            EventTimer eventTimer = timer.gameObject.AddComponent<EventTimer>();
+            eventTimer.Init(timer, diceEvent);
+            ActiveTimedEvents.Add(eventTimer);
 
             timer.name = $"Event Timer: {diceEvent.EventID}";
 
@@ -54,11 +58,22 @@ namespace TwitchDice.Twitch
             timer.m_slim_root.transform.Find("Pivot/Infinite ammo").gameObject.SetActive(false);
 
             float start = CalcVanilla(inventory);
-            RecalculatePosition(inventory, timer, start);
-            EventTimer eventTimer = timer.gameObject.AddComponent<EventTimer>();
-            eventTimer.Init(timer, diceEvent.Time, diceEvent.EventName, diceEvent.Tier);
 
+            RecalculatePosition(inventory, timer, start);
             Log.Debug($"Added new timed event with name {diceEvent.EventName}");
+        }
+
+        private bool CheckIfEventIsActive(IDiceEvent diceEvent)
+        {
+            foreach (var activeEvent in ActiveTimedEvents)
+            {
+                if (activeEvent.EventID == diceEvent.EventID)
+                {
+                    activeEvent.ResetTime();
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void RecalculatePosition(PUI_Inventory inventory, PUI_InventoryItem timer, float start)
@@ -66,7 +81,7 @@ namespace TwitchDice.Twitch
             foreach (var activeEvent in ActiveTimedEvents)
             {
                 if (activeEvent == timer) break;
-                start -= inventory.m_invSlotStartOffsetY + activeEvent.CurrentHeight;
+                start -= inventory.m_invSlotStartOffsetY + activeEvent.Item.CurrentHeight;
             }
             timer.SetPosition(new Vector2(inventory.m_invSlotStartPos.x, start));
         }
@@ -96,19 +111,26 @@ namespace TwitchDice.Twitch
         public PUI_InventoryItem Item;
         public float Time;
         public string EventName;
+        public string EventID;
         private DateTime End;
         private bool setup = false;
         private string color;
 
-        public void Init(PUI_InventoryItem item, int seconds, string eventName, DiceTier tier)
+        public void Init(PUI_InventoryItem item, IDiceEvent diceEvent)
         {
             Item = item;
-            Time = seconds;
-            EventName = eventName;
+            Time = diceEvent.Time;
+            EventName = diceEvent.EventName;
+            EventID = diceEvent.EventID;
 
             End = DateTime.Now.AddSeconds(Time);
             setup = true;
-            color = ColorUtil.GetDiceColorForTier(tier);
+            color = ColorUtil.GetDiceColorForTier(diceEvent.Tier);
+        }
+
+        public void ResetTime()
+        {
+            End = DateTime.Now.AddSeconds(Time);
         }
 
         void Update()
