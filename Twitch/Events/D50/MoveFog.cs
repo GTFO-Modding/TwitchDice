@@ -12,7 +12,7 @@ namespace TwitchDice.Twitch.Events.D50
         public override string EventID => "movefog";
 
         protected override DiceTier DiceTier => DiceTier.D50;
-        
+
         public override void ReceiveClient(ulong sender, MF packet)
         {
             TimedEvents.Start(this.DoTriggerEvent(packet.seconds, packet.delta));
@@ -21,9 +21,10 @@ namespace TwitchDice.Twitch.Events.D50
         public override void TriggerHost()
         {
             float seconds = 5f;
-            // Random height change from -10 to 10
-            float delta = (float) Main.rnd.NextDouble() * 20.0f - 10f;
             
+            // Random height change in (-10, 10) 
+            float delta = (float) Main.rnd.NextDouble() * 20.0f + 10.0f;
+
             this.TriggerClient(new MF(seconds, delta));
             TimedEvents.Start(this.DoTriggerEvent(seconds, delta));
         }
@@ -36,7 +37,10 @@ namespace TwitchDice.Twitch.Events.D50
                    || delta < 0 && PreLitVolume.Current.m_densityHeightAltitude > targetHeight)
             {
                 yield return new WaitForEndOfFrame();
-                PreLitVolume.Current.m_densityHeightAltitude +=  delta * (UnityEngine.Time.deltaTime / seconds);
+                if (PreLitVolume.Current != null)
+                {
+                    PreLitVolume.Current.m_densityHeightAltitude +=  delta * (UnityEngine.Time.deltaTime / seconds);
+                }
             }
         }
     }
