@@ -23,7 +23,7 @@ namespace TwitchDice.Twitch.Events.D50
             float seconds = 5f;
             
             // Random height change in (-10, 10) 
-            float delta = (float) Main.rnd.NextDouble() * 20.0f + 10.0f;
+            float delta = (float) Main.rnd.NextDouble() * 20.0f - 10.0f;
 
             this.TriggerClient(new MF(seconds, delta));
             TimedEvents.Start(this.DoTriggerEvent(seconds, delta));
