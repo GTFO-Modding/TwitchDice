@@ -57,9 +57,7 @@ namespace TwitchDice.Twitch
             timer.m_slim_root.transform.Find("Pivot/Background Small").gameObject.SetActive(false);
             timer.m_slim_root.transform.Find("Pivot/Infinite ammo").gameObject.SetActive(false);
 
-            float start = CalcVanilla(inventory);
-
-            RecalculatePosition(inventory, timer, start);
+            RecalculateAll();
             Log.Debug($"Added new timed event with name {diceEvent.EventName}");
         }
 
