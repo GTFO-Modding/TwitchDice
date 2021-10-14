@@ -110,6 +110,7 @@ namespace TwitchDice
             ClassInjector.RegisterTypeInIl2Cpp<DestroyOnCleanUp>();
             ClassInjector.RegisterTypeInIl2Cpp<EventTimerManager>();
             ClassInjector.RegisterTypeInIl2Cpp<EventTimer>();
+            ClassInjector.RegisterTypeInIl2Cpp<NoiseMaker>();
             CoroutineHandler.Init();
         }
 
@@ -125,12 +126,15 @@ namespace TwitchDice
         {
             if (DiceMasterObject == null)
             {
-                DiceMasterObject = new GameObject();
-                DiceMasterObject.name = "DICE MASTER";
+                DiceMasterObject = new GameObject
+                {
+                    name = "DICE MASTER"
+                };
                 UnityEngine.Object.DontDestroyOnLoad(DiceMasterObject);
 
                 DiceMasterObject.AddComponent<DiceMaster>();
                 DiceMasterObject.AddComponent<EventTimerManager>();
+                DiceMasterObject.AddComponent<NoiseMaker>();
 
 
                 TwitchDice.Log.Message("Created DiceMaster");
