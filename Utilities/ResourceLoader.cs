@@ -15,7 +15,7 @@ namespace TwitchDice.Utilities
         {
             s_banksToLoad = new List<(string, byte[])>();
 
-            InitBankResource("VineBOOMSFX");
+            InitBankResource("TwitchDice");
 
             AssetShardManager.add_OnStartupAssetsLoaded((System.Action)OnStartupAssetsLoaded);
         }
