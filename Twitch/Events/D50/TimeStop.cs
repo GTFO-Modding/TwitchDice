@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using TwitchDice.CustomSounds.TAK;
 using TwitchDice.Utilities;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace TwitchDice.Twitch.Events.D50
 
         protected override DiceTier DiceTier => DiceTier.D50;
 
-        public override int Time => 5;
+        public override int Time => 15;
 
         public override void ReceiveClient(ulong sender, TS packet)
         {
@@ -35,10 +36,26 @@ namespace TwitchDice.Twitch.Events.D50
 
         private IEnumerator StopTime()
         {
+            CellSound.Post(TEVENTS.PLAY_TIMESTOP);
+
             var previousTime = UnityEngine.Time.timeScale;
+
+            yield return new WaitForSecondsRealtime(0.5f);
+            UnityEngine.Time.timeScale = previousTime * 0.8f;
+
+            yield return new WaitForSecondsRealtime(0.5f);
+            UnityEngine.Time.timeScale = previousTime * 0.6f;
+
+            yield return new WaitForSecondsRealtime(0.5f);
+            UnityEngine.Time.timeScale = previousTime * 0.4f;
+
+            yield return new WaitForSecondsRealtime(0.5f);
+            UnityEngine.Time.timeScale = previousTime * 0.2f;
+
+            yield return new WaitForSecondsRealtime(0.5f);
             UnityEngine.Time.timeScale = 0;
 
-            yield return new WaitForSecondsRealtime(Time);
+            yield return new WaitForSecondsRealtime(Time - 3.0f);
 
             UnityEngine.Time.timeScale = previousTime;
 

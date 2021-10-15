@@ -7,11 +7,12 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <None Remove="Assets\TwitchDice.bnk" />
     <None Remove="Assets\VineBOOMSFX.bnk" />
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Assets\VineBOOMSFX.bnk" />
+    <EmbeddedResource Include="Assets\TwitchDice.bnk" />
   </ItemGroup>
   
   <ItemGroup>
