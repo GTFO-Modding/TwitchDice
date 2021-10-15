@@ -9,30 +9,44 @@ namespace TwitchDice.Utilities
 {
     public static class ResourceLoader
     {
-        internal static byte[] s_vineBoomSFXBank;
+        private static List<(string, byte[])> s_banksToLoad;
 
         internal static void Init()
         {
-            var assembly = Assembly.GetExecutingAssembly();
+            s_banksToLoad = new List<(string, byte[])>();
 
-            using (var vineBoomBankStream = assembly.GetManifestResourceStream("TwitchDice.Assets.VineBOOMSFX.bnk"))
-            {
-                s_vineBoomSFXBank = new byte[vineBoomBankStream.Length];
-                vineBoomBankStream.Read(s_vineBoomSFXBank);
-            }
+            InitBankResource("VineBOOMSFX");
 
             AssetShardManager.add_OnStartupAssetsLoaded((System.Action)OnStartupAssetsLoaded);
         }
 
+        private static void InitBankResource(string bankName)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            byte[] result;
+            using (var stream = assembly.GetManifestResourceStream($"TwitchDice.Assets.{bankName}.bnk"))
+            {
+                result = new byte[stream.Length - stream.Position];
+                stream.Read(result);
+            }
+
+            s_banksToLoad.Add((bankName, result));
+        }
+
         private static void OnStartupAssetsLoaded()
         {
-            if (LoadBNK(s_vineBoomSFXBank, out uint _))
+            while (s_banksToLoad.Count > 0)
             {
-                Log.Debug("Successfully loaded Vine Boom Bank");
-            }
-            else
-            {
-                Log.Error("Failed to load Vine Boom Bank!");
+                var bankInfo = s_banksToLoad[0];
+                s_banksToLoad.RemoveAt(0);
+                if (LoadBNK(bankInfo.Item2, out uint _))
+                {
+                    Log.Debug($"Successfully loaded {bankInfo.Item1} Bank");
+                }
+                else
+                {
+                    Log.Error($"Failed to load {bankInfo.Item1} Bank!");
+                }
             }
         }
 
@@ -62,8 +76,16 @@ namespace TwitchDice.Utilities
                 }
                 #endregion
 
-                var result = AkSoundEngine.LoadBank(ptr, size, out bnkID);
-                return result == AKRESULT.AK_Success || result == AKRESULT.AK_BankAlreadyLoaded;
+                switch (AkSoundEngine.LoadBank(ptr, size, out bnkID))
+                {
+                    case AKRESULT.AK_Success:
+                        return true;
+                    case AKRESULT.AK_BankAlreadyLoaded:
+                        Log.Warning($"Bank with id '{bnkID}' is already loaded");
+                        return true;
+                    default:
+                        return false;
+                }
             }
             catch (Exception)
             {
