@@ -46,7 +46,7 @@ namespace TwitchDice.Twitch.Events.D6
             go.transform.Rotate(0, 0, 180);
             yield return new WaitForSeconds(time);
             Active = false;
-            target.FPSCamera.m_holder.gameObject.transform.rotation = new Quaternion(0, 0, 0, 0);
+            go.transform.Rotate(0, 0, -180);
             yield break;
         }
 

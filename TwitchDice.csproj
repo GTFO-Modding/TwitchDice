@@ -7,6 +7,14 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <None Remove="Assets\VineBOOMSFX.bnk" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\VineBOOMSFX.bnk" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.5" />
     <PackageReference Include="TwitchLib" Version="3.2.0" />
   </ItemGroup>

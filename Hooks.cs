@@ -118,7 +118,7 @@ namespace TwitchDice
                 var player = sourceAgent?.TryCast<PlayerAgent>();
                 if (player != null && player.IsLocallyOwned)
                 {
-                    player.Damage.NoAirDamage(dam);
+                    player.Damage.NoAirDamage(dam * player.PlayerData.friendlyFireMulti);
                 }
             }
         }

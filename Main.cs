@@ -83,6 +83,7 @@ namespace TwitchDice
             EventManager = new EventManager();
 
             EnemyRespawnManager.Init();
+            ResourceLoader.Init();
         }
 
         private void SetupConfig()

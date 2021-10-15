@@ -27,11 +27,12 @@ namespace TwitchDice.Twitch.Events.D12
 
         private IEnumerator ApplyScale(EnemyAgent enemy, float seconds, float multiplier)
         {
+            var oldScale = enemy.transform.localScale;
             enemy.transform.localScale = enemy.transform.localScale * multiplier;
             yield return new WaitForSeconds(seconds);
             if (enemy != null)
             {
-                enemy.transform.localScale = enemy.transform.localScale / multiplier;
+                enemy.transform.localScale = oldScale;
             }
         }
 
