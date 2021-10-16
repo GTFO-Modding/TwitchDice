@@ -24,16 +24,6 @@ namespace TwitchDice.Twitch
 
         private readonly List<EventTimer> ActiveTimedEvents = new List<EventTimer>();
 
-        private void RecalculateAll()
-        {
-            PUI_Inventory inventory = GuiManager.PlayerLayer.Inventory;
-            float start = CalcVanilla(inventory);
-            foreach (var timer in ActiveTimedEvents)
-            {
-                RecalculatePosition(inventory, timer.Item, start);
-            }
-        }
-
         public void RemoveTimedInstance(EventTimer eventTimer)
         {
             ActiveTimedEvents.Remove(eventTimer);
@@ -74,16 +64,6 @@ namespace TwitchDice.Twitch
             return false;
         }
 
-        private void RecalculatePosition(PUI_Inventory inventory, PUI_InventoryItem timer, float start)
-        {
-            foreach (var activeEvent in ActiveTimedEvents)
-            {
-                if (activeEvent == timer) break;
-                start -= inventory.m_invSlotStartOffsetY + activeEvent.Item.CurrentHeight;
-            }
-            timer.SetPosition(new Vector2(inventory.m_invSlotStartPos.x, start));
-        }
-
         private float CalcVanilla(PUI_Inventory inventory)
         {
             float startPos = inventory.m_invSlotStartPos.y;
@@ -98,6 +78,27 @@ namespace TwitchDice.Twitch
                 }
             }
             return startPos;
+        }
+
+        private void RecalculateAll()
+        {
+            PUI_Inventory inventory = GuiManager.PlayerLayer.Inventory;
+            float start = CalcVanilla(inventory);
+            foreach (var timer in ActiveTimedEvents)
+            {
+                RecalculatePosition(inventory, timer.Item, start);
+            }
+        }
+
+        private void RecalculatePosition(PUI_Inventory inventory, PUI_InventoryItem timer, float start)
+        {
+            foreach (var activeEvent in ActiveTimedEvents)
+            {
+                if (activeEvent.Item == timer) break;
+                start -= inventory.m_invSlotStartOffsetY + activeEvent.Item.CurrentHeight;
+            }
+            Log.Debug($"Set position of event {timer.name} to {start}");
+            timer.SetPosition(new Vector2(inventory.m_invSlotStartPos.x, start));
         }
     }
 
@@ -120,6 +121,7 @@ namespace TwitchDice.Twitch
             Time = diceEvent.Time;
             EventName = diceEvent.EventName;
             EventID = diceEvent.EventID;
+            item.name += EventName;
 
             End = DateTime.Now.AddSeconds(Time);
             setup = true;
