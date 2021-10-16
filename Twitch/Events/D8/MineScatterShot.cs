@@ -24,7 +24,7 @@ namespace TwitchDice.Twitch.Events.D8
                 itemID_gearCRC = 125U
             };
 
-            PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent LocalPlayer, true);
+            PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent LocalPlayer);
 
             var hits = SpawnUtil.GetRandomScatterAround(LocalPlayer.EyePosition, MineCount);
 
