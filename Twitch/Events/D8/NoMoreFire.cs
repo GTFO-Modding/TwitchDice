@@ -4,7 +4,7 @@ namespace TwitchDice.Twitch.Events.D8
 {
     public class NoMoreFire : DiceEvent<NMF>
     {
-        public override string EventName => "No Guns";
+        public override string EventName => "Finger Cramp";
 
         public override string EventID => "disableFire";
 
@@ -14,15 +14,17 @@ namespace TwitchDice.Twitch.Events.D8
         
         public override void ReceiveClient(ulong sender, NMF packet)
         {
-            PlayerControlManager.DisableFireForSeconds(Time);
-            this.StartEventTimer();
+            this.TriggerCommon();
         }
 
         public override void TriggerHost()
         {
             this.TriggerClient();
+            this.TriggerCommon();
+        }
 
-
+        private void TriggerCommon()
+        {
             PlayerControlManager.DisableFireForSeconds(Time);
             this.StartEventTimer();
         }
