@@ -181,6 +181,16 @@ namespace TwitchDice
                         break;
                 }
             }
+            
+            if (PlayerControlManager.DisableFire)
+            {
+                switch (action)
+                {
+                    case InputAction.Fire:
+                        __result = false;
+                        break;
+                }
+            }
         }
 
         [HarmonyPatch(typeof(InputMapper), nameof(InputMapper.GetButtonKeyMouseGamepad))]
@@ -197,6 +207,16 @@ namespace TwitchDice
                         break;
                 }
             }
+
+            if (PlayerControlManager.DisableFire)
+            {
+                switch (action)
+                {
+                    case InputAction.Fire:
+                        __result = false;
+                        break;
+                }
+            }
         }
 
         [HarmonyPatch(typeof(InputMapper), nameof(InputMapper.GetButtonUpKeyMouseGamepad))]
@@ -209,6 +229,16 @@ namespace TwitchDice
                 {
                     case InputAction.Jump:
                     case InputAction.Crouch:
+                        __result = false;
+                        break;
+                }
+            }
+            
+            if (PlayerControlManager.DisableFire)
+            {
+                switch (action)
+                {
+                    case InputAction.Fire:
                         __result = false;
                         break;
                 }

@@ -15,11 +15,13 @@ namespace TwitchDice.Utilities
         public static bool DisableCrouching { get; set; }
         public static bool DoSelfDamage { get; set; }
         public static bool InstantKill { get; set; }
+        public static bool DisableFire { get; set; }
 
         private static CoroutineHandler.IRoutine _activeForceCrouch; // cache in case another force crouch is called.
         private static CoroutineHandler.IRoutine _activeInvertControls; // cache in case of another force invert controls is called.
         private static CoroutineHandler.IRoutine _activeDisableInteractions;
         private static CoroutineHandler.IRoutine _activeDisableMovement;
+        private static CoroutineHandler.IRoutine _activeDisableFire;
         private static CoroutineHandler.IRoutine _activeEnableGlobalPlayerDamage;
         private static CoroutineHandler.IRoutine _activeDisableRunning;
         private static CoroutineHandler.IRoutine _activeNoCrouch;
@@ -87,6 +89,13 @@ namespace TwitchDice.Utilities
             _activeForceCrouch?.Stop();
 
             _activeForceCrouch = TimedEvents.Start(DoForceCrouchForSeconds(seconds));
+        }
+
+        public static void DisableFireForSeconds(float seconds)
+        {
+            _activeDisableFire?.Stop();
+
+            _activeDisableFire = TimedEvents.Start(DoDisableFireForSeconds(seconds));
         }
 
         private static IEnumerator DoEnableSelfDamageForSeconds(float seconds)
@@ -159,6 +168,14 @@ namespace TwitchDice.Utilities
             yield return new WaitForSeconds(seconds);
             ForceCrouchEnabled = false;
             _activeForceCrouch = null;
+        }
+
+        private static IEnumerator DoDisableFireForSeconds(float seconds)
+        {
+            DisableFire = true;
+            yield return new WaitForSeconds(seconds);
+            DisableFire = false;
+            _activeDisableFire = null;
         }
     }
 }
