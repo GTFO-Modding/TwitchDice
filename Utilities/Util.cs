@@ -144,6 +144,28 @@ namespace TwitchDice.Utilities
 
             return list;
         }
+
+        public static RaycastHit GetRandomPointAround(Vector3 org)
+        {
+            Vector3 direction = UnityEngine.Random.insideUnitSphere.normalized;
+            Ray ray = new Ray(org, direction);
+            RaycastHit hit;
+            int iterations = 0;
+            while (!Physics.Raycast(ray, out hit, 100000, LayerManager.MASK_CAMERA_RAY) && iterations < 100)
+            {
+                direction = UnityEngine.Random.insideUnitSphere.normalized;
+                ray = new Ray(org, direction);
+                iterations++;
+            }
+            return hit;
+        }
+
+        public static void ThrowConsumable(Vector3 org, Vector3 target, PlayerAgent source, pItemData data, int throwForce)
+        {
+            Vector3 direction = (target - source.EyePosition).normalized;
+            var rot = Quaternion.LookRotation(direction, Vector3.up);
+            ItemReplicationManager.ThrowItem(data, null, ItemMode.Instance, org, rot, direction * throwForce, source.EyePosition, source.CourseNode, source);
+        }
     }
 
     public static class NetworkUtil
