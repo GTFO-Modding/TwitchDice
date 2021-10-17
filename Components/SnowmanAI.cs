@@ -19,6 +19,7 @@ namespace TwitchDice.Components
 
         const float MaxHealth = 50;
         const float DistFromPlayer = 2;
+        const int TeleportCooldown = 5;
 
         public SnowmanState State 
         { 
@@ -65,7 +66,6 @@ namespace TwitchDice.Components
         private SnowmanState _state;
         private PlayerAgent _target;
         private float nextClientUpdate;
-        Vector3 teleportPosition;
 
         void Awake()
         {
@@ -77,25 +77,26 @@ namespace TwitchDice.Components
 
             NetworkingManager.RegisterEvent<PSnowmanState>(typeof(PSnowmanState).Name, OnClientStateUpdate);
             NetworkingManager.RegisterEvent<PSnowmanHeal>(typeof(PSnowmanHeal).Name, OnClientHeal);
+            NetworkingManager.RegisterEvent<PSnowmanDamage>(typeof(PSnowmanDamage).Name, OnClientDamage);
             SetupInteraction();
+            SetupDamage();
             State = SnowmanState.Client;
 
             if (!SNet.IsMaster) return;
-            SetupDamage();
             State = SnowmanState.Idle;
             StateTimer = 0;
             Target = GetClosestPlayer();
             UpdateRotation();
         }
 
-        void SetupInteraction()
+        void SetupDamage()
         {
             Damage = gameObject.AddComponent<GenericDamageComponent>();
             Damage.add_OnGenericDamageTaken((Il2CppSystem.Action<float>)OnDamage);
             Health = MaxHealth;
         }
 
-        void SetupDamage()
+        void SetupInteraction()
         {
             Interaction.layer = LayerManager.LAYER_INTERACTION;
             Interact = Interaction.AddComponent<Interact_Timed>();
@@ -123,12 +124,25 @@ namespace TwitchDice.Components
             Log.Debug("Client Heal");
         }
 
-        void OnDamage(float damage)
+        void OnClientDamage(ulong sender, PSnowmanDamage damage)
         {
             if (!SNet.IsMaster) return;
-            Health -= damage;
+            Health -= damage.amount;
             if (Health < 0) Health = 0;
             UpdateClientState();
+        }
+
+        void OnDamage(float damage)
+        {
+            if (SNet.IsMaster)
+            {
+                Health -= damage;
+                if (Health < 0) Health = 0;
+                UpdateClientState();
+            } else
+            {
+                NetworkingManager.InvokeEvent(typeof(PSnowmanDamage).Name, new PSnowmanDamage() { amount = damage });
+            }
         }
 
         void OnInteractDone(PlayerAgent agent)
@@ -143,7 +157,7 @@ namespace TwitchDice.Components
         void Update()
         {
             UpdateVisuals();
-            Interact.SetActive(Health != MaxHealth);
+            if (Interact.IsActive != (Health != MaxHealth)) Interact.SetActive(Health != MaxHealth);
 
             if (!SNet.IsMaster) return;
             IsSeen = IsBeingLookedAt();
@@ -166,22 +180,28 @@ namespace TwitchDice.Components
                     {
                         State = SnowmanState.Idle;
                     }
+                    List<AIG_INode> validNodes = new List<AIG_INode>();
                     foreach (var node in Target.CourseNode.m_nodeCluster.m_nodes)
                     {
                         bool validNode = CanPositionBeSeen(node.Position);
-                        teleportPosition = node.Position;
-                        if (validNode && Vector3.Distance(Target.Position, node.Position) > DistFromPlayer)
+                        if (validNode)
                         {
-                            State = SnowmanState.Teleport;
-                            break;
+                            validNodes.Add(node);
                         }
+                    }
+
+                    if (validNodes.Count > 0)
+                    {
+                        var targetNode = validNodes.GetRandomElement<AIG_INode>();
+                        transform.position = targetNode.Position;
+                        UpdateRotation();
+                        State = SnowmanState.Teleport;
                     }
                     break;
 
                 case SnowmanState.Teleport:
-                    transform.position = teleportPosition;
                     State = SnowmanState.TeleportCooldown;
-                    StateTimer = Clock.Time + 15;
+                    StateTimer = Clock.Time + TeleportCooldown;
                     UpdateClientState();
                     break;
 
@@ -293,5 +313,10 @@ namespace TwitchDice.Components
     public struct PSnowmanHeal
     {
 
+    }
+
+    public struct PSnowmanDamage
+    {
+        public float amount;
     }
 }
