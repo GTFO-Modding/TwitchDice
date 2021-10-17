@@ -44,8 +44,7 @@ namespace TwitchDice.Utilities
                 result = new byte[stream.Length - stream.Position];
                 stream.Read(result);
             }
-            var bundle = AssetBundle.LoadFromMemory(result);
-            GTFO.API.AssetAPI.RegisterAssetBundle(bundle);
+            GTFO.API.AssetAPI.LoadAndRegisterAssetBundle(result);
         }
 
         private static void OnStartupAssetsLoaded()

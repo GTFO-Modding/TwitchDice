@@ -30,9 +30,9 @@ namespace TwitchDice.Twitch.Events.D100
 
         public override void TriggerHost()
         {
-            //Triggered = true;
+            Triggered = true;
             TriggerCommon();
-            TriggerClient(); 
+            TriggerClient();
         }
 
         private void TriggerCommon()
