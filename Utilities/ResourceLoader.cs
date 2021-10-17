@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using UnityEngine;
 
 namespace TwitchDice.Utilities
 {
@@ -16,6 +17,7 @@ namespace TwitchDice.Utilities
             s_banksToLoad = new List<(string, byte[])>();
 
             InitBankResource("TwitchDice");
+            InitAssetBundle("snowman");
 
             AssetShardManager.add_OnStartupAssetsLoaded((System.Action)OnStartupAssetsLoaded);
         }
@@ -31,6 +33,19 @@ namespace TwitchDice.Utilities
             }
 
             s_banksToLoad.Add((bankName, result));
+        }
+
+        private static void InitAssetBundle(string assetBundleName)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            byte[] result;
+            using (var stream = assembly.GetManifestResourceStream($"TwitchDice.Assets.Bundle.{assetBundleName}"))
+            {
+                result = new byte[stream.Length - stream.Position];
+                stream.Read(result);
+            }
+            var bundle = AssetBundle.LoadFromMemory(result);
+            GTFO.API.AssetAPI.RegisterAssetBundle(bundle);
         }
 
         private static void OnStartupAssetsLoaded()

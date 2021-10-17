@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.IL2CPP;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -10,11 +8,10 @@ using TwitchDice.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.CrashReportHandler;
-using System.Collections.Generic;
-using System.Linq;
 using Nidhogg.Managers;
 using System.Runtime.InteropServices;
 using BepInEx.Configuration;
+using GTFO.API;
 
 namespace TwitchDice
 {
@@ -112,6 +109,7 @@ namespace TwitchDice
             ClassInjector.RegisterTypeInIl2Cpp<EventTimerManager>();
             ClassInjector.RegisterTypeInIl2Cpp<EventTimer>();
             ClassInjector.RegisterTypeInIl2Cpp<NoiseMaker>();
+            ClassInjector.RegisterTypeInIl2Cpp<SnowmanAI>();
             CoroutineHandler.Init();
         }
 

@@ -12,6 +12,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <EmbeddedResource Include="Assets\Bundle\snowman" />
     <EmbeddedResource Include="Assets\TwitchDice.bnk" />
   </ItemGroup>
   
