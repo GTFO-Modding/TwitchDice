@@ -10,6 +10,7 @@ using UnhollowerBaseLib;
 using TwitchDice.CustomSounds.TAK;
 using AK;
 using Nidhogg.Managers;
+using Gear;
 
 namespace TwitchDice.Components
 {
@@ -20,6 +21,9 @@ namespace TwitchDice.Components
         const float MaxHealth = 50;
         const float DistFromPlayer = 2;
         const int TeleportCooldown = 5;
+        const float BaseAttackDamage = 1.5f;
+        const float AttackMulti = 1.5f;
+        const string SnowmanName = "SNOWFRIEND";
 
         public SnowmanState State 
         { 
@@ -57,6 +61,8 @@ namespace TwitchDice.Components
         public GenericDamageComponent Damage { get; private set; }
         public Interact_Timed Interact { get; private set; }
         public float Health { get; private set; }
+        public bool IsAngry { get => HealthPercent <= 0.2; }
+        public float AttackDamage { get; private set; }
 
 
         GameObject Eyebrows;
@@ -74,6 +80,7 @@ namespace TwitchDice.Components
             Eyebrows = transform.Find("Head/angy").gameObject;
             Interaction = transform.Find("Interaction").gameObject;
             gameObject.AddComponent<DestroyOnCleanUp>();
+            AttackDamage = BaseAttackDamage;
 
             NetworkingManager.RegisterEvent<PSnowmanState>(typeof(PSnowmanState).Name, OnClientStateUpdate);
             NetworkingManager.RegisterEvent<PSnowmanHeal>(typeof(PSnowmanHeal).Name, OnClientHeal);
@@ -101,13 +108,67 @@ namespace TwitchDice.Components
             Interaction.layer = LayerManager.LAYER_INTERACTION;
             Interact = Interaction.AddComponent<Interact_Timed>();
             Interact.m_colliderToOwn = Interaction.GetComponent<Collider>();
-            Interact.InteractDuration = 30;
-            Interact.InteractionMessage = "Heal Friend";
+            Interact.InteractDuration = 5;
+            Interact.InteractionMessage = "";
             Interact.SFXInteractCancel = TEVENTS.PLAY_VINEBOOM;
             Interact.SFXInteractEnd = EVENTS.EXPEDITION_FAILED_SCREEN_JUMP_SCARE;
             Interact.OnlyActiveWhenLookingStraightAt = false;
             Interact.AbortOnDotOrDistanceDiff = false;
+            Func<PlayerAgent, bool> CanInteract = CanPlayerInteract;
+            Interact.ExternalPlayerCanInteract = CanInteract;
             Interact.add_OnInteractionTriggered((Il2CppSystem.Action<PlayerAgent>)OnInteractDone);
+        }
+
+        bool CanPlayerInteract(PlayerAgent player)
+        {
+            ResourcePackFirstPerson pack = player.FPItemHolder.WieldedItem.TryCast<ResourcePackFirstPerson>();
+
+            if (pack != null)
+            {
+                eResourceContainerSpawnType packType = pack.m_packType;
+                string text = "sus";
+                switch (packType)
+                {
+                    case eResourceContainerSpawnType.Health:
+                        if (Health >= MaxHealth)
+                        {
+                            text = $"{SnowmanName} DOES NOT NEED MEDICAL RESOURCES";
+                        } else
+                        {
+                            Interact.InteractionMessage = $"Use Medipack on <b>{SnowmanName}</b>";
+                            return true;
+                        }
+                        break;
+                    case eResourceContainerSpawnType.AmmoWeapon:
+                        text =  $"{SnowmanName} DOES NOT NEED WEAPON AMMUNITION";
+                        break;
+                    case eResourceContainerSpawnType.AmmoTool:
+                        text = $"{SnowmanName} DOES NOT NEED TOOL AMMUNITION";
+                        break;
+                    case eResourceContainerSpawnType.Disinfection:
+                        text = $"{SnowmanName} DOES NOT NEED DISINFECTION";
+                        break;
+                }
+                //if (InputMapper.GetButtonDown.Invoke(InputAction.Use, player.InputFilter))
+                //{
+                //    player.Sound.Post(EVENTS.BUTTONGENERICBLIPDENIED);
+                //    GuiManager.InteractionLayer.SetTimedInteractionPrompt(text, 1.4f, ePUIMessageStyle.Default);
+                //}
+            }
+            return false;
+        }
+
+        void OnInteractDone(PlayerAgent agent)
+        {
+            PlayerAmmoStorage ammoStorage = PlayerBackpackManager.LocalBackpack.AmmoStorage;
+            ammoStorage.UpdateBulletsInPack(AmmoType.ResourcePackRel, -1);
+            ResourcePackFirstPerson pack = agent.FPItemHolder.WieldedItem.TryCast<ResourcePackFirstPerson>();
+            pack.m_itemUpTimer = Clock.Time + 0.6f;
+            if (SNet.IsMaster)
+                HealSnowman();
+            else
+                NetworkingManager.InvokeEvent(typeof(PSnowmanHeal).Name, new PSnowmanHeal());
+            Log.Debug("Interact Done");
         }
 
         void OnClientStateUpdate(ulong sender, PSnowmanState state)
@@ -120,7 +181,7 @@ namespace TwitchDice.Components
 
         void OnClientHeal(ulong sender, PSnowmanHeal hela)
         {
-            Health = MaxHealth;
+            HealSnowman();
             Log.Debug("Client Heal");
         }
 
@@ -145,19 +206,17 @@ namespace TwitchDice.Components
             }
         }
 
-        void OnInteractDone(PlayerAgent agent)
+        void HealSnowman()
         {
-            if (SNet.IsMaster) 
-                Health = MaxHealth;
-            else
-                NetworkingManager.InvokeEvent(typeof(PSnowmanHeal).Name, new PSnowmanHeal());
-            Log.Debug("Interact Done");
+            Health += 20;
+            if (Health > MaxHealth) Health = MaxHealth;
+            AttackDamage = BaseAttackDamage;
         }
 
         void Update()
         {
             UpdateVisuals();
-            if (Interact.IsActive != (Health != MaxHealth)) Interact.SetActive(Health != MaxHealth);
+            //if (Interact.IsActive != (Health != MaxHealth)) Interact.SetActive(Health != MaxHealth);
 
             if (!SNet.IsMaster) return;
             IsSeen = IsBeingLookedAt();
@@ -180,6 +239,21 @@ namespace TwitchDice.Components
                     {
                         State = SnowmanState.Idle;
                     }
+                    if (IsAngry)
+                    {
+                        if (SNet.IsMaster)
+                        {
+                            Log.Debug($"Try damage for {AttackDamage}");
+                            Target.Damage.ParasiteDamage(AttackDamage);
+                            Target.Locomotion.AddExternalPushForce(Vector3.forward * 10);
+                            Target.Sound.Post(EVENTS.EXPEDITION_FAILED_SCREEN_JUMP_SCARE);
+                            AttackDamage *= AttackMulti;
+                        }
+                        transform.position = Target.Position;
+                        State = SnowmanState.Teleport;
+                        break;
+                    }
+
                     List<AIG_INode> validNodes = new List<AIG_INode>();
                     foreach (var node in Target.CourseNode.m_nodeCluster.m_nodes)
                     {
@@ -201,7 +275,15 @@ namespace TwitchDice.Components
 
                 case SnowmanState.Teleport:
                     State = SnowmanState.TeleportCooldown;
-                    StateTimer = Clock.Time + TeleportCooldown;
+                    StateTimer = Clock.Time + (TeleportCooldown * AttackDamage);
+                    if (!Target.Alive)
+                    {
+                        if (PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent newTarget, true, null, true))
+                        {
+                            Target = newTarget;
+                        }
+                        else State = SnowmanState.NoTarget;
+                    }
                     UpdateClientState();
                     break;
 
@@ -299,6 +381,7 @@ namespace TwitchDice.Components
         LookingForNodes,
         Teleport,
         TeleportCooldown,
+        NoTarget,
         Client
     }
 
