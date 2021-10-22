@@ -78,18 +78,21 @@ namespace TwitchDice.Utilities
             }
         }
 
-        public static bool TryGetRandomPlayerAgent(out PlayerAgent playerAgent, bool IncludeHost = true, List<PlayerAgent> exclude = null)
+        public static bool TryGetRandomPlayerAgent(out PlayerAgent playerAgent, bool IncludeHost = true, List<PlayerAgent> exclude = null, bool excludeDead = false)
         {
             playerAgent = null;
             var list = new List<PlayerAgent>();
             foreach (var item in PlayerManager.PlayerAgentsInLevel)
             {
                 if (!IncludeHost && item.IsLocallyOwned) continue;
+                if (excludeDead && !item.Alive) continue;
                 if (exclude != null)
                     if (exclude.Contains(item)) continue;
 
                 list.Add(item);
             }
+
+            if (list.Count == 0) return false;
 
             try
             {
