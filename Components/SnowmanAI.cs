@@ -214,9 +214,9 @@ namespace TwitchDice.Components
                     {
                         if (SNet.IsMaster)
                         {
-                            Log.Debug($"Try damage for {AttackDamage}");
                             Target.Damage.ParasiteDamage(AttackDamage);
                             Target.Locomotion.AddExternalPushForce(Vector3.forward * 10);
+                            Target.FPSCamera.AddHitReact(AttackDamage / (BaseAttackDamage * 2), Vector3.up, 1, true, true);
                             Target.Sound.Post(EVENTS.EXPEDITION_FAILED_SCREEN_JUMP_SCARE);
                             AttackDamage *= AttackMulti;
                         }
