@@ -12,6 +12,10 @@ using Nidhogg.Managers;
 using System.Runtime.InteropServices;
 using BepInEx.Configuration;
 using GTFO.API;
+using UnhollowerBaseLib.Runtime.VersionSpecific.Class;
+using UnhollowerBaseLib.Runtime;
+using UnhollowerBaseLib;
+using Gear;
 
 namespace TwitchDice
 {
@@ -109,7 +113,13 @@ namespace TwitchDice
             ClassInjector.RegisterTypeInIl2Cpp<EventTimerManager>();
             ClassInjector.RegisterTypeInIl2Cpp<EventTimer>();
             ClassInjector.RegisterTypeInIl2Cpp<NoiseMaker>();
-            ClassInjector.RegisterTypeInIl2Cpp<SnowmanAI>();
+            //unsafe
+            //{
+            //    INativeClassStruct nativeClassStruct = UnityVersionHandler.Wrap((Il2CppClass*)((void*)Il2CppClassPointerStore<iResourcePackReceiver>.NativeClassPtr));
+            //    ClassInjector.RegisterTypeInIl2Cpp<SnowmanAI>(nativeClassStruct);
+            //}
+            InterfaceInjector.InjectWithInterface<SnowmanAI>();
+
             CoroutineHandler.Init();
         }
 

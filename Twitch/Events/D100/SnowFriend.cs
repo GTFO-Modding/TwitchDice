@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Gear;
 using GTFO.API;
 using TwitchDice.Components;
 using TwitchDice.Utilities;
