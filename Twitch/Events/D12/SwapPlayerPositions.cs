@@ -39,7 +39,7 @@ namespace TwitchDice.Twitch.Events.D12
 
             for (int i = 1; i <= playerCards.Count; i++)
             {
-                if (i != playerCards.Count)
+                if (i + 1 > playerCards.Count)
                 {
                     playerCards[i].Position = playerCards[i + 1].Position;
                 } else
