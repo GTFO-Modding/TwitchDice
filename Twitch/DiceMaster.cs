@@ -11,7 +11,6 @@ namespace TwitchDice.Twitch
 {
     public enum DiceTier
     {
-        INVALID,
         D3 = 3,
         D4 = 4,
         D6 = 6,
@@ -78,13 +77,14 @@ namespace TwitchDice.Twitch
             if (IsHost)
             {
                 Log.Debug("Player is host, creating twitch connection...");
-                if (!Main.SKIP_TWITCH)
+                if (Main.Instance.TwitchEnabled)
                 {
                     TwitchManager = new TwitchManager();
                     TwitchManager.OnMessageReceived += TwitchManager_OnMessageReceived;
                     TwitchManager.OnConnected += TwitchManager_OnConnected;
                     TwitchManager.OnDisconnected += TwitchManager_OnDisconnected;
                     TwitchManager.OnRewardRedeemed += TwitchManager_OnRewardRedeemed;
+                    TwitchManager.OnBitsReceived += TwitchManager_OnBitsReceived;
                     TwitchManager.Connect(Main.Secrets);
                     TwitchManager.OnConnected += TwitchManager_OnConnected;
                 } else
@@ -99,14 +99,12 @@ namespace TwitchDice.Twitch
             #endregion
 
             #region Debug
-//#if DEBUG
             PlayerChatManager.add_OnIncomingChatMessage((Action<SNetwork.SNet_Player, string>)((player, data) =>
             {
                 Log.Debug("Incoming chat message");
-                if (State != DiceMasterState.InLevel || !IsHost || !Main.DEBUG) return;
+                if (State != DiceMasterState.InLevel || !IsHost || Main.Instance.TwitchEnabled) return;
                 Main.EventManager.TryActivateEvent(data, player.NickName);
             }));
-//#endif
             #endregion
 
         }
@@ -141,7 +139,6 @@ namespace TwitchDice.Twitch
                     Destroy(this);
                     break;
             }
-
         }
 
 
@@ -163,7 +160,34 @@ namespace TwitchDice.Twitch
 
         private void TwitchManager_OnRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnRewardRedeemedArgs e)
         {
-            Log.Message("Trying to parse reward into dice...");
+            Log.Debug("Trying to parse reward into dice...");
+            if (Main.Instance.TryGetDiceTier(e.RewardTitle, out Main.DiceTierConfigEntry config))
+            {
+                EventInfo info = new EventInfo()
+                {
+                    ActivatorUsername = e.DisplayName,
+                    Tier = config.Tier
+                };
+                EventQueue.Enqueue(info);
+                return;
+            }
+            Log.Debug($"Found no associated tier for reward {e.RewardTitle}");
+        }
+
+        private void TwitchManager_OnBitsReceived(object sender, TwitchLib.PubSub.Events.OnBitsReceivedArgs e)
+        {
+            Log.Debug("Trying to parse reward into dice...");
+            if (Main.Instance.TryGetDiceTier(e.BitsUsed, out Main.DiceTierConfigEntry config))
+            {
+                EventInfo info = new EventInfo()
+                {
+                    ActivatorUsername = e.Username,
+                    Tier = config.Tier
+                };
+                EventQueue.Enqueue(info);
+                return;
+            }
+            Log.Debug($"{e.BitsUsed} < minimum dice amount");
         }
 
         private void TwitchManager_OnDisconnected(object sender, TwitchLib.Communication.Events.OnDisconnectedEventArgs e)

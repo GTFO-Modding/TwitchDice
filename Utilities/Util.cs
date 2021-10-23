@@ -330,7 +330,6 @@ namespace TwitchDice.Utilities
         {
             return tier switch
             {
-                DiceTier.INVALID => "",
                 DiceTier.D3 => Main.COLOR_D3,
                 DiceTier.D4 => Main.COLOR_D4,
                 DiceTier.D6 => Main.COLOR_D6,

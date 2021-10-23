@@ -16,6 +16,8 @@ using UnhollowerBaseLib.Runtime.VersionSpecific.Class;
 using UnhollowerBaseLib.Runtime;
 using UnhollowerBaseLib;
 using Gear;
+using System;
+using System.Collections.Generic;
 
 namespace TwitchDice
 {
@@ -23,6 +25,7 @@ namespace TwitchDice
     [BepInDependency("com.kasuromi.nidhogg", BepInDependency.DependencyFlags.HardDependency)]
     public class Main : BasePlugin
     {
+        #region String consts
         public const string
             NAME = "TwitchDice",
             AUTHOR = "dak",
@@ -40,6 +43,17 @@ namespace TwitchDice
             CONFIG_TWITCH_IMPLICITOAUTH_KEY = "OAuth",
             CONFIG_TWITCH_IMPLICITOAUTH_DESC = "The OAuth token for the user",
 
+            CONFIG_TWITCH_ENABLED_KEY = "Enable Twitch Connection",
+            CONFIG_TWITCH_ENABLED_DESC = "Toggles if the mod should connect to twitch, used for testing events",
+
+            CONFIG_TWITCH_DICETIER_SECTION = "Dice tier costs & rewards",
+
+            CONFIG_TWITCH_DICETIER_BITS_KEY_FORMAT = "{0} bit cost",
+            CONFIG_TWITCH_DICETIER_CHANNELPOINTS_KEY_FORMAT = "{0} channel reward",
+
+            CONFIG_TWITCH_DICETIER_BITS_DESC_FORMAT = "The cost in bits for events of tier {0} to activate",
+            CONFIG_TWITCH_DICETIER_CHANNELPOINTS_DESC_FORMAT = "The name of the channel reward that should trigger an event of tier {0}",
+
             CONFIG_EVENTS_SECTION = "Enabled Events",
             CONFIG_DICE_SECTION = "Event Tiers",
             
@@ -51,9 +65,7 @@ namespace TwitchDice
             COLOR_D20 = "#ff6464",
             COLOR_D50 = "#ff4545",
             COLOR_D100 = "red";
-
-        public static bool DEBUG = true;
-        public static bool SKIP_TWITCH = true;
+        #endregion
 
         public static ManualLogSource log;
         public static Main Instance;
@@ -62,10 +74,17 @@ namespace TwitchDice
         public static System.Random rnd = new System.Random();
         public static Secrets Secrets;
 
+        public string Channel => configChannel.Value;
+        public string Username => configUsername.Value;
+        public string ImplicitOAuth => configImplicitOAuth.Value;
+        public bool TwitchEnabled => configTwitchEnabled.Value;
+
         //Config
         private ConfigEntry<string> configChannel;
         private ConfigEntry<string> configUsername;
         private ConfigEntry<string> configImplicitOAuth;
+        private ConfigEntry<bool> configTwitchEnabled;
+        private readonly List<DiceTierConfigEntry> TierConfigs = new List<DiceTierConfigEntry>();
 
         public override void Load()
         {
@@ -81,10 +100,27 @@ namespace TwitchDice
 
             Hooks.OnLobbyStart += Hooks_OnLobbyStart;
             NetworkingManager.RegisterEvent<ChatMsg>(typeof(ChatMsg).Name, OnMessage);
-            EventManager = new EventManager();
 
+            EventManager = new EventManager();
             EnemyRespawnManager.Init();
             ResourceLoader.Init();
+        }
+
+        public bool TryGetDiceTier(int bit, out DiceTierConfigEntry config)
+        {
+            config = null;
+            foreach (var entry in TierConfigs)
+            {
+                if (bit <= entry.BitAmount) return true;
+                config = entry;
+            }
+            return config != null;
+        }
+
+        public bool TryGetDiceTier(string channelReward, out DiceTierConfigEntry config)
+        {
+            config = TierConfigs.Find(t => t.ChannelReward == channelReward);
+            return config != null;
         }
 
         private void SetupConfig()
@@ -92,12 +128,19 @@ namespace TwitchDice
             configChannel = Config.Bind(CONFIG_TWITCH_SECTION, CONFIG_TWITCH_CHANNEL_KEY, "", CONFIG_TWITCH_CHANNEL_DESC);
             configUsername = Config.Bind(CONFIG_TWITCH_SECTION, CONFIG_TWITCH_USERNAME_KEY, "", CONFIG_TWITCH_USERNAME_DESC);
             configImplicitOAuth = Config.Bind(CONFIG_TWITCH_SECTION, CONFIG_TWITCH_IMPLICITOAUTH_KEY, "", CONFIG_TWITCH_IMPLICITOAUTH_DESC);
+            configTwitchEnabled = Config.Bind(CONFIG_TWITCH_SECTION, CONFIG_TWITCH_ENABLED_KEY, true, CONFIG_TWITCH_ENABLED_DESC);
             Secrets = new Secrets()
             {
                 Channel = configChannel.Value,
                 Username = configUsername.Value,
                 ImplicitOAuth = configImplicitOAuth.Value
             };
+
+            foreach (var _tier in Enum.GetValues(typeof(DiceTier)))
+            {
+                DiceTier tier = (DiceTier)_tier;
+                TierConfigs.Add(new DiceTierConfigEntry(tier, Config));
+            }
         }
 
         private void OnMessage(ulong sender, ChatMsg message)
@@ -113,11 +156,7 @@ namespace TwitchDice
             ClassInjector.RegisterTypeInIl2Cpp<EventTimerManager>();
             ClassInjector.RegisterTypeInIl2Cpp<EventTimer>();
             ClassInjector.RegisterTypeInIl2Cpp<NoiseMaker>();
-            //unsafe
-            //{
-            //    INativeClassStruct nativeClassStruct = UnityVersionHandler.Wrap((Il2CppClass*)((void*)Il2CppClassPointerStore<iResourcePackReceiver>.NativeClassPtr));
-            //    ClassInjector.RegisterTypeInIl2Cpp<SnowmanAI>(nativeClassStruct);
-            //}
+
             InterfaceInjector.InjectWithInterface<SnowmanAI>();
 
             CoroutineHandler.Init();
@@ -155,11 +194,35 @@ namespace TwitchDice
 
         public void CreateChatManager()
         {
-            GameObject gameObject = new GameObject();
-            gameObject.name = "CHAT MANAGER";
+            GameObject gameObject = new GameObject
+            {
+                name = "CHAT MANAGER"
+            };
             gameObject.AddComponent<ChatManager>();
             UnityEngine.Object.DontDestroyOnLoad(gameObject);
             TwitchDice.Log.Message("Created Chat Manager!");
+        }
+
+        public class DiceTierConfigEntry
+        {
+            public DiceTierConfigEntry(DiceTier tier, ConfigFile config)
+            {
+                string bitsKey = string.Format(CONFIG_TWITCH_DICETIER_BITS_KEY_FORMAT, tier);
+                string bitsDesc = string.Format(CONFIG_TWITCH_DICETIER_BITS_DESC_FORMAT, tier);
+
+                string rewardKey = string.Format(CONFIG_TWITCH_DICETIER_CHANNELPOINTS_KEY_FORMAT, tier);
+                string rewardDesc = string.Format(CONFIG_TWITCH_DICETIER_CHANNELPOINTS_DESC_FORMAT, tier);
+
+                _bitAmount = config.Bind(CONFIG_TWITCH_DICETIER_SECTION, bitsKey, (int)tier, bitsDesc);
+                _channelReward = config.Bind(CONFIG_TWITCH_DICETIER_SECTION, rewardKey, "", rewardDesc);
+                Tier = tier;
+            }
+            public int BitAmount { get => _bitAmount.Value; }
+            public string ChannelReward { get => _channelReward.Value; }
+            public DiceTier Tier { get; private set; }
+
+            private readonly ConfigEntry<int> _bitAmount;
+            private readonly ConfigEntry<string> _channelReward;
         }
     }
 

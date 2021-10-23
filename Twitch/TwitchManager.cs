@@ -34,6 +34,7 @@ namespace TwitchDice
         public event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
         public event EventHandler<OnJoinedChannelArgs> OnConnected;
         public event EventHandler<OnDisconnectedEventArgs> OnDisconnected;
+        public event EventHandler<OnBitsReceivedArgs> OnBitsReceived;
 
         public TwitchManager()
         {
@@ -124,6 +125,8 @@ namespace TwitchDice
                 {
                     Log.Message("[Twitch PubSub] Sending topics to listen too...");
                     TwitchPubSub.ListenToRewards(channelId);
+                    TwitchPubSub.ListenToBitsEvents(channelId);
+                    TwitchPubSub.ListenToSubscriptions(channelId);
                     TwitchPubSub.SendTopics(twitchApiOauthToken);
                 };
                 TwitchPubSub.OnPubSubServiceError += (sender, e) =>
@@ -146,6 +149,7 @@ namespace TwitchDice
                     }
                 };
                 TwitchPubSub.OnRewardRedeemed += OnRewardRedeemed;
+                TwitchPubSub.OnBitsReceived += OnBitsReceived;
                 Log.Message("[Twitch PubSub] Connecting...");
                 TwitchPubSub.Connect();
             }
