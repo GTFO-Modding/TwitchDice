@@ -72,7 +72,7 @@ namespace TwitchDice
         public static GameObject DiceMasterObject;
         public static EventManager EventManager;
         public static System.Random rnd = new System.Random();
-        public static Secrets Secrets;
+        public static Secrets Secret;
 
         public string Channel => configChannel.Value;
         public string Username => configUsername.Value;
@@ -129,7 +129,7 @@ namespace TwitchDice
             configUsername = Config.Bind(CONFIG_TWITCH_SECTION, CONFIG_TWITCH_USERNAME_KEY, "", CONFIG_TWITCH_USERNAME_DESC);
             configImplicitOAuth = Config.Bind(CONFIG_TWITCH_SECTION, CONFIG_TWITCH_IMPLICITOAUTH_KEY, "", CONFIG_TWITCH_IMPLICITOAUTH_DESC);
             configTwitchEnabled = Config.Bind(CONFIG_TWITCH_SECTION, CONFIG_TWITCH_ENABLED_KEY, true, CONFIG_TWITCH_ENABLED_DESC);
-            Secrets = new Secrets()
+            Secret = new Secrets()
             {
                 Channel = configChannel.Value,
                 Username = configUsername.Value,
@@ -213,7 +213,7 @@ namespace TwitchDice
                 string rewardKey = string.Format(CONFIG_TWITCH_DICETIER_CHANNELPOINTS_KEY_FORMAT, tier);
                 string rewardDesc = string.Format(CONFIG_TWITCH_DICETIER_CHANNELPOINTS_DESC_FORMAT, tier);
 
-                _bitAmount = config.Bind(CONFIG_TWITCH_DICETIER_SECTION, bitsKey, (int)tier, bitsDesc);
+                _bitAmount = config.Bind(CONFIG_TWITCH_DICETIER_SECTION, bitsKey, (int)tier * 10, bitsDesc);
                 _channelReward = config.Bind(CONFIG_TWITCH_DICETIER_SECTION, rewardKey, "", rewardDesc);
                 Tier = tier;
             }

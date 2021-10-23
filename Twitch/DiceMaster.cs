@@ -79,14 +79,7 @@ namespace TwitchDice.Twitch
                 Log.Debug("Player is host, creating twitch connection...");
                 if (Main.Instance.TwitchEnabled)
                 {
-                    TwitchManager = new TwitchManager();
-                    TwitchManager.OnMessageReceived += TwitchManager_OnMessageReceived;
-                    TwitchManager.OnConnected += TwitchManager_OnConnected;
-                    TwitchManager.OnDisconnected += TwitchManager_OnDisconnected;
-                    TwitchManager.OnRewardRedeemed += TwitchManager_OnRewardRedeemed;
-                    TwitchManager.OnBitsReceived += TwitchManager_OnBitsReceived;
-                    TwitchManager.Connect(Main.Secrets);
-                    TwitchManager.OnConnected += TwitchManager_OnConnected;
+                    StartTwitch();
                 } else
                 {
                     State = DiceMasterState.InLobby;
@@ -106,7 +99,36 @@ namespace TwitchDice.Twitch
                 Main.EventManager.TryActivateEvent(data, player.NickName);
             }));
             #endregion
+        }
 
+        private void StartTwitch()
+        {
+            //Check if secret is set
+            if (Main.Secret.Channel == string.Empty) ChatUtil.DiceMasterSpeak("<color=red>ERR://</color> Channel name not set");
+            if (Main.Secret.Username == string.Empty) ChatUtil.DiceMasterSpeak("<color=red>ERR://</color> Username not set");
+            if (Main.Secret.ImplicitOAuth == string.Empty) ChatUtil.DiceMasterSpeak("<color=red>ERR://</color> OAuth not set");
+            if (Main.Secret.Channel == string.Empty || Main.Secret.Username == string.Empty || Main.Secret.ImplicitOAuth == string.Empty)
+            {
+                ChatUtil.DiceMasterSpeak("Unable to start twitch connection");
+                ChatUtil.DiceMasterSpeak("Please fix error(s) and restart");
+                return;
+            }
+
+            try
+            {
+                TwitchManager = new TwitchManager();
+                TwitchManager.OnMessageReceived += TwitchManager_OnMessageReceived;
+                TwitchManager.OnConnected += TwitchManager_OnConnected;
+                TwitchManager.OnDisconnected += TwitchManager_OnDisconnected;
+                TwitchManager.OnRewardRedeemed += TwitchManager_OnRewardRedeemed;
+                TwitchManager.OnBitsReceived += TwitchManager_OnBitsReceived;
+                TwitchManager.Connect(Main.Secret);
+                TwitchManager.OnConnected += TwitchManager_OnConnected;
+            } catch(Exception e)
+            {
+                Log.Error(e);
+                ChatUtil.DiceMasterSpeak("Unable to connect to twitch.", true);
+            }
         }
 
         private void Hooks_OnFail()
