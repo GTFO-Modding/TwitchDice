@@ -11,6 +11,7 @@ using Nidhogg.Managers;
 using System.Reflection;
 using System.Linq;
 using AIGraph;
+using GTFO.API;
 
 namespace TwitchDice.Utilities
 {

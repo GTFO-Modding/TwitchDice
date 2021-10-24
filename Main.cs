@@ -22,7 +22,6 @@ using System.Collections.Generic;
 namespace TwitchDice
 {
     [BepInPlugin(GUID, NAME, VERSION)]
-    [BepInDependency("com.kasuromi.nidhogg", BepInDependency.DependencyFlags.HardDependency)]
     public class Main : BasePlugin
     {
         #region String consts
