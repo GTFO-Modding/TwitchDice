@@ -7,6 +7,7 @@ using SNetwork;
 using TwitchLib.Client.Models;
 using Nidhogg.Managers;
 using BepInEx.Configuration;
+using GTFO.API;
 
 namespace TwitchDice.Twitch
 {
@@ -104,7 +105,7 @@ namespace TwitchDice.Twitch
         public override void Register()
         {
             if (_registered) return;
-            NetworkingManager.RegisterEvent<T>($"TwitchDice_DiceEvent_{typeof(T).Name}", ReceiveClient);
+            NetworkAPI.RegisterEvent<T>($"TwitchDice_DiceEvent_{typeof(T).Name}", ReceiveClient);
             _registered = true;
             Log.Debug($"Registered {EventName} with ID {EventID}");
         }
@@ -123,7 +124,7 @@ namespace TwitchDice.Twitch
         /// <param name="packet">The packet to send</param>
         protected void TriggerClient(T packet)
         {
-            NetworkingManager.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet);
+            NetworkAPI.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet);
         }
 
         /// <summary>
@@ -133,7 +134,7 @@ namespace TwitchDice.Twitch
         /// <param name="target">The target player</param>
         protected void TriggerClient(T packet, SNet_Player target)
         {
-            NetworkingManager.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet, target);
+            NetworkAPI.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet, target);
         }
 
         /// <summary>
@@ -143,7 +144,7 @@ namespace TwitchDice.Twitch
         /// <param name="players">A list of players to send to</param>
         protected void TriggerClient(T packet, List<SNet_Player> players)
         {
-            NetworkingManager.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet, players);
+            NetworkAPI.InvokeEvent($"TwitchDice_DiceEvent_{typeof(T).Name}", packet, players);
         }
 
         /// <summary>

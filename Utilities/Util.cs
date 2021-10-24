@@ -32,7 +32,7 @@ namespace TwitchDice.Utilities
 
             if (!networksync) return;
             ChatMsg chatMsg = new ChatMsg() { Message = message, LogType = (int)chatLogType };
-            if (PlayerUtil.IsHost) NetworkingManager.InvokeEvent(typeof(ChatMsg).Name, chatMsg);
+            if (PlayerUtil.IsHost) NetworkAPI.InvokeEvent(typeof(ChatMsg).Name, chatMsg);
         }
     }
 

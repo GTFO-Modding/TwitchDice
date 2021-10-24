@@ -11,6 +11,7 @@ using TwitchDice.CustomSounds.TAK;
 using AK;
 using Nidhogg.Managers;
 using Gear;
+using GTFO.API;
 
 namespace TwitchDice.Components
 {
@@ -82,9 +83,9 @@ namespace TwitchDice.Components
             gameObject.AddComponent<DestroyOnCleanUp>();
             AttackDamage = BaseAttackDamage;
 
-            NetworkingManager.RegisterEvent<PSnowmanState>(typeof(PSnowmanState).Name, OnClientStateUpdate);
-            NetworkingManager.RegisterEvent<PSnowmanHeal>(typeof(PSnowmanHeal).Name, OnClientHeal);
-            NetworkingManager.RegisterEvent<PSnowmanDamage>(typeof(PSnowmanDamage).Name, OnClientDamage);
+            NetworkAPI.RegisterEvent<PSnowmanState>(typeof(PSnowmanState).Name, OnClientStateUpdate);
+            NetworkAPI.RegisterEvent<PSnowmanHeal>(typeof(PSnowmanHeal).Name, OnClientHeal);
+            NetworkAPI.RegisterEvent<PSnowmanDamage>(typeof(PSnowmanDamage).Name, OnClientDamage);
             SetupInteraction();
             SetupDamage();
             State = SnowmanState.Client;
@@ -106,17 +107,6 @@ namespace TwitchDice.Components
         void SetupInteraction()
         {
             Interaction.layer = LayerManager.LAYER_INTERACTION;
-            //Interact = Interaction.AddComponent<Interact_Timed>();
-            //Interact.m_colliderToOwn = Interaction.GetComponent<Collider>();
-            //Interact.InteractDuration = 5;
-            //Interact.InteractionMessage = "";
-            //Interact.SFXInteractCancel = TEVENTS.PLAY_VINEBOOM;
-            //Interact.SFXInteractEnd = EVENTS.EXPEDITION_FAILED_SCREEN_JUMP_SCARE;
-            //Interact.OnlyActiveWhenLookingStraightAt = false;
-            //Interact.AbortOnDotOrDistanceDiff = false;
-            //Func<PlayerAgent, bool> CanInteract = CanPlayerInteract;
-            //Interact.ExternalPlayerCanInteract = CanInteract;
-            //Interact.add_OnInteractionTriggered((Il2CppSystem.Action<PlayerAgent>)OnInteractDone);
         }
 
         public void GiveAmmoRel(float ammoStandardRel, float ammoSpecialRel, float ammoClassRel) { }
@@ -128,7 +118,7 @@ namespace TwitchDice.Components
             if (SNet.IsMaster)
                 HealSnowman();
             else
-                NetworkingManager.InvokeEvent(typeof(PSnowmanHeal).Name, new PSnowmanHeal());
+                NetworkAPI.InvokeEvent(typeof(PSnowmanHeal).Name, new PSnowmanHeal());
         }
 
         public bool NeedDisinfection() { return false; }
@@ -174,7 +164,7 @@ namespace TwitchDice.Components
                 UpdateClientState();
             } else
             {
-                NetworkingManager.InvokeEvent(typeof(PSnowmanDamage).Name, new PSnowmanDamage() { amount = damage });
+                NetworkAPI.InvokeEvent(typeof(PSnowmanDamage).Name, new PSnowmanDamage() { amount = damage });
             }
         }
 
@@ -195,6 +185,7 @@ namespace TwitchDice.Components
             {
                 UpdateRotation();
             }
+            if (Target == null) return;
 
             switch (State)
             {
@@ -341,7 +332,7 @@ namespace TwitchDice.Components
                 Position = transform.position,
                 Rotation = transform.rotation
             };
-            NetworkingManager.InvokeEvent(typeof(PSnowmanState).Name, state);
+            NetworkAPI.InvokeEvent(typeof(PSnowmanState).Name, state);
             nextClientUpdate = Clock.Time + 1;
         }
     }

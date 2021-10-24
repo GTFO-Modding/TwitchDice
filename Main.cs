@@ -99,7 +99,7 @@ namespace TwitchDice
             harmony.PatchAll();
 
             Hooks.OnLobbyStart += Hooks_OnLobbyStart;
-            NetworkingManager.RegisterEvent<ChatMsg>(typeof(ChatMsg).Name, OnMessage);
+            NetworkAPI.RegisterEvent<ChatMsg>(typeof(ChatMsg).Name, OnMessage);
 
             EventManager = new EventManager();
             EnemyRespawnManager.Init();
