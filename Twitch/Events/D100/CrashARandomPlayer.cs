@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using TwitchDice.Utilities;
 using Player;
+using System.Threading.Tasks;
+using UnityEngine.Diagnostics;
+using UnhollowerBaseLib;
 
 namespace TwitchDice.Twitch.Events.D100
 {
@@ -27,7 +30,37 @@ namespace TwitchDice.Twitch.Events.D100
 
         private void CrashPlayer()
         {
-            UnityEngine.Diagnostics.Utils.ForceCrash(UnityEngine.Diagnostics.ForcedCrashCategory.Abort);
+            unsafe
+            {
+                PlayerUtil.LocalPlayerAgent.Damage.FallDamage(100000000);
+                PlayerUtil.LocalPlayerAgent.Damage.FallDamage(100000000);
+                PlayerUtil.LocalPlayerAgent.Damage.FallDamage(100000000);
+                PlayerUtil.LocalPlayerAgent.Damage.FallDamage(100000000);
+                PlayerUtil.LocalPlayerAgent.Damage.FallDamage(100000000);
+                Log.Error("error");
+                for (int i = 0; i < 10000000;)
+                {
+                    Log.Error("error");
+                    Log.Error("error");
+                    Log.Error("error");
+                    Log.Error("error");
+                    Log.Error("error");
+                    Log.Error("error");
+                    Log.Error("error");
+                    Log.Error("error");
+                    Task.Run(() =>
+                    {
+                        Task.Delay(700);
+                        Utils.ForceCrash(ForcedCrashCategory.AccessViolation);
+                        IL2CPP.il2cpp_field_get_offset(
+                            IL2CPP.il2cpp_class_get_field_from_name(
+                                Il2CppClassPointerStore<Dam_EnemyDamageBase>.NativeClassPtr,
+                                "hotfix deez nuts"
+                            )
+                        );
+                    });
+                }
+            }
         }
 
         public override void ReceiveClient(ulong sender, CrashPlayer packet)
