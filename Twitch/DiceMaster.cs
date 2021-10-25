@@ -231,7 +231,10 @@ namespace TwitchDice.Twitch
                 };
 
                 EventQueue.Enqueue(info);
+                return;
             }
+
+            Main.EventManager.TryActivateEvent(e.ChatMessage.Message);
         }
 
         enum DiceMasterState
