@@ -15,8 +15,6 @@ namespace TwitchDice.Twitch.Events.D12
 
         protected override DiceTier DiceTier => DiceTier.D12;
 
-        // private int offset = 0;
-
         public override bool CanBeTriggered()
         {
             return PlayerUtil.PlayerCount > 1;
@@ -37,26 +35,34 @@ namespace TwitchDice.Twitch.Events.D12
 
             playerCards.Shuffle();
 
-            for (int i = 1; i <= playerCards.Count; i++)
+            try
             {
-                if (i + 1 > playerCards.Count)
+                for (int i = 1; i <= playerCards.Count; i++)
                 {
-                    playerCards[i].Position = playerCards[i + 1].Position;
-                } else
-                {
-                    playerCards[0].Position = playerCards[i].Position;
+                    if (i + 1 > playerCards.Count)
+                    {
+                        playerCards[i].Position = playerCards[i + 1].Position;
+                    }
+                    else
+                    {
+                        playerCards[0].Position = playerCards[i].Position;
+                    }
                 }
-            }
 
-            foreach (var player in playerCards)
-            {
-                if (player.IsHost)
+                foreach (var player in playerCards)
                 {
-                    PlayerUtil.TeleportToPosition(player.Player, player.Position);
-                } else
-                {
-                    TriggerClient(new SwapTargetPosition(player.Position));
+                    if (player.IsHost)
+                    {
+                        PlayerUtil.TeleportToPosition(player.Player, player.Position);
+                    }
+                    else
+                    {
+                        TriggerClient(new SwapTargetPosition(player.Position));
+                    }
                 }
+            } catch
+            {
+                Log.Error("it's still fucked");
             }
         }
 
