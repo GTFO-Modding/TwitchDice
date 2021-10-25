@@ -178,14 +178,13 @@ namespace TwitchDice.Components
         void Update()
         {
             UpdateVisuals();
-
             if (!SNet.IsMaster) return;
+            if (Target == null) return;
             IsSeen = IsBeingLookedAt();
             if (!IsSeen)
             {
                 UpdateRotation();
             }
-            if (Target == null) return;
 
             switch (State)
             {
@@ -267,6 +266,7 @@ namespace TwitchDice.Components
             float lastDist = float.MaxValue;
             foreach (var player in PlayerManager.PlayerAgentsInLevel)
             {
+                if (!player.Alive) return null;
                 float dist = Vector3.Distance(player.EyePosition, transform.position);
                 if (dist <= lastDist)
                 {
