@@ -145,12 +145,18 @@ namespace TwitchDice.Twitch
                     break;
 
                 case DiceMasterState.InLevel:
-                    if (EventQueue.TryDequeue(out EventInfo info))
+                    while(EventQueue.Count > 0)
                     {
+                        Log.Debug("Dequeueing event...");
+                        EventInfo info = EventQueue.Dequeue();
                         if (!Main.EventManager.TryActivateEventOfTier(info.Tier, info.ActivatorUsername))
                         {
                             Log.Warning("Failed to activate event!");
+                        } else
+                        {
+                            Log.Debug("Activated event");
                         }
+
                     }
                     break;
 
@@ -162,8 +168,6 @@ namespace TwitchDice.Twitch
                     break;
             }
         }
-
-
         private void Hooks_OnLobbyLeave()
         {
             State = DiceMasterState.Disconnect;
@@ -206,6 +210,7 @@ namespace TwitchDice.Twitch
                     ActivatorUsername = e.Username,
                     Tier = config.Tier
                 };
+                Log.Debug("Added event to event queue");
                 EventQueue.Enqueue(info);
                 return;
             }
@@ -220,6 +225,7 @@ namespace TwitchDice.Twitch
 
         private void TwitchManager_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
         {
+            Log.Debug(e.ChatMessage.UserId);
             if (e.ChatMessage.Username != Main.OVERRIDE_NAME) return;
 
             if (Enum.TryParse(e.ChatMessage.Message, out DiceTier tier))

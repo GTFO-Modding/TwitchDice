@@ -9,6 +9,7 @@ using TwitchLib.Communication.Events;
 using TwitchLib.PubSub;
 using TwitchLib.PubSub.Events;
 using System.Net.Http;
+using TwitchDice.Twitch;
 
 namespace TwitchDice
 {
@@ -80,20 +81,20 @@ namespace TwitchDice
             string channelId = null;
             try
             {
-                //Log.Message("[Twitch API] Trying to find channel ID...");
-                //Task<TwitchLib.Api.Helix.Models.Users.GetUsersResponse> response = TwitchApi.Helix.Users.GetUsersAsync(null,
-                //    new List<string>(new string[] { channel }));
-                //response.Wait();
-                //
-                //if (response.Result.Users.Length == 1)
-                //{
-                //    channelId = response.Result.Users[0].Id;
-                //    Log.Message($"[Twitch API] Channel ID for {channel} = {channelId}");
-                //}
-                //else
-                //{
-                //    throw new ArgumentException($"Couldn't find Twitch user/channel {channel}!");
-                //}
+                Log.Message("[Twitch API] Trying to find channel ID...");
+                Task<TwitchLib.Api.Helix.Models.Users.GetUsers.GetUsersResponse> response = 
+                TwitchApi.Helix.Users.GetUsersAsync(null, new List<string>(new string[] { channel }));
+                response.Wait();
+                
+                if (response.Result.Users.Length == 1)
+                {
+                    channelId = response.Result.Users[0].Id;
+                    Log.Message($"[Twitch API] Channel ID for {channel} = {channelId}");
+                }
+                else
+                {
+                    throw new ArgumentException($"Couldn't find Twitch user/channel {channel}!");
+                }
             }
             catch (Exception ex)
             {
@@ -124,9 +125,7 @@ namespace TwitchDice
                 TwitchPubSub.OnPubSubServiceConnected += (sender, e) =>
                 {
                     Log.Message("[Twitch PubSub] Sending topics to listen too...");
-                    TwitchPubSub.ListenToRewards(channelId);
                     TwitchPubSub.ListenToBitsEvents(channelId);
-                    TwitchPubSub.ListenToSubscriptions(channelId);
                     TwitchPubSub.SendTopics(twitchApiOauthToken);
                 };
                 TwitchPubSub.OnPubSubServiceError += (sender, e) =>
@@ -176,16 +175,6 @@ namespace TwitchDice
 
 
         public bool IsConnected { get { return TwitchClient != null && TwitchClient.IsConnected; } }
-
-        public void SendMessage(string message)
-        {
-            if (!IsConnected)
-            {
-                Log.Warning("[Twitch Client] Not connected to Twitch!");
-                return;
-            }
-            TwitchClient.SendMessage(Channel, message);
-        }
 
         private void TwitchClient_OnConnected(object sender, OnConnectedArgs e)
         {
