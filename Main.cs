@@ -18,6 +18,8 @@ using UnhollowerBaseLib;
 using Gear;
 using System;
 using System.Collections.Generic;
+using TwitchDice.Twitch.API;
+using System.Threading;
 
 namespace TwitchDice
 {
@@ -85,6 +87,9 @@ namespace TwitchDice
         private ConfigEntry<bool> configTwitchEnabled;
         private readonly List<DiceTierConfigEntry> TierConfigs = new List<DiceTierConfigEntry>();
 
+        //Thread
+        private Thread _currentThread;
+
         public override void Load()
         {
             CrashReportHandler.SetUserMetadata("Modded", "true");
@@ -103,6 +108,22 @@ namespace TwitchDice
             EventManager = new EventManager();
             EnemyRespawnManager.Init();
             ResourceLoader.Init();
+
+            //Start twitch
+            TClient client = new TClient(Secret);
+            client.OnMessageReceived += Client_OnMessageReceived;
+            _currentThread = new Thread(client.StartReceive)
+            {
+                IsBackground = true
+            };
+            _currentThread.Start();
+            TPubSub pubSub = new TPubSub();
+            pubSub.Connect(Secret);
+        }
+
+        private void Client_OnMessageReceived(object sender, ChatMessageArgs e)
+        {
+            Log.LogDebug($"{e.User} | {e.Message}");
         }
 
         public bool TryGetDiceTier(int bit, out DiceTierConfigEntry config)

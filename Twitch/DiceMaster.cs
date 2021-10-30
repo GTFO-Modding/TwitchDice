@@ -25,7 +25,6 @@ namespace TwitchDice.Twitch
     {
         public DiceMaster(IntPtr intPtr) : base(intPtr) { }
 
-        public TwitchManager TwitchManager;
         private readonly Queue<EventInfo> EventQueue = new Queue<EventInfo>();
         private DiceMasterState _state = DiceMasterState.InLobbySetup;
         private DiceMasterState State
@@ -113,22 +112,6 @@ namespace TwitchDice.Twitch
                 ChatUtil.DiceMasterSpeak("Please fix error(s) and restart");
                 return;
             }
-
-            try
-            {
-                TwitchManager = new TwitchManager();
-                TwitchManager.OnMessageReceived += TwitchManager_OnMessageReceived;
-                TwitchManager.OnConnected += TwitchManager_OnConnected;
-                TwitchManager.OnDisconnected += TwitchManager_OnDisconnected;
-                TwitchManager.OnRewardRedeemed += TwitchManager_OnRewardRedeemed;
-                TwitchManager.OnBitsReceived += TwitchManager_OnBitsReceived;
-                TwitchManager.Connect(Main.Secret);
-                TwitchManager.OnConnected += TwitchManager_OnConnected;
-            } catch(Exception e)
-            {
-                Log.Error(e);
-                ChatUtil.DiceMasterSpeak("Unable to connect to twitch.", true);
-            }
         }
 
         private void Hooks_OnFail()
@@ -161,7 +144,6 @@ namespace TwitchDice.Twitch
                     break;
 
                 case DiceMasterState.Disconnect:
-                    if (TwitchManager.IsConnected) TwitchManager.Disconnect();
                     ChatUtil.DiceMasterSpeak("NOT ACTIVE // <color=red>DISCONNECTED</color>");
                     Main.DiceMasterObject = null;
                     Destroy(this);
