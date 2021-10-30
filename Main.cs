@@ -30,7 +30,7 @@ namespace TwitchDice
             AUTHOR = "dak",
             VERSION = "1.0.0",
             GUID = "com." + AUTHOR + "." + NAME,
-            OVERRIDE_NAME = "dakkhuza",
+            OVERRIDE_NAME = "DakKhuza",
 
             CONFIG_TWITCH_SECTION = "Twitch",
             CONFIG_TWITCH_CHANNEL_KEY = "Channel",
