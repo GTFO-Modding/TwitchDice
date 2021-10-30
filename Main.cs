@@ -107,9 +107,17 @@ namespace TwitchDice
 
         public bool TryGetDiceTier(int bit, out DiceTierConfigEntry config)
         {
+            Log.LogDebug($"Getting event tier for {bit} bits...");
             config = null;
             foreach (var entry in TierConfigs)
             {
+                if (config == null)
+                {
+                    Log.LogDebug("Tier unset");
+                } else
+                {
+                    Log.LogDebug($"Tier {config.Tier}");
+                }
                 if (bit <= entry.BitAmount) return true;
                 config = entry;
             }
