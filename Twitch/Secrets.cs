@@ -9,6 +9,6 @@ namespace TwitchDice
         public string Channel;
         public string Username;
         public string ImplicitOAuth;
-        public string ClientID = "q6batx0epp608isickayubi39itsckt";
+        public string ClientID = "xzfxouvj51dg198umgjjupwmmkmz3r";
     }
 }
