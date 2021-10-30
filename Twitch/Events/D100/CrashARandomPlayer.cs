@@ -17,7 +17,7 @@ namespace TwitchDice.Twitch.Events.D100
 
         protected override DiceTier DiceTier => DiceTier.D100;
 
-        private bool Activated = false;
+        private bool Activated = true;
 
         public override bool CanBeTriggered() => !Activated && PlayerUtil.PlayerCount > 1;
 
