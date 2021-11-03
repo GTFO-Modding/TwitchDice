@@ -18,6 +18,8 @@ using UnhollowerBaseLib;
 using Gear;
 using System;
 using System.Collections.Generic;
+using TwitchDice.Twitch.API;
+using System.Threading;
 
 namespace TwitchDice
 {
@@ -105,6 +107,11 @@ namespace TwitchDice
             ResourceLoader.Init();
         }
 
+        private void Client_OnMessageReceived(object sender, ChatMessageArgs e)
+        {
+            Log.LogDebug($"{e.User} | {e.Message}");
+        }
+
         public bool TryGetDiceTier(int bit, out DiceTierConfigEntry config)
         {
             Log.LogDebug($"Getting event tier for {bit} bits...");
@@ -118,7 +125,7 @@ namespace TwitchDice
                 {
                     Log.LogDebug($"Tier {config.Tier}");
                 }
-                if (bit <= entry.BitAmount) return true;
+                if (bit < entry.BitAmount) return true;
                 config = entry;
             }
             return config != null;
@@ -177,7 +184,7 @@ namespace TwitchDice
             Hooks.OnLobbyStart -= Hooks_OnLobbyStart;
         }
 
-        public void CreateDiceMaster()
+        private void CreateDiceMaster()
         {
             if (DiceMasterObject == null)
             {
@@ -199,7 +206,7 @@ namespace TwitchDice
             }
         }
 
-        public void CreateChatManager()
+        private void CreateChatManager()
         {
             GameObject gameObject = new GameObject
             {
@@ -209,27 +216,32 @@ namespace TwitchDice
             UnityEngine.Object.DontDestroyOnLoad(gameObject);
             TwitchDice.Log.Message("Created Chat Manager!");
         }
+    }
 
-        public class DiceTierConfigEntry
+    public class DiceTierConfigEntry
+    {
+        public DiceTierConfigEntry(DiceTier tier, ConfigFile config)
         {
-            public DiceTierConfigEntry(DiceTier tier, ConfigFile config)
-            {
-                string bitsKey = string.Format(CONFIG_TWITCH_DICETIER_BITS_KEY_FORMAT, tier);
-                string bitsDesc = string.Format(CONFIG_TWITCH_DICETIER_BITS_DESC_FORMAT, tier);
+            string bitsKey = string.Format(Main.CONFIG_TWITCH_DICETIER_BITS_KEY_FORMAT, tier);
+            string bitsDesc = string.Format(Main.CONFIG_TWITCH_DICETIER_BITS_DESC_FORMAT, tier);
 
-                string rewardKey = string.Format(CONFIG_TWITCH_DICETIER_CHANNELPOINTS_KEY_FORMAT, tier);
-                string rewardDesc = string.Format(CONFIG_TWITCH_DICETIER_CHANNELPOINTS_DESC_FORMAT, tier);
+            string rewardKey = string.Format(Main.CONFIG_TWITCH_DICETIER_CHANNELPOINTS_KEY_FORMAT, tier);
+            string rewardDesc = string.Format(Main.CONFIG_TWITCH_DICETIER_CHANNELPOINTS_DESC_FORMAT, tier);
 
-                _bitAmount = config.Bind(CONFIG_TWITCH_DICETIER_SECTION, bitsKey, (int)tier * 10, bitsDesc);
-                _channelReward = config.Bind(CONFIG_TWITCH_DICETIER_SECTION, rewardKey, "", rewardDesc);
-                Tier = tier;
-            }
-            public int BitAmount { get => _bitAmount.Value; }
-            public string ChannelReward { get => _channelReward.Value; }
-            public DiceTier Tier { get; private set; }
+            _bitAmount = config.Bind(Main.CONFIG_TWITCH_DICETIER_SECTION, bitsKey, (int)tier * 10, bitsDesc);
+            _channelReward = config.Bind(Main.CONFIG_TWITCH_DICETIER_SECTION, rewardKey, "", rewardDesc);
+            Tier = tier;
+        }
+        public int BitAmount { get => _bitAmount.Value; }
+        public string ChannelReward { get => _channelReward.Value; }
+        public DiceTier Tier { get; private set; }
 
-            private readonly ConfigEntry<int> _bitAmount;
-            private readonly ConfigEntry<string> _channelReward;
+        private readonly ConfigEntry<int> _bitAmount;
+        private readonly ConfigEntry<string> _channelReward;
+
+        public override string ToString()
+        {
+            return $"Tier: {Tier}, BitAmount: {BitAmount}, ChannelReward: {ChannelReward}";
         }
     }
 

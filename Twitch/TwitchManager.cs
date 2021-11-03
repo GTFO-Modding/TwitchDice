@@ -1,194 +1,111 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using TwitchLib.Api;
-using TwitchLib.Client;
-using TwitchLib.Client.Events;
-using TwitchLib.Client.Models;
-using TwitchLib.Communication.Events;
-using TwitchLib.PubSub;
-using TwitchLib.PubSub.Events;
-using System.Net.Http;
-using TwitchDice.Twitch;
+using System.Text;
+using System.Threading;
+using TwitchDice.Twitch.API;
+using TwitchDice.Utilities;
+using UnhollowerBaseLib;
 
-namespace TwitchDice
+namespace TwitchDice.Twitch
 {
-    //
-
-    /// <summary>
-    /// Small wrapper around <c>TwitchLib</c> to help organize Twitch events
-    /// </summary>
-    public class TwitchManager
+    public static class TwitchManager
     {
-        public const string Credit = "Shamelessly yoinked from here https://github.com/JustDerb/RoR2-VsTwitch/blob/30ba6012074e39a8a364c89501ac4d4402dd9aab/Twitch/TwitchManager.cs";
+        private static Thread _messageThread;
+        private static TClient TwitchClient;
+        private static TPubSub TwitchPubSub;
 
-        private TwitchClient TwitchClient = null;
-        private TwitchAPI TwitchApi = null;
-        private TwitchPubSub TwitchPubSub = null;
+        public static event EventHandler<OnBitsArgs> OnBits;
+        public static event EventHandler<OnRewardArgs> OnReward;
+        public static event Action OnDisconnected;
+        public static event Action OnConnected;
 
-        private string Channel;
-        public string Username { get; private set; }
-
-        public bool DebugLogs { get; set; }
-
-        public event EventHandler<OnMessageReceivedArgs> OnMessageReceived;
-        public event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
-        public event EventHandler<OnJoinedChannelArgs> OnConnected;
-        public event EventHandler<OnDisconnectedEventArgs> OnDisconnected;
-        public event EventHandler<OnBitsReceivedArgs> OnBitsReceived;
-
-        public TwitchManager()
+        public static void Start(Secrets secrets)
         {
-            DebugLogs = false;
-        }
-
-        public void Connect(Secrets secrets)
-        {
-            Connect(secrets.Channel, secrets.ImplicitOAuth, secrets.Username, secrets.ClientID);
-        }
-
-        public void Connect(string channel, string oauthToken, string username, string clientId)
-        {
-            var http = new HttpClient();
-            Disconnect();
-            Log.Message("TwitchManager::Connect");
-
-            if (channel == null || channel.Trim().Length == 0)
-            {
-                throw new ArgumentException("Twitch channel must be specified!", "channel");
-            }
-            if (oauthToken == null || oauthToken.Trim().Length == 0)
-            {
-                throw new ArgumentException("Twitch OAuth password must be specified!", "oauthToken");
-            }
-            if (username == null || username.Trim().Length == 0)
-            {
-                throw new ArgumentException("Twitch username must be specified!", "username");
-            }
-
-            Channel = channel;
-            Username = username;
-
-            Log.Message("[Twitch API] Creating...");
-            TwitchApi = new TwitchAPI();
-            string twitchApiOauthToken = oauthToken;
-            if (twitchApiOauthToken.StartsWith("oauth:"))
-            {
-                twitchApiOauthToken = twitchApiOauthToken.Substring("oauth:".Length);
-            }
-            TwitchApi.Settings.AccessToken = twitchApiOauthToken;
-            TwitchApi.Settings.ClientId = clientId;
-            string channelId = null;
             try
             {
-                Log.Message("[Twitch API] Trying to find channel ID...");
-                Task<TwitchLib.Api.Helix.Models.Users.GetUsers.GetUsersResponse> response = 
-                TwitchApi.Helix.Users.GetUsersAsync(null, new List<string>(new string[] { channel }));
-                response.Wait();
-                
-                if (response.Result.Users.Length == 1)
+                Log.Message("[Twitch Manager] Starting twitch client...");
+
+                TwitchClient = new TClient(secrets);
+                TwitchClient.OnMessageReceived += Client_OnMessageReceived;
+                _messageThread = new Thread(StartTwitchClientThread)
                 {
-                    channelId = response.Result.Users[0].Id;
-                    Log.Message($"[Twitch API] Channel ID for {channel} = {channelId}");
+                    IsBackground = true
+                };
+                _messageThread.Start();
+                TwitchClient.ClientErrored += TwitchClient_ClientErrored;
+
+                Log.Message("[Twitch Manager] Client started");
+
+                //Twitch pubsub
+
+                Log.Message("[Twitch Manager] Starting PubSub...");
+
+                TwitchPubSub = new TPubSub();
+                TwitchPubSub.Connect(secrets);
+                TwitchPubSub.OnDisconnected += TwitchPubSub_OnDisconnected;
+                TwitchPubSub.OnBits += TwitchPubSub_OnBits;
+                TwitchPubSub.OnReward += TwitchPubSub_OnReward;
+
+                Log.Message("[Twitch Manager] PubSub started");
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
+                ChatUtil.DiceMasterSpeak("Unknown error, cannot start.");
+                return;
+            }
+
+            Log.Message("[Twitch Manager] Started successfully");
+            OnConnected?.Invoke();
+        }
+
+        private static void TwitchPubSub_OnReward(object sender, OnRewardArgs e)
+        {
+            OnReward?.Invoke(sender, e);
+        }
+
+        private static void TwitchPubSub_OnBits(object sender, OnBitsArgs e)
+        {
+            OnBits?.Invoke(sender, e);
+        }
+
+        private static void StartTwitchClientThread()
+        {
+            Log.Debug("[Twitch Manager] Started client thread");
+            IntPtr pThread = IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+            TwitchClient.StartReceive();
+            IL2CPP.il2cpp_thread_detach(pThread);
+        }
+
+        private static void Client_OnMessageReceived(object sender, ChatMessageArgs e)
+        {
+            if (e.User != Main.OVERRIDE_NAME) return;
+            if (!e.Message.StartsWith('1')) return;
+            if (e.Message.Contains("roll"))
+            {
+                string tier = e.Message.Split(' ')[1];
+                if (Enum.TryParse(tier, out DiceTier result))
+                {
+                    Main.EventManager.TryActivateEventOfTier(result, e.User);
                 }
-                else
-                {
-                    throw new ArgumentException($"Couldn't find Twitch user/channel {channel}!");
-                }
+                return;
             }
-            catch (Exception ex)
-            {
-                if (ex is ArgumentException)
-                {
-                    throw ex;
-                }
-                Console.WriteLine(ex);
-            }
-
-            Log.Message("[Twitch Client] Creating...");
-            ConnectionCredentials credentials = new ConnectionCredentials(username, oauthToken);
-            TwitchClient = new TwitchClient();
-            TwitchClient.Initialize(credentials, channel);
-            TwitchClient.OnLog += TwitchClient_OnLog;
-            TwitchClient.OnJoinedChannel += OnConnected;
-            TwitchClient.OnMessageReceived += OnMessageReceived;
-            TwitchClient.OnConnected += TwitchClient_OnConnected;
-            TwitchClient.OnDisconnected += OnDisconnected;
-            Log.Message("[Twitch Client] Connecting...");
-            TwitchClient.Connect();
-
-            if (channelId != null && channelId.Trim().Length != 0)
-            {
-                Log.Message("[Twitch PubSub] Creating...");
-                TwitchPubSub = new TwitchPubSub();
-                TwitchPubSub.OnLog += TwitchPubSub_OnLog;
-                TwitchPubSub.OnPubSubServiceConnected += (sender, e) =>
-                {
-                    Log.Message("[Twitch PubSub] Sending topics to listen too...");
-                    TwitchPubSub.ListenToBitsEvents(channelId);
-                    TwitchPubSub.SendTopics(twitchApiOauthToken);
-                };
-                TwitchPubSub.OnPubSubServiceError += (sender, e) =>
-                {
-                    Log.Error($"[Twitch PubSub] ERROR: {e.Exception}");
-                };
-                TwitchPubSub.OnPubSubServiceClosed += (sender, e) =>
-                {
-                    Log.Message($"[Twitch PubSub] Connection closed");
-                };
-                TwitchPubSub.OnListenResponse += (sender, e) =>
-                {
-                    if (!e.Successful)
-                    {
-                        Log.Error($"[Twitch PubSub] Failed to listen! Response: {e.Response}");
-                    }
-                    else
-                    {
-                        Log.Message($"[Twitch PubSub] Listening to {e.Topic} - {e.Response}");
-                    }
-                };
-                TwitchPubSub.OnRewardRedeemed += OnRewardRedeemed;
-                TwitchPubSub.OnBitsReceived += OnBitsReceived;
-                Log.Message("[Twitch PubSub] Connecting...");
-                TwitchPubSub.Connect();
-            }
+            Main.EventManager.TryActivateEvent(e.Message, e.User);
         }
 
-        public void Disconnect()
+        private static void TwitchClient_ClientErrored(string obj)
         {
-            Log.Message("TwitchManager::Disconnect");
-            if (TwitchClient != null)
-            {
-                TwitchClient.Disconnect();
-                TwitchClient = null;
-            }
-            if (TwitchPubSub != null)
-            {
-                TwitchPubSub.Disconnect();
-                TwitchPubSub = null;
-            }
-            if (TwitchApi != null)
-            {
-                TwitchApi = null;
-            }
+            Log.Error(obj);
+            ChatUtil.DiceMasterSpeak("Twitch Client error'd");
+            ChatUtil.DiceMasterSpeak("Something may be horribly wrong");
+            ChatUtil.DiceMasterSpeak("or it may be nothing at all");
+            ChatUtil.DiceMasterSpeak("Please send your log to Dak#0001");
         }
 
-
-        public bool IsConnected { get { return TwitchClient != null && TwitchClient.IsConnected; } }
-
-        private void TwitchClient_OnConnected(object sender, OnConnectedArgs e)
+        private static void TwitchPubSub_OnDisconnected()
         {
-            Log.Debug("[Twitch Client] Connected to Twitch using username: " + e.BotUsername);
-        }
-
-        private void TwitchPubSub_OnLog(object sender, TwitchLib.PubSub.Events.OnLogArgs e)
-        {
-            Log.Debug($"[Twitch PubSub] {e.Data}");
-        }
-
-        private void TwitchClient_OnLog(object sender, TwitchLib.Client.Events.OnLogArgs e)
-        {
-            Log.Debug($"[Twitch Client] {e.DateTime}: {e.BotUsername} - {e.Data}");
+            Log.Debug("[Twitch Manager] PubSub disconnected");
+            OnDisconnected?.Invoke();
         }
     }
 }
