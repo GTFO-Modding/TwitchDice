@@ -36,11 +36,11 @@ namespace TwitchDice.Twitch.Events.D4
         {
             for (int i = 0; i < splatAmount; i++)
             {
-                if (ScreenLiquidManager.TryApply(ScreenLiquidSettingName.spitterJizz, PlayerUtil.LocalPlayerAgent.Position, 10))
-                {
-                    PlayerUtil.LocalPlayerAgent.Sound.Post(EVENTS.DISINFECTION_SPRAY_ON_VISOR);
-                }
+                ScreenLiquidManager.DirectApply(ScreenLiquidSettingName.disinfectionPack_Apply, new Vector2(0.5f, 0.5f), Vector2.zero);
+                ScreenLiquidManager.DirectApply(ScreenLiquidSettingName.disinfectionPack_Apply, new Vector2(0.5f, 0.5f), Vector2.zero);
+                ScreenLiquidManager.DirectApply(ScreenLiquidSettingName.disinfectionPack_Apply, new Vector2(0.5f, 0.5f), Vector2.zero);
             }
+            PlayerUtil.LocalPlayerAgent.Sound.Post(EVENTS.DISINFECTION_SPRAY_ON_VISOR);
         }
     }
 
