@@ -25,6 +25,7 @@ namespace TwitchDice.Twitch.API
 
         public TClient(Secrets secret)
         {
+            Log.Debug("[Twitch Client] Created");
             _secret = secret;
             ConnectAndAuthenticate(secret);
             RawPayload += ProcessMessage;
@@ -32,7 +33,7 @@ namespace TwitchDice.Twitch.API
 
         private void ConnectAndAuthenticate(Secrets secret)
         {
-            Log.Error("TwtchClient // Connect");
+            Log.Debug("[Twitch Client] Connecting to twitch...");
             _client = new TcpClient("irc.twitch.tv", 6667);
 
             _output = new StreamReader(_client.GetStream());
@@ -50,11 +51,13 @@ namespace TwitchDice.Twitch.API
             SendMessage($"PASS oauth:{secret.ImplicitOAuth}");
             SendMessage($"NICK {secret.Username}");
             SendMessage($"JOIN #{secret.Channel}");
+            Log.Debug("[Twitch Client] Connected!");
         }
 
         private void Reconnect(int delay)
         {
-            ClientErrored?.Invoke("Reconnecting........");
+            //ClientErrored?.Invoke("[Twitch Client] Reconnecting...");
+            Log.Debug("[Twitch Client] Reconnecting...");
             Dispose();
             Thread.Sleep(delay);
             ConnectAndAuthenticate(_secret);
@@ -67,7 +70,7 @@ namespace TwitchDice.Twitch.API
             if (message.Contains("PING"))
             {
                 SendMessage("PONG :tmi.twitch.tv");
-                Console.WriteLine("sent pong!");
+                Log.Debug("[Twitch Client] Pong!");
             }
             else if (message.Contains("PRIVMSG"))
             {
@@ -96,6 +99,7 @@ namespace TwitchDice.Twitch.API
                 }
                 catch (Exception e)
                 {
+                    Log.Error($"[Twitch Client] {e}");
                     ClientErrored?.Invoke("Error occured trying to read stream: " + e);
                     Reconnect(5000);
                 }

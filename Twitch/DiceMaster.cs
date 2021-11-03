@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using TwitchDice.Utilities;
-using TwitchLib.Client.Models;
 using UnityEngine;
 using SNetwork;
-using Steamworks;
+using TwitchDice.Twitch.API;
 
 namespace TwitchDice.Twitch
 {
@@ -68,6 +66,7 @@ namespace TwitchDice.Twitch
 
         void Awake()
         {
+            State = DiceMasterState.InLobbySetup;
             Hooks.OnFail += Hooks_OnFail;
             Hooks.OnLobbyLeave += Hooks_OnLobbyLeave;
             RundownManager.add_OnExpeditionGameplayStarted((Il2CppSystem.Action)RundownManager_OnExpeditionGameplayStarted);
@@ -75,9 +74,9 @@ namespace TwitchDice.Twitch
             #region Twitch
             if (IsHost)
             {
-                Log.Debug("Player is host, creating twitch connection...");
                 if (Main.Instance.TwitchEnabled)
                 {
+                    Log.Debug("Starting twitch connection...");
                     StartTwitch();
                 } else
                 {
@@ -90,14 +89,23 @@ namespace TwitchDice.Twitch
             }
             #endregion
 
-            #region Debug
             PlayerChatManager.add_OnIncomingChatMessage((Action<SNetwork.SNet_Player, string>)((player, data) =>
             {
-                Log.Debug("Incoming chat message");
+#if DEBUG
+                if (int.TryParse(data, out int result))
+                {
+                    if (Main.Instance.TryGetDiceTier(result, out DiceTierConfigEntry config))
+                    {
+                        Log.Debug(config);
+                        EventQueue.Enqueue(new EventInfo() { Tier = config.Tier, ActivatorUsername = "DEBUG" });
+                    }
+                }
+#endif
+
                 if (State != DiceMasterState.InLevel || !IsHost || Main.Instance.TwitchEnabled) return;
+                Log.Debug("Incoming chat message");
                 Main.EventManager.TryActivateEvent(data, player.NickName);
             }));
-            #endregion
         }
 
         private void StartTwitch()
@@ -112,6 +120,32 @@ namespace TwitchDice.Twitch
                 ChatUtil.DiceMasterSpeak("Please fix error(s) and restart");
                 return;
             }
+
+            //Start twitch
+            TwitchManager.OnDisconnected += TwitchManager_OnDisconnected;
+            TwitchManager.OnConnected += TwitchManager_OnConnected;
+            TwitchManager.OnBits += TwitchManager_OnBitsReceived;
+            TwitchManager.OnReward += TwitchManager_OnRewardRedeemed;
+            Log.Debug("Before start");
+            TwitchManager.Start(Main.Secret);
+            Log.Debug("After start");
+        }
+
+        #region Events
+        private void Hooks_OnLobbyLeave()
+        {
+            State = DiceMasterState.Disconnect;
+        }
+
+        private void TwitchManager_OnConnected()
+        {
+            State = DiceMasterState.InLobby;
+        }
+
+        private void RundownManager_OnExpeditionGameplayStarted()
+        {
+            if (State == DiceMasterState.InLobby)
+                State = DiceMasterState.InLevel;
         }
 
         private void Hooks_OnFail()
@@ -119,6 +153,12 @@ namespace TwitchDice.Twitch
             EventQueue.Clear();
             State = DiceMasterState.InLobby;
         }
+
+        private void TwitchManager_OnDisconnected()
+        {
+            State = DiceMasterState.Disconnect;
+        }
+        #endregion
 
         void Update()
         {
@@ -145,47 +185,33 @@ namespace TwitchDice.Twitch
 
                 case DiceMasterState.Disconnect:
                     ChatUtil.DiceMasterSpeak("NOT ACTIVE // <color=red>DISCONNECTED</color>");
+                    ChatUtil.DiceMasterSpeak("<color=orange>///</color> <b>PLEASE RESTART YOUR GAME</b> <color=orange>///</color>");
                     Main.DiceMasterObject = null;
                     Destroy(this);
                     break;
             }
         }
-        private void Hooks_OnLobbyLeave()
-        {
-            State = DiceMasterState.Disconnect;
-        }
 
-        private void TwitchManager_OnConnected(object sender, TwitchLib.Client.Events.OnJoinedChannelArgs e)
-        {
-            State = DiceMasterState.InLobby;
-        }
-
-        private void RundownManager_OnExpeditionGameplayStarted()
-        {
-            if (State == DiceMasterState.InLobby)
-                State = DiceMasterState.InLevel;
-        }
-
-        private void TwitchManager_OnRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnRewardRedeemedArgs e)
+        private void TwitchManager_OnRewardRedeemed(object sender, OnRewardArgs e)
         {
             Log.Debug("Trying to parse reward into dice...");
-            if (Main.Instance.TryGetDiceTier(e.RewardTitle, out Main.DiceTierConfigEntry config))
+            if (Main.Instance.TryGetDiceTier(e.Reward, out DiceTierConfigEntry config))
             {
                 EventInfo info = new EventInfo()
                 {
-                    ActivatorUsername = e.DisplayName,
+                    ActivatorUsername = e.Username,
                     Tier = config.Tier
                 };
                 EventQueue.Enqueue(info);
                 return;
             }
-            Log.Debug($"Found no associated tier for reward {e.RewardTitle}");
+            Log.Debug($"Found no associated tier for reward {e.Reward}");
         }
 
-        private void TwitchManager_OnBitsReceived(object sender, TwitchLib.PubSub.Events.OnBitsReceivedArgs e)
+        private void TwitchManager_OnBitsReceived(object sender, OnBitsArgs e)
         {
             Log.Debug("Trying to parse reward into dice...");
-            if (Main.Instance.TryGetDiceTier(e.BitsUsed, out Main.DiceTierConfigEntry config))
+            if (Main.Instance.TryGetDiceTier(e.Bits, out DiceTierConfigEntry config))
             {
                 EventInfo info = new EventInfo()
                 {
@@ -196,33 +222,7 @@ namespace TwitchDice.Twitch
                 EventQueue.Enqueue(info);
                 return;
             }
-            Log.Debug($"{e.BitsUsed} < minimum dice amount");
-        }
-
-        private void TwitchManager_OnDisconnected(object sender, TwitchLib.Communication.Events.OnDisconnectedEventArgs e)
-        {
-            ChatUtil.DiceMasterSpeak("DISCONNECTED FROM TWITCH // <color=red>NOT ACTIVE</color>");
-            State = DiceMasterState.Disconnect;
-        }
-
-        private void TwitchManager_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
-        {
-            Log.Debug(e.ChatMessage.UserId);
-            if (e.ChatMessage.Username != Main.OVERRIDE_NAME) return;
-
-            if (Enum.TryParse(e.ChatMessage.Message, out DiceTier tier))
-            {
-                EventInfo info = new EventInfo()
-                {
-                    ActivatorUsername = e.ChatMessage.Username,
-                    Tier = tier
-                };
-
-                EventQueue.Enqueue(info);
-                return;
-            }
-
-            Main.EventManager.TryActivateEvent(e.ChatMessage.Message);
+            Log.Debug($"{e.Bits} < minimum dice amount");
         }
 
         enum DiceMasterState
