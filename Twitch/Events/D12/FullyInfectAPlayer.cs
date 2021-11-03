@@ -9,7 +9,7 @@ namespace TwitchDice.Twitch.Events.D12
 {
     public class FullyInfectAPlayer : DiceEvent<Splat>
     {
-        public override string EventName => "Fully Infect A Player";
+        public override string EventName => "<color=green>Infect-o-Matic!</color>";
 
         public override string EventID => "infect";
 
