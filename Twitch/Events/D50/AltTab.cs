@@ -30,7 +30,7 @@ namespace TwitchDice.Twitch.Events.D50
             Application.OpenURL(urls.GetRandomElement<string>());
         }
 
-        private List<string> urls = new List<string>()
+        private readonly List<string> urls = new List<string>()
         {
             "https://media.discordapp.net/attachments/620576156613345310/901513808797913108/IMG_20210227_081726.jpg?width=1092&height=910",
             "https://cdn.discordapp.com/attachments/620576156613345310/901568419609059328/90a78000d93d44d9ca64de04f0aae91d55d0875624e16aa4e67e364d3374521d_1.png",
