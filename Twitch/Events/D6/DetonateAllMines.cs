@@ -10,6 +10,12 @@ namespace TwitchDice.Twitch.Events.D6
 
         protected override DiceTier DiceTier => DiceTier.D6;
 
+        public override bool CanBeTriggered()
+        {
+            var mines = UnityEngine.Object.FindObjectsOfType<MineDeployerInstance>();
+            return mines.Count > 0;
+        }
+
         public override void TriggerHost()
         {
             var mines = UnityEngine.Object.FindObjectsOfType<MineDeployerInstance>();

@@ -13,6 +13,16 @@ namespace TwitchDice.Twitch.Events.D50
 
         protected override DiceTier DiceTier => DiceTier.D50;
 
+        public override bool CanBeTriggered()
+        {
+            int alivePlayers = 0;
+            foreach (var player in PlayerManager.PlayerAgentsInLevel)
+            {
+                if (player.Alive) alivePlayers++;
+            }
+            return alivePlayers > 1;
+        }
+
         public override void TriggerHost()
         {
             if (PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent target))

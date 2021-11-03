@@ -1,4 +1,5 @@
-﻿using Player;
+﻿using Enemies;
+using Player;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,6 +16,11 @@ namespace TwitchDice.Twitch.Events.D3
         protected override DiceTier DiceTier => DiceTier.D3;
 
         private readonly int range = 200;
+
+        public override bool CanBeTriggered()
+        {
+            return EnemyUpdateManager.Summary.m_closeEnemyCount > 0 && DramaManager.CurrentStateEnum == DRAMA_State.Sneaking;
+        }
 
         public override void TriggerHost()
         {

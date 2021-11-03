@@ -14,6 +14,19 @@ namespace TwitchDice.Twitch.Events.D4
 
         protected override DiceTier DiceTier => DiceTier.D4;
 
+        public override bool CanBeTriggered()
+        {
+            int playersUsingTerminals = 0;
+            foreach (var terminal in LG_ComputerTerminalManager.Current.m_terminals.Values)
+            {
+                if (terminal.m_hasInteractingPlayer)
+                {
+                    playersUsingTerminals++;
+                }
+            }
+            return playersUsingTerminals > 0;
+        }
+
         public override void ReceiveClient(ulong sender, NMT packet)
         {
             this.TriggerCommon();
