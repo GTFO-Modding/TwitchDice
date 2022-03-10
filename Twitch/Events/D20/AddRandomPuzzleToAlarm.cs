@@ -4,6 +4,7 @@ using LevelGeneration;
 using Player;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using TwitchDice.Extensions;
 using TwitchDice.Utilities;
 using UnhollowerBaseLib;
 using UnityEngine;
@@ -59,30 +60,14 @@ namespace TwitchDice.Twitch.Events.D20
 
         private static List<LG_SecurityDoor> FetchSecurityDoors()
         {
-            return FetchSecurityDoors(new List<LG_SecurityDoor>());
-        }
-
-        private static List<LG_SecurityDoor> FetchSecurityDoors(List<LG_SecurityDoor> doors)
-        {
-            FetchSecurityDoors(Builder.CurrentFloor, doors);
+            var doors = new List<LG_SecurityDoor>();
+            foreach (var zone in Builder.CurrentFloor.GetAllZones())
+            {
+                FetchSecurityDoors(zone, doors);
+            }
             return doors;
         }
 
-        private static void FetchSecurityDoors(LG_Floor floor, List<LG_SecurityDoor> doors)
-        {
-            for (int index = 0, length = floor.m_layers.Count; index < length; index++)
-            {
-                FetchSecurityDoors(floor.m_layers[index], doors);
-            }
-        }
-
-        private static void FetchSecurityDoors(LG_Layer layer, List<LG_SecurityDoor> doors)
-        {
-            for (int index = 0, length = layer.m_zones.Count; index < length; index++)
-            {
-                FetchSecurityDoors(layer.m_zones[index], doors);
-            }
-        }
 
         private static void FetchSecurityDoors(LG_Zone zone, List<LG_SecurityDoor> doors)
         {
@@ -112,7 +97,7 @@ namespace TwitchDice.Twitch.Events.D20
 
         private static LG_SecurityDoor FetchDoor(LG_Floor floor, LG_LayerType layer, eLocalZoneIndex index)
         {
-            foreach (var lgLayer in floor.m_layers)
+            foreach (var lgLayer in floor.GetAllLayers())
             {
                 var result = FetchDoor(lgLayer, layer, index);
                 if (result != null)
@@ -187,7 +172,7 @@ namespace TwitchDice.Twitch.Events.D20
             {
                 var puzzle = GOUtil.SpawnChildAndGetComp<iChainedPuzzleCore>(puzzlePrefab, list[0], Quaternion.identity, instance.m_parent);
 
-                puzzle.Setup(instance.m_chainedPuzzleCores.Length, instance.m_sourceArea, true, position, null, instance.Data.TriggerAlarmOnActivate, instance.Data.UseRandomPositions, instance.Data.OnlyShowHUDWhenPlayerIsClose, instance.m_puzzleUID);
+                puzzle.Setup(instance.m_chainedPuzzleCores.Length, instance.Cast<iChainedPuzzleOwner>(), instance.m_sourceArea, true, position, null, instance.Data.TriggerAlarmOnActivate, instance.Data.UseRandomPositions, instance.Data.OnlyShowHUDWhenPlayerIsClose, instance.m_puzzleUID);
 
                 puzzle.add_OnPuzzleDone((System.Action<int>)instance.OnPuzzleDone);
                 puzzle.add_Master_OnScanStateChanged((System.Action<float, Il2CppSystem.Collections.Generic.List<PlayerAgent>, int, Il2CppStructArray<bool>>)instance.Master_OnPlayerScanChanged);

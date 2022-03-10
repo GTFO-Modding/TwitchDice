@@ -35,7 +35,9 @@ namespace TwitchDice.Twitch.Events.D4
             //enemy.AI.Mode = Agents.AgentMode.Patrolling;
             //enemy.AI.m_locomotion.ChangeState(ES_StateEnum.PathMove);
             enemy.AI.m_navMeshAgent.enabled = true;
-            enemy.AI.m_navMeshAgent.Move(PlayerUtil.LocalPlayerAgent.Position);
+            enemy.AI.m_navMeshAgent.SetDestination(PlayerUtil.LocalPlayerAgent.Position);
+            // old code [doesn't work]
+            //enemy.AI.m_navMeshAgent.Move(PlayerUtil.LocalPlayerAgent.Position);
         }
 
         public override void TriggerHost()

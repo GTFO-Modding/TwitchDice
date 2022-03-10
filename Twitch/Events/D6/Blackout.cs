@@ -20,7 +20,7 @@ namespace TwitchDice.Twitch.Events.D6
 
         public override bool CanBeTriggered()
         {
-            return EnvironmentStateManager.Current.m_stateReplicator.State.LightsEnabled;
+            return EnvironmentStateManager.Current.m_stateReplicator.State.LightsEnabled[(int)eDimensionIndex.Reality];
         }
 
         public override void ReceiveClient(ulong sender, bo packet)

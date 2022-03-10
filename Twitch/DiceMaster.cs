@@ -92,7 +92,7 @@ namespace TwitchDice.Twitch
             #endregion
 
             #region Debug
-            PlayerChatManager.add_OnIncomingChatMessage((Action<SNetwork.SNet_Player, string>)((player, data) =>
+            PlayerChatManager.add_OnIncomingChatMessage((Action<string, SNetwork.SNet_Player, SNetwork.SNet_Player>)((data, player, _) =>
             {
                 Log.Debug("Incoming chat message");
                 if (State != DiceMasterState.InLevel || !IsHost || Main.Instance.TwitchEnabled) return;
