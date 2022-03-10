@@ -8,7 +8,6 @@ using TwitchDice.Utilities;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.CrashReportHandler;
-using Nidhogg.Managers;
 using System.Runtime.InteropServices;
 using BepInEx.Configuration;
 using GTFO.API;

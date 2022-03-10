@@ -9,7 +9,6 @@ using UnityEngine;
 using UnhollowerBaseLib;
 using TwitchDice.CustomSounds.TAK;
 using AK;
-using Nidhogg.Managers;
 using Gear;
 using GTFO.API;
 

@@ -7,7 +7,6 @@ using TwitchDice.Twitch;
 using UnityEngine;
 using SNetwork;
 using Player;
-using Nidhogg.Managers;
 using System.Reflection;
 using System.Linq;
 using AIGraph;
