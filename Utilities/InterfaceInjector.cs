@@ -28,7 +28,11 @@ namespace TwitchDice.Utilities
                     var nativeStruct = UnityVersionHandler.Wrap((Il2CppClass*)(void*)pointer);
                     interfaceList.Add(nativeStruct);
                 }
-                ClassInjector.RegisterTypeInIl2Cpp<T>(interfaceList.ToArray());
+
+                ClassInjector.RegisterTypeInIl2Cpp(typeof(T), new RegisterTypeOptions()
+                {
+                    Interfaces = interfaceList.ToArray()
+                });
             }
         }
     }
