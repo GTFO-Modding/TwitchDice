@@ -1,6 +1,7 @@
 ﻿using LevelGeneration;
 using System;
 using System.Collections.Generic;
+using TwitchDice.Extensions;
 using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D100
@@ -36,29 +37,12 @@ namespace TwitchDice.Twitch.Events.D100
 
         private static List<LG_SecurityDoor> FetchSecurityDoors()
         {
-            return FetchSecurityDoors(new List<LG_SecurityDoor>());
-        }
-
-        private static List<LG_SecurityDoor> FetchSecurityDoors(List<LG_SecurityDoor> doors)
-        {
-            FetchSecurityDoors(Builder.CurrentFloor, doors);
+            var doors = new List<LG_SecurityDoor>();
+            foreach (var zone in Builder.CurrentFloor.GetAllZones())
+            {
+                FetchSecurityDoors(zone, doors);
+            }
             return doors;
-        }
-
-        private static void FetchSecurityDoors(LG_Floor floor, List<LG_SecurityDoor> doors)
-        {
-            for (int index = 0, length = floor.m_layers.Count; index < length; index++)
-            {
-                FetchSecurityDoors(floor.m_layers[index], doors);
-            }
-        }
-
-        private static void FetchSecurityDoors(LG_Layer layer, List<LG_SecurityDoor> doors)
-        {
-            for (int index = 0, length = layer.m_zones.Count; index < length; index++)
-            {
-                FetchSecurityDoors(layer.m_zones[index], doors);
-            }
         }
 
         private static void FetchSecurityDoors(LG_Zone zone, List<LG_SecurityDoor> doors)
