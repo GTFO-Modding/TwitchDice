@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using CellMenu;
 using TwitchDice.Twitch;
 using UnityEngine;
 using SNetwork;
 using Player;
-using System.Reflection;
-using System.Linq;
 using AIGraph;
 using GTFO.API;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using Il2CppInterop.Runtime.InteropTypes;
 
 namespace TwitchDice.Utilities
 {
@@ -348,7 +347,7 @@ namespace TwitchDice.Utilities
         public static int Matches<T>(this IList<T> list, Func<T, bool> matchFN)
         {
             int count = 0;
-            foreach (var item in list)
+            foreach (T item in list)
             {
                 if (matchFN(item))
                 {
@@ -373,8 +372,8 @@ namespace TwitchDice.Utilities
             return count;
         }
 
-        public static int Matches<T>(this UnhollowerBaseLib.Il2CppReferenceArray<T> array, Func<T, bool> matchFN)
-            where T : UnhollowerBaseLib.Il2CppObjectBase
+        public static int Matches<T>(this Il2CppReferenceArray<T> array, Func<T, bool> matchFN)
+            where T : Il2CppObjectBase
         {
             int count = 0;
             for (int index = 0, length = array.Length; index < length; index++)
@@ -388,7 +387,7 @@ namespace TwitchDice.Utilities
             return count;
         }
 
-        public static int Matches<T>(this UnhollowerBaseLib.Il2CppStructArray<T> array, Func<T, bool> matchFN)
+        public static int Matches<T>(this Il2CppStructArray<T> array, Func<T, bool> matchFN)
             where T : unmanaged
         {
             int count = 0;
@@ -403,7 +402,7 @@ namespace TwitchDice.Utilities
             return count;
         }
 
-        public static int Matches(this UnhollowerBaseLib.Il2CppStringArray array, Func<string, bool> matchFN)
+        public static int Matches(this Il2CppStringArray array, Func<string, bool> matchFN)
         {
             int count = 0;
             for (int index = 0, length = array.Length; index < length; index++)

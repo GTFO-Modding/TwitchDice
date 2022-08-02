@@ -24,7 +24,7 @@ namespace TwitchDice.Twitch.Events.D100
         
         public override void TriggerHost()
         {
-            int seed = (int) (Main.rnd.NextDouble() * Int32.MaxValue);
+            int seed = (int) (Main.rnd.NextDouble() * int.MaxValue);
             this.TriggerClient(new RL(seed));
             TimedEvents.Start(this.DoTriggerEvent(seed));
         }

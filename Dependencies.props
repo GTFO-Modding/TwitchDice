@@ -16,8 +16,8 @@
 
   <PropertyGroup>
     <BIELibsFolder>$(GameFolder)/BepInEx/core</BIELibsFolder>
-    <MonoLibsFolder>$(GameFolder)/mono/Managed</MonoLibsFolder>
-    <UnhollowedLibsFolder>$(GameFolder)/BepInEx/unhollowed</UnhollowedLibsFolder>
+    <MonoLibsFolder>$(GameFolder)/dotnet/corlib</MonoLibsFolder>
+    <UnhollowedLibsFolder>$(GameFolder)/BepInEx/interop</UnhollowedLibsFolder>
     <PluginLibFolder>$(GameFolder)/Plugins</PluginLibFolder>
   </PropertyGroup>
 
@@ -34,20 +34,22 @@
   <ItemGroup>
     <Reference Include="$(BIELibsFolder)/BepInEx.*.dll" Private="false" />
     <Reference Include="$(BIELibsFolder)/0Harmony.dll" Private="false" />
-    <Reference Include="$(BIELibsFolder)/UnhollowerBaseLib.dll" Private="false" />
-    <Reference Include="$(BIELibsFolder)/UnhollowerRuntimeLib.dll" Private="false" />
+    <Reference Include="$(BIELibsFolder)/Il2CppInterop.Runtime.dll" Private="false" />
+    <Reference Include="$(MonoLibsFolder)\..\System.Private.CoreLib.dll" Private="false" />
   </ItemGroup>
 
   <!-- BepInEx mono libs -->
   <ItemGroup>
-    <Reference Include="$(MonoLibsFolder)/Microsoft.Bcl.AsyncInterfaces.dll" Private="false" />
-    <Reference Include="$(MonoLibsFolder)/System.Text.Json.dll" Private="false" />
+    <Reference Include="$(MonoLibsFolder)/*.dll" Private="false" />
+    <Reference Remove="$(MonoLibsFolder)\msquic.dll" />
+    <Reference Remove="$(MonoLibsFolder)\System.IO.Compression.Native.dll" />
   </ItemGroup>
 
   <!-- Unhollowed assemblies -->
   <ItemGroup>
     <Reference Include="$(UnhollowedLibsFolder)/*.dll" Private="false" />
     <Reference Remove="$(UnhollowedLibsFolder)/netstandard.dll" />
+    <Reference Remove="$(UnhollowedLibsFolder)/mscorlib.dll" />
     <Reference Remove="$(UnhollowedLibsFolder)/Newtonsoft.Json.dll" />
   </ItemGroup>
 </Project>

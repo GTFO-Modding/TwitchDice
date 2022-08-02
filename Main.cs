@@ -5,18 +5,14 @@ using HarmonyLib;
 using TwitchDice.Components;
 using TwitchDice.Twitch;
 using TwitchDice.Utilities;
-using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.CrashReportHandler;
 using System.Runtime.InteropServices;
 using BepInEx.Configuration;
 using GTFO.API;
-using UnhollowerBaseLib.Runtime.VersionSpecific.Class;
-using UnhollowerBaseLib.Runtime;
-using UnhollowerBaseLib;
-using Gear;
 using System;
 using System.Collections.Generic;
+using Il2CppInterop.Runtime.Injection;
 
 namespace TwitchDice
 {
@@ -108,7 +104,7 @@ namespace TwitchDice
         {
             Log.LogDebug($"Getting event tier for {bit} bits...");
             config = null;
-            foreach (var entry in TierConfigs)
+            foreach (DiceTierConfigEntry entry in TierConfigs)
             {
                 if (config == null)
                 {
@@ -117,7 +113,11 @@ namespace TwitchDice
                 {
                     Log.LogDebug($"Tier {config.Tier}");
                 }
-                if (bit <= entry.BitAmount) return true;
+                if (bit <= entry.BitAmount)
+                {
+                    return true;
+                }
+
                 config = entry;
             }
             return config != null;
