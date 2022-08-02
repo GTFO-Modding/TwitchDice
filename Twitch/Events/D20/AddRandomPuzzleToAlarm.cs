@@ -1,12 +1,12 @@
 ﻿using ChainedPuzzles;
 using GameData;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using LevelGeneration;
 using Player;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using TwitchDice.Extensions;
 using TwitchDice.Utilities;
-using UnhollowerBaseLib;
 using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D20

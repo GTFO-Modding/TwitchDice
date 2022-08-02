@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
-using UnhollowerRuntimeLib;
-using UnhollowerBaseLib.Attributes;
 using System.Collections.Generic;
 using System.Collections;
 using System;
 using AssetShards;
+using Il2CppInterop.Runtime.Injection;
+using Il2CppInterop.Runtime.Attributes;
 
 namespace TwitchDice.Utilities
 {

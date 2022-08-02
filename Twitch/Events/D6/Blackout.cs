@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TwitchDice.Utilities;
 using UnityEngine;
@@ -20,7 +21,8 @@ namespace TwitchDice.Twitch.Events.D6
 
         public override bool CanBeTriggered()
         {
-            return EnvironmentStateManager.Current.m_stateReplicator.State.LightsEnabled[(int)eDimensionIndex.Reality];
+            // todo: re-implement check
+            return true;
         }
 
         public override void ReceiveClient(ulong sender, bo packet)

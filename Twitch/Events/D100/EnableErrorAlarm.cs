@@ -42,10 +42,9 @@ namespace TwitchDice.Twitch.Events.D100
                 alarm.SurvivalWaveSettings,
                 alarm.SurvivalWavePopulation,
                 out _,
-                SurvivalWaveSpawnType.InRelationToClosestAlivePlayer,
-                5,
-                true,
-                false);
+                spawnType: SurvivalWaveSpawnType.InRelationToClosestAlivePlayer,
+                spawnDelay: 5,
+                playScreamOnSpawn: true);
         }
     }
 

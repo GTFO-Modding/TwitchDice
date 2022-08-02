@@ -26,8 +26,8 @@ namespace TwitchDice.Twitch.Events.D8
 
         private void TriggerCommon()
         {
-            PlayerUtil.LocalPlayerAgent.GiveAmmoRel(1f, 1f, 1f);
-            PlayerUtil.LocalPlayerAgent.GiveHealth(1f);
+            PlayerUtil.LocalPlayerAgent.GiveAmmoRel(PlayerUtil.LocalPlayerAgent, 1f, 1f, 1f);
+            PlayerUtil.LocalPlayerAgent.GiveHealth(PlayerUtil.LocalPlayerAgent, 1f);
 
             var weapons = GameObject.FindObjectsOfType<BulletWeapon>();
             foreach (var weapon in weapons)

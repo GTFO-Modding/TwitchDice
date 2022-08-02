@@ -5,7 +5,7 @@ using TwitchDice.Utilities;
 using Player;
 using System.Threading.Tasks;
 using UnityEngine.Diagnostics;
-using UnhollowerBaseLib;
+using Il2CppInterop.Runtime;
 
 namespace TwitchDice.Twitch.Events.D100
 {

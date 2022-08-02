@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.Injection;
+using Il2CppInterop.Runtime.Runtime;
+using Il2CppInterop.Runtime.Runtime.VersionSpecific.Class;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using UnhollowerBaseLib;
-using UnhollowerBaseLib.Runtime;
-using UnhollowerBaseLib.Runtime.VersionSpecific.Class;
-using UnhollowerRuntimeLib;
 
 namespace TwitchDice.Utilities
 {

@@ -38,21 +38,21 @@ namespace TwitchDice.Twitch.Events.D4
             switch (res)
             {
                 case 0:
-                    player.GiveHealth(0.2f);
+                    player.GiveHealth(player, 0.2f);
                     player.Sound.Post(EVENTS.MEDPACK_APPLY);
                     break;
                 case 1:
-                    player.GiveAmmoRel(0.2f, 0.2f, 0.0f);
+                    player.GiveAmmoRel(player, 0.2f, 0.2f, 0.0f);
                     player.Sound.Post(EVENTS.FOLEY_USE_AMMO_PACK_FINISHED);
                     player.Sound.Post(EVENTS.AMMOPACK_APPLY);
                     break;
                 case 2:
-                    player.GiveAmmoRel(0, 0, 0.2f);
+                    player.GiveAmmoRel(player, 0, 0, 0.2f);
                     player.Sound.Post(EVENTS.FOLEY_USE_AMMO_PACK_FINISHED);
                     player.Sound.Post(EVENTS.AMMOPACK_APPLY);
                     break;
                 case 3:
-                    player.GiveDisinfection(0.2f);
+                    player.GiveDisinfection(player, 0.2f);
                     player.Sound.Post(EVENTS.DISINFECTION_SPRAY_ON_VISOR);
                     break;
             }

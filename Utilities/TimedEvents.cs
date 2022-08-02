@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TwitchDice.Twitch;
-using UnhollowerBaseLib;
 using UnityEngine;
 
 namespace TwitchDice.Utilities
