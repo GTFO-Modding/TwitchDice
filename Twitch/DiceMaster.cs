@@ -32,23 +32,23 @@ namespace TwitchDice.Twitch
         {
             get
             {
-                return _state;
+                return this._state;
             }
             set
             {
-                Log.Debug($"DiceMaster State {_state} => {value}");
+                Log.Debug($"DiceMaster State {this._state} => {value}");
 
                 switch(value)
                 {
                     case DiceMasterState.InLobby:
-                        ChatUtil.DiceMasterSpeak($"READY // {(IsHost ? "<color=orange>HOST</color>" : "<color=orange>CLIENT</color>")} // <color=red>WAITING FOR DROP</color>", false);
+                        ChatUtil.DiceMasterSpeak($"READY // {(this.IsHost ? "<color=orange>HOST</color>" : "<color=orange>CLIENT</color>")} // <color=red>WAITING FOR DROP</color>", false);
                         break;
                     case DiceMasterState.InLevel:
                         ChatUtil.DiceMasterSpeak("IN LEVEL // <color=red>GET READY</color> // ", false);
                         break;
                 }
 
-                _state = value;
+                this._state = value;
             }
         }
         private bool? _isHost;
@@ -56,16 +56,17 @@ namespace TwitchDice.Twitch
         {
             get
             {
-                if (_isHost.HasValue) return _isHost.Value;
+                if (this._isHost.HasValue) return this._isHost.Value;
                 if (SNet.Core.TryGetLobbyOwner(out SNet_Player player))
                 {
-                    _isHost = player.IsLocal;
-                    return _isHost.Value;
+                    this._isHost = player.IsLocal;
+                    return this._isHost.Value;
                 }
                 Log.Error("Couldn't get lobby host :(");
                 return false;
             }
         }
+        private bool TwitchManagerConnected => this.TwitchManager != null && this.TwitchManager.IsConnected;
 
         void Awake()
         {
@@ -95,7 +96,7 @@ namespace TwitchDice.Twitch
             PlayerChatManager.add_OnIncomingChatMessage((Action<string, SNetwork.SNet_Player, SNetwork.SNet_Player>)((data, player, _) =>
             {
                 Log.Debug("Incoming chat message");
-                if (State != DiceMasterState.InLevel || !IsHost || Main.Instance.TwitchEnabled) return;
+                if (State != DiceMasterState.InLevel || !this.IsHost || Main.Instance.TwitchEnabled) return;
                 Main.EventManager.TryActivateEvent(data, player.NickName);
             }));
             #endregion
@@ -116,14 +117,14 @@ namespace TwitchDice.Twitch
 
             try
             {
-                TwitchManager = new TwitchManager();
-                TwitchManager.OnMessageReceived += TwitchManager_OnMessageReceived;
-                TwitchManager.OnConnected += TwitchManager_OnConnected;
-                TwitchManager.OnDisconnected += TwitchManager_OnDisconnected;
-                TwitchManager.OnRewardRedeemed += TwitchManager_OnRewardRedeemed;
-                TwitchManager.OnBitsReceived += TwitchManager_OnBitsReceived;
-                TwitchManager.Connect(Main.Secret);
-                TwitchManager.OnConnected += TwitchManager_OnConnected;
+                this.TwitchManager = new TwitchManager();
+                this.TwitchManager.OnMessageReceived += this.TwitchManager_OnMessageReceived;
+                this.TwitchManager.OnConnected += this.TwitchManager_OnConnected;
+                this.TwitchManager.OnDisconnected += this.TwitchManager_OnDisconnected;
+                this.TwitchManager.OnRewardRedeemed += this.TwitchManager_OnRewardRedeemed;
+                this.TwitchManager.OnBitsReceived += this.TwitchManager_OnBitsReceived;
+                this.TwitchManager.Connect(Main.Secret);
+                this.TwitchManager.OnConnected += this.TwitchManager_OnConnected;
             } catch(Exception e)
             {
                 Log.Error(e);
@@ -133,22 +134,22 @@ namespace TwitchDice.Twitch
 
         private void Hooks_OnFail()
         {
-            EventQueue.Clear();
-            State = DiceMasterState.InLobby;
+            this.EventQueue.Clear();
+            this.State = DiceMasterState.InLobby;
         }
 
         void Update()
         {
-            switch(State)
+            switch(this.State)
             {
                 case DiceMasterState.InLobby:
                     break;
 
                 case DiceMasterState.InLevel:
-                    while(EventQueue.Count > 0)
+                    while(this.EventQueue.Count > 0)
                     {
                         Log.Debug("Dequeueing event...");
-                        EventInfo info = EventQueue.Dequeue();
+                        EventInfo info = this.EventQueue.Dequeue();
                         if (!Main.EventManager.TryActivateEventOfTier(info.Tier, info.ActivatorUsername))
                         {
                             Log.Warning("Failed to activate event!");
@@ -161,7 +162,7 @@ namespace TwitchDice.Twitch
                     break;
 
                 case DiceMasterState.Disconnect:
-                    if (TwitchManager.IsConnected) TwitchManager.Disconnect();
+                    if (this.TwitchManagerConnected) this.TwitchManager.Disconnect();
                     ChatUtil.DiceMasterSpeak("NOT ACTIVE // <color=red>DISCONNECTED</color>");
                     Main.DiceMasterObject = null;
                     Destroy(this);
@@ -170,18 +171,18 @@ namespace TwitchDice.Twitch
         }
         private void Hooks_OnLobbyLeave()
         {
-            State = DiceMasterState.Disconnect;
+            this.State = DiceMasterState.Disconnect;
         }
 
         private void TwitchManager_OnConnected(object sender, TwitchLib.Client.Events.OnJoinedChannelArgs e)
         {
-            State = DiceMasterState.InLobby;
+            this.State = DiceMasterState.InLobby;
         }
 
         private void RundownManager_OnExpeditionGameplayStarted()
         {
-            if (State == DiceMasterState.InLobby)
-                State = DiceMasterState.InLevel;
+            if (this.State == DiceMasterState.InLobby)
+                this.State = DiceMasterState.InLevel;
         }
 
         private void TwitchManager_OnRewardRedeemed(object sender, TwitchLib.PubSub.Events.OnRewardRedeemedArgs e)
@@ -194,7 +195,7 @@ namespace TwitchDice.Twitch
                     ActivatorUsername = e.DisplayName,
                     Tier = config.Tier
                 };
-                EventQueue.Enqueue(info);
+                this.EventQueue.Enqueue(info);
                 return;
             }
             Log.Debug($"Found no associated tier for reward {e.RewardTitle}");
@@ -211,7 +212,7 @@ namespace TwitchDice.Twitch
                     Tier = config.Tier
                 };
                 Log.Debug("Added event to event queue");
-                EventQueue.Enqueue(info);
+                this.EventQueue.Enqueue(info);
                 return;
             }
             Log.Debug($"{e.BitsUsed} < minimum dice amount");
@@ -220,7 +221,7 @@ namespace TwitchDice.Twitch
         private void TwitchManager_OnDisconnected(object sender, TwitchLib.Communication.Events.OnDisconnectedEventArgs e)
         {
             ChatUtil.DiceMasterSpeak("DISCONNECTED FROM TWITCH // <color=red>NOT ACTIVE</color>");
-            State = DiceMasterState.Disconnect;
+            this.State = DiceMasterState.Disconnect;
         }
 
         private void TwitchManager_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
@@ -236,7 +237,7 @@ namespace TwitchDice.Twitch
                     Tier = tier
                 };
 
-                EventQueue.Enqueue(info);
+                this.EventQueue.Enqueue(info);
                 return;
             }
 

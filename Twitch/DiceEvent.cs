@@ -1,6 +1,7 @@
 ﻿using BepInEx.Configuration;
 using GTFO.API;
 using SNetwork;
+using System;
 using System.Collections.Generic;
 
 namespace TwitchDice.Twitch
@@ -33,22 +34,47 @@ namespace TwitchDice.Twitch
         protected abstract DiceTier DiceTier { get; }
         private ConfigEntry<DiceTier> tierConfig;
         private ConfigEntry<bool> enabled;
+        private bool registered;
 
         public DiceEvent()
         {
+        }
+
+        private void FetchConfig()
+        {
+            try
+            {
+                if (this.enabled == null)
+                {
+                    this.enabled = Main.Instance.Config.Bind(
+                        Main.CONFIG_EVENTS_SECTION,
+                        $"Enable {this.EventName.Replace(" ", "")}",
+                        true,
+                        $"Set if {this.EventName} can be activated"
+                    );
+                }
+                if (this.tierConfig == null)
+                {
+                    this.tierConfig = Main.Instance.Config.Bind(
+                        Main.CONFIG_DICE_SECTION,
+                        this.EventName,
+                        this.DiceTier,
+                        $"Set the tier for {this.EventName}"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Attempted to register dice event '{this.EventName}', but failed to fetch a config entry: {ex}");
+            }
         }
 
         public DiceTier Tier
         {
             get
             {
-                tierConfig = Main.Instance.Config.Bind(
-                    Main.CONFIG_DICE_SECTION,
-                    EventName,
-                    DiceTier,
-                    $"Set the tier for {EventName}"
-                    );
-                return tierConfig.Value;
+                this.FetchConfig();
+                return this.tierConfig.Value;
             }
         }
 
@@ -56,13 +82,8 @@ namespace TwitchDice.Twitch
         {
             get
             {
-                enabled = Main.Instance.Config.Bind(
-                    Main.CONFIG_EVENTS_SECTION,
-                    $"Enable {EventName.Replace(" ", "")}",
-                    true,
-                    $"Set if {EventName} can be activated"
-                    );
-                return enabled.Value;
+                this.FetchConfig();
+                return this.enabled.Value;
             }
         }
 
@@ -80,7 +101,21 @@ namespace TwitchDice.Twitch
         /// <summary>
         /// Used internally to register this event for networking (if required)
         /// </summary>
-        public virtual void Register() { }
+        public void Register()
+        {
+            if (this.registered)
+            {
+                return;
+            }
+
+            this.RegisterImpl();
+            this.registered = true;
+
+            Log.Debug($"Registered DiceEvent '{this.EventName}' with ID '{this.EventID}'");
+        }
+
+        protected virtual void RegisterImpl()
+        { }
 
         /// <summary>
         /// Code that runs on the hosts end when this event is activated
@@ -95,16 +130,13 @@ namespace TwitchDice.Twitch
 
     public abstract class DiceEvent<T> : DiceEvent where T : struct
     {
-        bool _registered = false;
         string _networkEvent;
 
-        public override void Register()
+        protected override void RegisterImpl()
         {
-            if (_registered) return;
             _networkEvent = $"TwitchDice_DiceEvent_{typeof(T).Name}";
-            NetworkAPI.RegisterEvent<T>(_networkEvent, ReceiveClient);
-            _registered = true;
-            Log.Debug($"Registered {EventName} with ID {EventID} and network name of {_networkEvent}");
+            NetworkAPI.RegisterEvent<T>(_networkEvent, this.ReceiveClient);
+            Log.Debug($"Linked event '{this.EventName}' with ID '{this.EventID}' to network name of {this._networkEvent}");
         }
 
         /// <summary>

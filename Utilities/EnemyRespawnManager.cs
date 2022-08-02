@@ -17,6 +17,7 @@ namespace TwitchDice.Utilities
             public float m_x;
             public float m_y;
             public float m_z;
+            public Agents.AgentMode m_mode;
             public AIG_CourseNode m_node;
 
             public DeadEnemy(EnemyAgent enemy)
@@ -26,11 +27,12 @@ namespace TwitchDice.Utilities
                 this.m_y = enemy.Position.y;
                 this.m_z = enemy.Position.z;
                 this.m_node = enemy.CourseNode;
+                this.m_mode = enemy.AI.Mode;
             }
 
             public void Spawn()
             {
-                EnemyAllocator.Current.SpawnEnemy(this.m_id, this.m_node, Agents.AgentMode.Agressive, new Vector3(this.m_x, this.m_y, this.m_z), Quaternion.identity);
+                EnemyAllocator.Current.SpawnEnemy(this.m_id, this.m_node, this.m_mode, new Vector3(this.m_x, this.m_y, this.m_z), Quaternion.identity);
             }
         }
 

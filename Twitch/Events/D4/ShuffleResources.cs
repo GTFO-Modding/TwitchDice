@@ -32,7 +32,7 @@ namespace TwitchDice.Twitch.Events.D4
             float special = backpack.AmmoStorage.SpecialAmmo.AmmoInPack;
             float tool = backpack.AmmoStorage.ClassAmmo.AmmoInPack;
 
-            backpack.AmmoStorage.StandardAmmo.AmmoInPack = special;
+            backpack.AmmoStorage.SpecialAmmo.AmmoInPack = special;
             backpack.AmmoStorage.StandardAmmo.AmmoInPack = tool;
             backpack.AmmoStorage.ClassAmmo.AmmoInPack = main;
 

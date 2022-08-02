@@ -472,6 +472,11 @@ namespace TwitchDice.Utilities
             return result;
         }
 
+        public static T GetRandomElement<T>(this T[] array)
+        {
+            return array[Main.rnd.Next(array.Length)];
+        }
+
         public static T GetRandomElement<T>(this IList list)
         {
             return (T)list[Main.rnd.Next(list.Count)];

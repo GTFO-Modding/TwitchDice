@@ -14,38 +14,64 @@ namespace TwitchDice.Twitch
         public Lookup<DiceTier, IDiceEvent> TierLookup;
         public EventManager()
         {
-            var type = typeof(DiceEvent);
-            var types = GetType().Assembly.GetTypes()
+            Type type = typeof(DiceEvent);
+            IEnumerable<Type> types = GetType().Assembly.GetTypes()
                 .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(type));
 
             Log.Debug($"Found {types.Count()} events");
 
-            Events = new Dictionary<string, IDiceEvent>();
+            this.Events = new Dictionary<string, IDiceEvent>();
 
             Log.Debug("Created events dictionary");
-            foreach (var item in types)
+            foreach (Type item in types)
             {
-                if (item.GetConstructors().Length == 0) Log.Error("No constructor????");
+                string diceEventID = null;
+                try
+                {
+                    if (item.GetConstructors().Length == 0)
+                    {
+                        Log.Error("No constructor????");
+                    }
 
-                var diceType = Activator.CreateInstance(item);
+                    object diceType = Activator.CreateInstance(item);
 
-                if (diceType == null) { Log.Warning("Unable to instantiate type"); return; }
+                    if (diceType == null) { Log.Warning("Unable to instantiate type"); return; }
 
-                IDiceEvent diceEvent = (diceType as IDiceEvent);
+                    IDiceEvent diceEvent = diceType as IDiceEvent;
+                    diceEventID = diceEvent.EventID;
 
-                if (!diceEvent.Enabled) continue;
+                    if (!diceEvent.Enabled)
+                    {
+                        continue;
+                    }
 
-                Events.Add(diceEvent.EventID, diceEvent);
-                diceEvent.Register();
+                    this.Events.Add(diceEvent.EventID, diceEvent);
+                    diceEvent.Register();
+                }
+                catch (Exception ex)
+                {
+                    if (diceEventID == null)
+                    {
+                        Log.Error("Failed registering a dice event! " + ex);
+                    }
+                    else
+                    {
+                        Log.Error($"Failed registering dice event '{diceEventID}': {ex}");
+                    }
+                }
             }
 
-            TierLookup = (Lookup<DiceTier, IDiceEvent>)Events.ToLookup(p => p.Value.Tier, p => p.Value);
+            this.TierLookup = (Lookup<DiceTier, IDiceEvent>)this.Events.ToLookup(p => p.Value.Tier, p => p.Value);
         }
 
         public bool TryActivateEvent(string eventID, string activator = null)
         {
             
-            if (!Events.TryGetValue(eventID, out IDiceEvent diceEvent)) return false;
+            if (!this.Events.TryGetValue(eventID, out IDiceEvent diceEvent))
+            {
+                return false;
+            }
+
             if (!diceEvent.CanBeTriggered())
             {
                 Log.Warning($"Trigger requirements not met for ID {eventID}");
@@ -58,7 +84,7 @@ namespace TwitchDice.Twitch
 
         public bool TryActivateEventOfTier(DiceTier tier, string activator = null)
         {
-            var events = TierLookup[tier];
+            IEnumerable<IDiceEvent> events = this.TierLookup[tier];
             events = events.Where(e => e.CanBeTriggered());
             if (!events.Any())
             {
@@ -71,7 +97,7 @@ namespace TwitchDice.Twitch
             return true;
         }
 
-        private void ActivateEvent(IDiceEvent diceEvent, string activator = null)
+        private static void ActivateEvent(IDiceEvent diceEvent, string activator = null)
         {
             if (activator == null)
             {
