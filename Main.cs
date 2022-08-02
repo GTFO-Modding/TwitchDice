@@ -13,6 +13,7 @@ using GTFO.API;
 using System;
 using System.Collections.Generic;
 using Il2CppInterop.Runtime.Injection;
+using System.Linq;
 
 namespace TwitchDice
 {
@@ -78,7 +79,7 @@ namespace TwitchDice
         private ConfigEntry<string> configUsername;
         private ConfigEntry<string> configImplicitOAuth;
         private ConfigEntry<bool> configTwitchEnabled;
-        private readonly List<DiceTierConfigEntry> TierConfigs = new List<DiceTierConfigEntry>();
+        private List<DiceTierConfigEntry> TierConfigs = new List<DiceTierConfigEntry>();
 
         public override void Load()
         {
@@ -115,7 +116,7 @@ namespace TwitchDice
                 }
                 if (bit <= entry.BitAmount)
                 {
-                    return true;
+                    continue; // continue if the bit amount is to big
                 }
 
                 config = entry;
@@ -147,6 +148,9 @@ namespace TwitchDice
                 DiceTier tier = (DiceTier)_tier;
                 TierConfigs.Add(new DiceTierConfigEntry(tier, Config));
             }
+
+            // Sort by dice tier
+            TierConfigs = TierConfigs.OrderByDescending(x => (int)x.Tier).ToList();
         }
 
         private void OnMessage(ulong sender, ChatMsg message)
