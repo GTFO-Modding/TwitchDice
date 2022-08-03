@@ -1,21 +1,26 @@
 ﻿using Player;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using TwitchDice.Utilities;
+using System.Collections.Generic;
 
 namespace TwitchDice.Twitch.Events.D8
 {
     public class MineSS : DiceEvent
     {
         public override string EventName => "Mine Scatter Shot";
-
+        public override string EventDescription => "Places a bunch of mines around a random player.";
         public override string EventID => "mineSS";
 
         protected override DiceTier DiceTier => DiceTier.D8;
 
-        private readonly int MineCount = 10;
+        private int MineCount => this.Config.ClientConfig.GetValue<int>(nameof(this.MineCount));
+
+        protected override IDiceEventConfig FetchConfig()
+        {
+            IDiceEventConfig cfg = base.FetchConfig();
+            cfg.ClientConfig.Add(nameof(this.MineCount), "The number of mines to place", 10);
+            return cfg;
+        }
 
         public override void TriggerHost()
         {
@@ -26,9 +31,9 @@ namespace TwitchDice.Twitch.Events.D8
 
             PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent LocalPlayer);
 
-            var hits = SpawnUtil.GetRandomScatterAround(LocalPlayer.EyePosition, MineCount);
+            List<RaycastHit> hits = SpawnUtil.GetRandomScatterAround(LocalPlayer.EyePosition, this.MineCount);
 
-            foreach (var hit in hits)
+            foreach (RaycastHit hit in hits)
             {
                 Vector3 direction = (hit.point - LocalPlayer.EyePosition).normalized;
                 var rot = Quaternion.LookRotation(direction, Vector3.up);

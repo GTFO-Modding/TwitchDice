@@ -1,9 +1,5 @@
 ﻿using Player;
-using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
-using TwitchDice.Utilities;
 using UnityEngine;
 
 namespace TwitchDice.Twitch.Events
@@ -11,7 +7,7 @@ namespace TwitchDice.Twitch.Events
     public class RandomZoneLighting : DiceEvent<RandomZLPacket>
     {
         public override string EventName => "Randomize Room Lighting";
-
+        public override string EventDescription => "Randomizes the current zone's lighting";
         public override string EventID => "randomZL";
 
         protected override DiceTier DiceTier => DiceTier.D3;
@@ -25,15 +21,15 @@ namespace TwitchDice.Twitch.Events
         {
             int seed = Main.rnd.Next(0, 255);
             RandomizeZL(seed);
-            TriggerClient(new RandomZLPacket(seed));
+            this.TriggerClient(new RandomZLPacket(seed));
         }
 
-        private void RandomizeZL(int seed)
+        private static void RandomizeZL(int seed)
         {
-            foreach (var player in PlayerManager.PlayerAgentsInLevel)
+            foreach (PlayerAgent player in PlayerManager.PlayerAgentsInLevel)
             {
                 System.Random random = new System.Random(seed);
-                foreach (var light in player.CourseNode.m_lightsInNode)
+                foreach (LevelGeneration.LG_Light light in player.CourseNode.m_lightsInNode)
                 {
                     float r = (float)random.NextDouble();
                     float g = (float)random.NextDouble();
@@ -51,7 +47,7 @@ namespace TwitchDice.Twitch.Events
 
         public RandomZLPacket(int seed)
         {
-            Seed = seed;
+            this.Seed = seed;
         }
     }
 

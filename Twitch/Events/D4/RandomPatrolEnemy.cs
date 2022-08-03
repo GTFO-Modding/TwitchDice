@@ -1,7 +1,5 @@
 ﻿using Enemies;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using TwitchDice.Extensions;
 using TwitchDice.Utilities;
 using UnityEngine;
@@ -11,14 +9,16 @@ namespace TwitchDice.Twitch.Events.D4
     public class RandomPatrolEnemy : DiceEvent<RPE>
     {
         public override string EventName => "What the Sleeper Doing?";
-
+        public override string EventDescription => "Makes a random enemy a patrolling enemy.";
         public override string EventID => "randomPatrol";
+
+        protected override bool ForceDisable => true;
 
         protected override DiceTier DiceTier => DiceTier.D4;
 
         public override void ReceiveClient(ulong sender, RPE packet)
         {
-            foreach (var enemy in GameObject.FindObjectsOfType<EnemyAgent>())
+            foreach (EnemyAgent enemy in GameObject.FindObjectsOfType<EnemyAgent>())
             {
                 if (enemy.GlobalID == packet.EnemyID)
                 {
@@ -43,10 +43,10 @@ namespace TwitchDice.Twitch.Events.D4
 
         public override void TriggerHost()
         {
-            var enemies = new List<EnemyAgent>(GameObject.FindObjectsOfType<EnemyAgent>())
+            List<EnemyAgent> enemies = new List<EnemyAgent>(GameObject.FindObjectsOfType<EnemyAgent>())
                 .Filter((enemy) => enemy.AI.m_behaviour.m_currentStateName == EB_States.Hibernating);
 
-            var randomEnemy = enemies.GetRandomElement<EnemyAgent>();
+            EnemyAgent randomEnemy = enemies.GetRandomElement<EnemyAgent>();
 
             this.TriggerCommon(randomEnemy);
             this.TriggerClient(new RPE(randomEnemy));

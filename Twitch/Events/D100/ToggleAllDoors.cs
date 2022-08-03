@@ -13,26 +13,35 @@ namespace TwitchDice.Twitch.Events.D100
 
         protected override DiceTier DiceTier => DiceTier.D100;
 
-        public sealed class RundownConfig : DiceEventRundownConfig
+        protected override DiceEventConfig<RundownConfig> GetConfig()
         {
-            // example config
-            public List<LevelRestrictions> Levels { get; set; } = new()
+            DiceEventConfig<RundownConfig> cfg = base.GetConfig();
+            cfg.ExampleRundownConfig = new()
             {
-                new LevelRestrictions()
+                Levels = new()
                 {
-                    ExcludeSecurityDoors = new()
+                    new LevelRestrictions()
                     {
-                        new DoorRestriction()
+                        ExcludeSecurityDoors = new()
                         {
-                            Dimension = eDimensionIndex.Dimension_20,
-                            Layer = LG_LayerType.ThirdLayer,
-                            Zone = eLocalZoneIndex.Zone_20
-                        }
-                    },
-                    ExpeditionIndex = 9,
-                    Tier = eRundownTier.TierA
+                            new DoorRestriction()
+                            {
+                                Dimension = eDimensionIndex.Dimension_20,
+                                Layer = LG_LayerType.ThirdLayer,
+                                Zone = eLocalZoneIndex.Zone_20
+                            }
+                        },
+                        ExpeditionIndex = 9,
+                        Tier = eRundownTier.TierA
+                    }
                 }
             };
+            return cfg;
+        }
+
+        public sealed class RundownConfig : DiceEventRundownConfig
+        {
+            public List<LevelRestrictions> Levels { get; set; } = new();
 
             protected override void InitImpl(IDiceEvent diceEvent)
             {

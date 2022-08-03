@@ -1,18 +1,23 @@
-﻿
-
-using TwitchDice.Utilities;
+﻿using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D8
 {
     public class NoMoreCrouching : DiceEvent<NMC>
     {
         public override string EventName => "No Crouch";
-
+        public override string EventDescription => "Disables crouching for all players.";
         public override string EventID => "disableCrouch";
 
         protected override DiceTier DiceTier => DiceTier.D8;
 
-        public override int Time => 20;
+        public override int Time => this.Config.ClientConfig.GetValue<int>(nameof(this.Time));
+
+        protected override IDiceEventConfig FetchConfig()
+        {
+            IDiceEventConfig cfg = base.FetchConfig();
+            cfg.ClientConfig.Add(nameof(this.Time), "The time (in seconds) to disable crouching", 20);
+            return cfg;
+        }
 
         public override bool CanBeTriggered()
         {
@@ -21,7 +26,7 @@ namespace TwitchDice.Twitch.Events.D8
 
         public override void ReceiveClient(ulong sender, NMC packet)
         {
-            PlayerControlManager.DisableCrouchingForSeconds(Time);
+            PlayerControlManager.DisableCrouchingForSeconds(this.Time);
             this.StartEventTimer();
         }
 
@@ -30,7 +35,7 @@ namespace TwitchDice.Twitch.Events.D8
             this.TriggerClient();
 
 
-            PlayerControlManager.DisableCrouchingForSeconds(Time);
+            PlayerControlManager.DisableCrouchingForSeconds(this.Time);
             this.StartEventTimer();
         }
     }

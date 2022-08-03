@@ -1,5 +1,4 @@
-﻿
-using Agents;
+﻿using Agents;
 using Player;
 using TwitchDice.Utilities;
 
@@ -8,7 +7,7 @@ namespace TwitchDice.Twitch.Events.D50
     public class DownReviveRandomPlayer : DiceEvent
     {
         public override string EventName => "Bone Hurting Juice";
-
+        public override string EventDescription => "Downs/Revives a random player.";
         public override string EventID => "bhj";
 
         protected override DiceTier DiceTier => DiceTier.D50;
@@ -16,9 +15,12 @@ namespace TwitchDice.Twitch.Events.D50
         public override bool CanBeTriggered()
         {
             int alivePlayers = 0;
-            foreach (var player in PlayerManager.PlayerAgentsInLevel)
+            foreach (PlayerAgent player in PlayerManager.PlayerAgentsInLevel)
             {
-                if (player.Alive) alivePlayers++;
+                if (player.Alive)
+                {
+                    alivePlayers++;
+                }
             }
             return alivePlayers > 1;
         }

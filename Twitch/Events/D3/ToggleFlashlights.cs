@@ -8,7 +8,7 @@ namespace TwitchDice.Twitch.Events.D3
     public class ToggleFlashlights : DiceEvent<Flashlight>
     {
         public override string EventName => "Toggle Flashlights";
-
+        public override string EventDescription => "Toggles all player's flashlights";
         public override string EventID => "toggleF";
 
         protected override DiceTier DiceTier => DiceTier.D3;
@@ -21,10 +21,10 @@ namespace TwitchDice.Twitch.Events.D3
         public override void TriggerHost()
         {
             ToggleFlashlight();
-            TriggerClient(new Flashlight());
+            this.TriggerClient(new Flashlight());
         }
 
-        private void ToggleFlashlight()
+        private static void ToggleFlashlight()
         {
             if (PlayerManager.TryGetLocalPlayerAgent(out PlayerAgent agent))
             {

@@ -1,6 +1,5 @@
-﻿
-
-using Gear;
+﻿using Gear;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Player;
 using System.Runtime.InteropServices;
 using TwitchDice.Utilities;
@@ -11,7 +10,7 @@ namespace TwitchDice.Twitch.Events.D8
     public class RefillRandomPlayer : DiceEvent<RRP>
     {
         public override string EventName => "Resupply Random";
-
+        public override string EventDescription => "Refills a random player's supplies.";
         public override string EventID => "refillrandom";
 
         protected override DiceTier DiceTier => DiceTier.D8;
@@ -29,8 +28,8 @@ namespace TwitchDice.Twitch.Events.D8
             PlayerUtil.LocalPlayerAgent.GiveAmmoRel(PlayerUtil.LocalPlayerAgent, 1f, 1f, 1f);
             PlayerUtil.LocalPlayerAgent.GiveHealth(PlayerUtil.LocalPlayerAgent, 1f);
 
-            var weapons = GameObject.FindObjectsOfType<BulletWeapon>();
-            foreach (var weapon in weapons)
+            Il2CppArrayBase<BulletWeapon> weapons = GameObject.FindObjectsOfType<BulletWeapon>();
+            foreach (BulletWeapon? weapon in weapons)
             {
                 weapon.m_clip = weapon.GetMaxClip();
             }

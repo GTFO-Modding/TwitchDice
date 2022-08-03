@@ -1,7 +1,5 @@
 ﻿using Player;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using TwitchDice.Utilities;
 using UnityEngine;
 
@@ -10,8 +8,10 @@ namespace TwitchDice.Twitch.Events.D4
     public class FireShooterProjectile : DiceEvent
     {
         public override string EventName => "Shooter!";
-
+        public override string EventDescription => "Fires a shooter projectile";
         public override string EventID => "shooterP";
+
+        protected override bool ForceDisable => true;
 
         protected override DiceTier DiceTier => DiceTier.D4;
 

@@ -1,8 +1,5 @@
 ﻿using AK;
 using Player;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D4
@@ -10,7 +7,7 @@ namespace TwitchDice.Twitch.Events.D4
     public class GiveRandomResource : DiceEvent<GiveRanRes>
     {
         public override string EventName => "Random Resource";
-
+        public override string EventDescription => "Gives a random player a random resource.";
         public override string EventID => "ranRes";
 
         protected override DiceTier DiceTier => DiceTier.D4;

@@ -8,7 +8,7 @@ namespace TwitchDice.Twitch.Events.D50
     public class MoveFog : DiceEvent<MF>
     {
         public override string EventName => "Move Fog";
-
+        public override string EventDescription => "Moves the fog up/down";
         public override string EventID => "movefog";
 
         protected override DiceTier DiceTier => DiceTier.D50;
@@ -33,8 +33,8 @@ namespace TwitchDice.Twitch.Events.D50
         {   
             float targetHeight = PreLitVolume.Current.m_densityHeightAltitude + delta;
 
-            while (delta > 0 && PreLitVolume.Current.m_densityHeightAltitude < targetHeight 
-                   || delta < 0 && PreLitVolume.Current.m_densityHeightAltitude > targetHeight)
+            while (delta > 0 && PreLitVolume.Current!.m_densityHeightAltitude < targetHeight 
+                   || delta < 0 && PreLitVolume.Current!.m_densityHeightAltitude > targetHeight)
             {
                 yield return new WaitForEndOfFrame();
                 if (PreLitVolume.Current != null)

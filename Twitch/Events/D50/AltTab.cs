@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TwitchDice.Extensions;
-using TwitchDice.Utilities;
+﻿using TwitchDice.Extensions;
 using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D50
@@ -10,7 +6,7 @@ namespace TwitchDice.Twitch.Events.D50
     public class AltTab : DiceEvent<alttab>
     {
         public override string EventName => "Alt + Tab";
-
+        public override string EventDescription => "Opens a random image for all players forcing an Alt + Tab.";
         public override string EventID => "alttab";
 
         protected override DiceTier DiceTier => DiceTier.D50;

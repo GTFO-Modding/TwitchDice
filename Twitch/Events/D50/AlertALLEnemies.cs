@@ -1,7 +1,4 @@
 ﻿using Enemies;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TwitchDice.Utilities;
 using UnityEngine;
 
@@ -10,15 +7,17 @@ namespace TwitchDice.Twitch.Events.D50
     public class AlertALLEnemies : DiceEvent
     {
         public override string EventName => "Sleepers Mad";
-
+        public override string EventDescription => "Alerts all enemies";
         public override string EventID => "alertEnemies";
+
+        protected override bool ForceDisable => true;
 
         protected override DiceTier DiceTier => DiceTier.D50;
 
         public override void TriggerHost()
         {
-            var noiseMaker = PlayerUtil.LocalPlayerAgent.Cast<INM_NoiseMaker>();
-            foreach (var enemy in GameObject.FindObjectsOfType<EnemyAgent>())
+            INM_NoiseMaker noiseMaker = PlayerUtil.LocalPlayerAgent.Cast<INM_NoiseMaker>();
+            foreach (EnemyAgent enemy in GameObject.FindObjectsOfType<EnemyAgent>())
             {
                 NoiseManager.MakeNoise(new NM_NoiseData()
                 {

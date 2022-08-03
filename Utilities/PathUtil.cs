@@ -51,5 +51,10 @@ namespace TwitchDice.Utilities
         {
             return Path.Combine(RundownEventFolder, config.DiceEvent.EventName + ".json");
         }
+
+        public static string GetExampleRundownConfigPath(this IDiceEventConfig config)
+        {
+            return Path.Combine(RundownEventFolder, "Example " + config.DiceEvent.EventName + ".json");
+        }
     }
 }

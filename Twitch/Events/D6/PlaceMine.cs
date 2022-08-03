@@ -1,7 +1,4 @@
 ﻿using Player;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TwitchDice.Utilities;
 using UnityEngine;
 
@@ -10,7 +7,7 @@ namespace TwitchDice.Twitch.Events.D6
     public class PlaceMine : DiceEvent
     {
         public override string EventName => "Materialize Mine";
-
+        public override string EventDescription => "Places a mine in fromt of a random player.";
         public override string EventID => "mineLook";
 
         protected override DiceTier DiceTier => DiceTier.D6;

@@ -1,14 +1,11 @@
 ﻿using Player;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TwitchDice.Twitch.Events.D4
 {
     public class AutoJump : DiceEvent<Jump>
     {
-        public override string EventName => "yump";
-
+        public override string EventName => "One Hop This Time";
+        public override string EventDescription => "Forces all players to jump";
         public override string EventID => "jump";
 
         protected override DiceTier DiceTier => DiceTier.D4;
@@ -21,15 +18,17 @@ namespace TwitchDice.Twitch.Events.D4
         public override void TriggerHost()
         {
             MakePlayerJump();
-            TriggerClient(new Jump());
+            this.TriggerClient(new Jump());
         }
 
-        private void MakePlayerJump()
+        private static void MakePlayerJump()
         {
             if (PlayerManager.TryGetLocalPlayerAgent(out PlayerAgent agent))
             {
                 if (agent.Alive)
+                {
                     agent.Locomotion.ChangeState(PlayerLocomotion.PLOC_State.Jump, true);
+                }
             }
         }
     }

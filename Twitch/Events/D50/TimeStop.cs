@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections;
 using TwitchDice.CustomSounds.TAK;
 using TwitchDice.Utilities;
 using UnityEngine;
@@ -11,7 +8,7 @@ namespace TwitchDice.Twitch.Events.D50
     public class TimeStop : DiceEvent<TS>
     {
         public override string EventName => "ZA WARUDO!!";
-
+        public override string EventDescription => "Forces time to stop.";
         public override string EventID => "timeStop";
 
         protected override DiceTier DiceTier => DiceTier.D50;
@@ -20,18 +17,18 @@ namespace TwitchDice.Twitch.Events.D50
 
         public override void ReceiveClient(ulong sender, TS packet)
         {
-            TriggerCommon();
+            this.TriggerCommon();
         }
 
         public override void TriggerHost()
         {
-            TriggerCommon();
-            TriggerClient();
+            this.TriggerCommon();
+            this.TriggerClient();
         }
 
         private void TriggerCommon()
         {
-            TimedEvents.Start(StopTime(), this);
+            TimedEvents.Start(this.StopTime(), this);
         }
 
         private IEnumerator StopTime()

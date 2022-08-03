@@ -1,9 +1,10 @@
 ﻿using BepInEx.Configuration;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using TwitchDice.Utilities;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace TwitchDice.Twitch
 {
@@ -11,6 +12,7 @@ namespace TwitchDice.Twitch
     {
         DiceEventClientConfig ClientConfig { get; }
         DiceEventRundownConfig? RundownConfig { get; }
+        DiceEventRundownConfig? ExampleRundownConfig { get; }
         IDiceEvent DiceEvent { get; }
 
         void Init();
@@ -240,6 +242,7 @@ namespace TwitchDice.Twitch
     {
         public DiceEventClientConfig ClientConfig { get; }
         public DiceEventRundownConfig? RundownConfig => null;
+        public DiceEventRundownConfig? ExampleRundownConfig => null;
         public IDiceEvent DiceEvent { get; }
 
         public DiceEventConfig(IDiceEvent eventOwner, DiceEventClientConfig? clientConfig = null)
@@ -263,37 +266,59 @@ namespace TwitchDice.Twitch
     {
         public DiceEventClientConfig ClientConfig { get; }
         public TRundownConfig RundownConfig { get; set; }
+        public TRundownConfig ExampleRundownConfig { get; set; }
         public IDiceEvent DiceEvent { get; }
 
-        public DiceEventConfig(IDiceEvent eventOwner, TRundownConfig? rundown = default, DiceEventClientConfig? client = null)
+        public DiceEventConfig(IDiceEvent eventOwner, TRundownConfig? exampleRundown = default, DiceEventClientConfig? client = null)
         {
-            if (rundown is null)
+            if (exampleRundown is null)
             {
-                rundown = new();
+                exampleRundown = new();
             }
+
             this.DiceEvent = eventOwner;
-            this.RundownConfig = rundown;
+            this.RundownConfig = new();
             this.ClientConfig = client ?? new();
+            this.ExampleRundownConfig = exampleRundown;
         }
 
         public void Init()
         {
             this.ClientConfig.Init(this.DiceEvent);
             string path = this.GetRundownConfigPath();
+            string examplePath = this.GetExampleRundownConfigPath();
+
+            if (!File.Exists(examplePath))
+            {
+                File.WriteAllText(path, JsonSerializer.Serialize(this.ExampleRundownConfig, SERIALIZER_SETTINGS));
+            }
 
             if (!File.Exists(path))
             {
-                File.WriteAllText(path, JsonConvert.SerializeObject(this.RundownConfig, Formatting.Indented));
+                File.WriteAllText(path, JsonSerializer.Serialize(this.RundownConfig, SERIALIZER_SETTINGS));
             }
             else
             {
-                this.RundownConfig = JsonConvert.DeserializeObject<TRundownConfig>(File.ReadAllText(path)) ?? this.RundownConfig;
+                this.RundownConfig = JsonSerializer.Deserialize<TRundownConfig>(File.ReadAllText(path), SERIALIZER_SETTINGS) ?? this.RundownConfig;
             }
 
             this.RundownConfig.Init(this.DiceEvent);
             return;
         }
 
+        private static readonly JsonSerializerOptions SERIALIZER_SETTINGS = new()
+        {
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            WriteIndented = true
+        };
+
         DiceEventRundownConfig IDiceEventConfig.RundownConfig => this.RundownConfig;
+        DiceEventRundownConfig IDiceEventConfig.ExampleRundownConfig => this.ExampleRundownConfig;
+
+        static DiceEventConfig()
+        {
+            SERIALIZER_SETTINGS.Converters.Add(new JsonStringEnumConverter());
+        }
     }
 }

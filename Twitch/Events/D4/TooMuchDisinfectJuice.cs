@@ -1,7 +1,4 @@
 ﻿using Player;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TwitchDice.Utilities;
 using UnityEngine;
 using AK;
@@ -11,7 +8,7 @@ namespace TwitchDice.Twitch.Events.D4
     public class TooMuchDisinfect : DiceEvent<TMD>
     {
         public override string EventName => "Too Much Juice";
-
+        public override string EventDescription => "Applies a lot of disinfection juice to a random player.";
         public override string EventID => "juice";
 
         protected override DiceTier DiceTier => DiceTier.D4;
@@ -27,12 +24,16 @@ namespace TwitchDice.Twitch.Events.D4
         {
             PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent target);
             if (target.IsLocallyOwned)
+            {
                 PlaySplat();
+            }
             else
-                TriggerClient(new TMD(), target.Owner);
+            {
+                this.TriggerClient(new TMD(), target.Owner);
+            }
         }
 
-        private void PlaySplat()
+        private static void PlaySplat()
         {
             for (int i = 0; i < splatAmount; i++)
             {

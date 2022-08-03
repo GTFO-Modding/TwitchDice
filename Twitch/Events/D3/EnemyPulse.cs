@@ -1,8 +1,5 @@
 ﻿using Enemies;
 using Player;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D3
@@ -10,7 +7,7 @@ namespace TwitchDice.Twitch.Events.D3
     public class EnemyPulse : DiceEvent
     {
         public override string EventName => "Pulse";
-
+        public override string EventDescription => "Makes the enemies pulse around the player.";
         public override string EventID => "pulse";
 
         protected override DiceTier DiceTier => DiceTier.D3;

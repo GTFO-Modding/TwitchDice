@@ -8,7 +8,7 @@ namespace TwitchDice.Twitch.Events.D50
     public class VoidFog : DiceEvent<VF>
     {
         public override string EventName => "The Darkness Consumes You";
-
+        public override string EventDescription => "Makes the fog black.";
         public override string EventID => "voidfog";
 
         protected override DiceTier DiceTier => DiceTier.D50;
@@ -17,23 +17,23 @@ namespace TwitchDice.Twitch.Events.D50
         
         public override void ReceiveClient(ulong sender, VF packet)
         {
-            TimedEvents.StartTimedEvent(this.DoTriggerEvent(packet.seconds, packet.fogColor, packet.fogDensity), this);
+            TimedEvents.StartTimedEvent(DoTriggerEvent(packet.seconds, packet.fogColor, packet.fogDensity), this);
         }
         
         public override void TriggerHost()
         {
-            float seconds = Time;
-            var fogColor = Color.black;
+            float seconds = this.Time;
+            Color fogColor = Color.black;
             float fogDensity = 0.2f;
 
             this.TriggerClient(new VF(seconds, fogColor, fogDensity));
-            TimedEvents.StartTimedEvent(this.DoTriggerEvent(seconds, fogColor, fogDensity), this);
+            TimedEvents.StartTimedEvent(DoTriggerEvent(seconds, fogColor, fogDensity), this);
         }
         
-        private IEnumerator DoTriggerEvent(float seconds, Color fogColor, float fogDensity)
+        private static IEnumerator DoTriggerEvent(float seconds, Color fogColor, float fogDensity)
         {
-            initialColor = PreLitVolume.Current.m_fogColor;
-            initialDensity = PreLitVolume.Current.m_fogDensity;
+            Color initialColor = PreLitVolume.Current.m_fogColor;
+            float initialDensity = PreLitVolume.Current.m_fogDensity;
 
             PreLitVolume.Current.m_fogColor = fogColor;
             PreLitVolume.Current.m_fogDensity = fogDensity;
@@ -46,9 +46,6 @@ namespace TwitchDice.Twitch.Events.D50
                 PreLitVolume.Current.m_fogDensity = initialDensity;
             }
         }
-
-        private Color initialColor;
-        private float initialDensity;
     }
     
     [StructLayout(LayoutKind.Sequential)]

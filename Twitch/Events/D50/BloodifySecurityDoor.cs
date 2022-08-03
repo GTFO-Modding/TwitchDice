@@ -8,10 +8,11 @@ using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D50
 {
+#warning TODO: Add config for BloodifySecurityDoor event
     public class BloodifySecurityDoor : DiceEvent<BSD>
     {
         public override string EventName => "Bloody Door";
-
+        public override string EventDescription => "Makes a random security door a blood door.";
         public override string EventID => "bloodifydoor";
 
         protected override DiceTier DiceTier => DiceTier.D50;

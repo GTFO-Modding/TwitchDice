@@ -1,15 +1,11 @@
 ﻿using Player;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D4
 {
     public class ShuffleResources : DiceEvent<ShuffleRes>
     {
         public override string EventName => "Shuffle Resources";
-
+        public override string EventDescription => "Shuffles the resources of all players.";
         public override string EventID => "shuffleRes";
 
         protected override DiceTier DiceTier => DiceTier.D4;
@@ -22,10 +18,10 @@ namespace TwitchDice.Twitch.Events.D4
         public override void TriggerHost()
         {
             Shuffle();
-            TriggerClient();
+            this.TriggerClient();
         }
 
-        private void Shuffle()
+        private static void Shuffle()
         {
             PlayerBackpack backpack = PlayerBackpackManager.LocalBackpack;
             float main = backpack.AmmoStorage.StandardAmmo.AmmoInPack;

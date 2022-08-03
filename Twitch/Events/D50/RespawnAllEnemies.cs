@@ -5,7 +5,7 @@ namespace TwitchDice.Twitch.Events.D50
     public class RespawnAllEnemies : DiceEvent
     {
         public override string EventName => "Back from the Dead!";
-
+        public override string EventDescription => "Respawns all enemies on the map.";
         public override string EventID => "respawnAll";
 
         protected override DiceTier DiceTier => DiceTier.D50;
