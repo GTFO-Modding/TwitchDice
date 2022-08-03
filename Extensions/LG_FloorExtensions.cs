@@ -1,7 +1,5 @@
 ﻿using LevelGeneration;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace TwitchDice.Extensions
 {
@@ -16,9 +14,9 @@ namespace TwitchDice.Extensions
         }
         public static IEnumerable<LG_Layer> GetAllLayers(this LG_Floor floor)
         {
-            foreach (var dimension in floor.GetAllDimensions())
+            foreach (Dimension dimension in floor.GetAllDimensions())
             {
-                foreach (var layer in dimension.GetAllLayers())
+                foreach (LG_Layer layer in dimension.GetAllLayers())
                 {
                     yield return layer;
                 }
@@ -26,9 +24,9 @@ namespace TwitchDice.Extensions
         }
         public static IEnumerable<LG_Zone> GetAllZones(this LG_Floor floor)
         {
-            foreach (var dimension in floor.GetAllDimensions())
+            foreach (Dimension dimension in floor.GetAllDimensions())
             {
-                foreach (var zone in dimension.GetAllZones())
+                foreach (LG_Zone zone in dimension.GetAllZones())
                 {
                     yield return zone;
                 }

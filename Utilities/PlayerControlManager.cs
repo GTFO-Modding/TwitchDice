@@ -1,5 +1,4 @@
-﻿
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 namespace TwitchDice.Utilities
@@ -16,17 +15,18 @@ namespace TwitchDice.Utilities
         public static bool DoSelfDamage { get; set; }
         public static bool InstantKill { get; set; }
         public static bool DisableFire { get; set; }
+        public static float SelfDamageMultiplier { get; set; }
 
-        private static CoroutineHandler.IRoutine _activeForceCrouch; // cache in case another force crouch is called.
-        private static CoroutineHandler.IRoutine _activeInvertControls; // cache in case of another force invert controls is called.
-        private static CoroutineHandler.IRoutine _activeDisableInteractions;
-        private static CoroutineHandler.IRoutine _activeDisableMovement;
-        private static CoroutineHandler.IRoutine _activeDisableFire;
-        private static CoroutineHandler.IRoutine _activeEnableGlobalPlayerDamage;
-        private static CoroutineHandler.IRoutine _activeDisableRunning;
-        private static CoroutineHandler.IRoutine _activeNoCrouch;
-        private static CoroutineHandler.IRoutine _activeDoSelfDamage;
-        private static CoroutineHandler.IRoutine _activeInstantKill;
+        private static CoroutineHandler.IRoutine? _activeForceCrouch; // cache in case another force crouch is called.
+        private static CoroutineHandler.IRoutine? _activeInvertControls; // cache in case of another force invert controls is called.
+        private static CoroutineHandler.IRoutine? _activeDisableInteractions;
+        private static CoroutineHandler.IRoutine? _activeDisableMovement;
+        private static CoroutineHandler.IRoutine? _activeDisableFire;
+        private static CoroutineHandler.IRoutine? _activeEnableGlobalPlayerDamage;
+        private static CoroutineHandler.IRoutine? _activeDisableRunning;
+        private static CoroutineHandler.IRoutine? _activeNoCrouch;
+        private static CoroutineHandler.IRoutine? _activeDoSelfDamage;
+        private static CoroutineHandler.IRoutine? _activeInstantKill;
 
         public static void EnableInstantKillForSeconds(float seconds)
         {
@@ -35,9 +35,10 @@ namespace TwitchDice.Utilities
             _activeInstantKill = TimedEvents.Start(DoEnableInstantKillForSeconds(seconds));
         }
 
-        public static void EnableSelfDamageForSeconds(float seconds)
+        public static void EnableSelfDamageForSeconds(float seconds, float multiplier)
         {
             _activeDoSelfDamage?.Stop();
+            SelfDamageMultiplier = multiplier;
 
             _activeDoSelfDamage = TimedEvents.Start(DoEnableSelfDamageForSeconds(seconds));
         }

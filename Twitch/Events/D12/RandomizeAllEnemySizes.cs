@@ -1,7 +1,4 @@
-﻿
-
-using Enemies;
-using System;
+﻿using Enemies;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -13,21 +10,30 @@ namespace TwitchDice.Twitch.Events.D12
     public class RandomizeAllEnemySizes : DiceEvent<RAES>
     {
         public override string EventName => "Randomize All Enemy Size";
-
+        public override string EventDescription => "Randomizes all enemy sizes.";
         public override string EventID => "randomizeSizes";
 
         protected override DiceTier DiceTier => DiceTier.D12;
 
-        public override int Time => 60;
+        protected override bool ForceDisable => true;
+
+        public override int Time => this.Config.ClientConfig.GetValue<int>(nameof(this.Time));
+
+        protected override IDiceEventConfig FetchConfig()
+        {
+            IDiceEventConfig cfg = base.FetchConfig();
+            cfg.ClientConfig.Add(nameof(this.Time), "The time the enemy sizes will be random", 60);
+            return cfg;
+        }
 
         public override void ReceiveClient(ulong sender, RAES packet)
         {
             this.TriggerCommon(packet.Seed);
         }
 
-        private IEnumerator ApplyScale(EnemyAgent enemy, float seconds, float multiplier)
+        private static IEnumerator ApplyScale(EnemyAgent enemy, float seconds, float multiplier)
         {
-            var oldScale = enemy.transform.localScale;
+            Vector3 oldScale = enemy.transform.localScale;
             enemy.transform.localScale = enemy.transform.localScale * multiplier;
             yield return new WaitForSeconds(seconds);
             if (enemy != null)
@@ -42,9 +48,9 @@ namespace TwitchDice.Twitch.Events.D12
             var enemies = new List<EnemyAgent>(GameObject.FindObjectsOfType<EnemyAgent>());
             enemies.Sort((a, b) => a.GlobalID - b.GlobalID);
 
-            foreach (var enemy in enemies)
+            foreach (EnemyAgent? enemy in enemies)
             {
-                TimedEvents.StartTimedEvent(ApplyScale(enemy, Time, random.Next(75, 125) / 100f), this);
+                TimedEvents.StartTimedEvent(ApplyScale(enemy, this.Time, random.Next(75, 125) / 100f), this);
                 enemy.transform.localScale = enemy.transform.localScale * (random.Next(75, 125) / 100f);
             }
         }

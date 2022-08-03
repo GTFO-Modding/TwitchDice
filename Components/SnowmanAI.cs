@@ -3,22 +3,24 @@ using Player;
 using SNetwork;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using TwitchDice.Utilities;
 using UnityEngine;
-using TwitchDice.CustomSounds.TAK;
 using AK;
 using Gear;
 using GTFO.API;
+using TwitchDice.Extensions;
 
 namespace TwitchDice.Components
 {
     [Il2cppInterface(typeof(iResourcePackReceiver))]
     public class SnowmanAI : MonoBehaviour
     {
-        public SnowmanAI(IntPtr intPtr) : base(intPtr) { }
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        public SnowmanAI(IntPtr intPtr) : base(intPtr)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        { }
 
-        const float MaxHealth = 50;
+        const float MAX_HEALTH = 50;
         const float DistFromPlayer = 2;
         const int TeleportCooldown = 5;
         const float BaseAttackDamage = 1.5f;
@@ -26,85 +28,90 @@ namespace TwitchDice.Components
 
         public SnowmanState State 
         { 
-            get => _state;
+            get => this._state;
             private set
             {
-                Log.Debug($"Snowman state change {_state} -> {value}");
-                _state = value;
+                Log.Debug($"Snowman state change {this._state} -> {value}");
+                this._state = value;
             }
         }
 
-        public float HealthPercent
-        {
-            get
-            {
-                return Health / MaxHealth;
-            }
-        }
+        public float HealthPercent => this.Health / this.MaxHealth;
 
         public float StateTimer { get; private set; }
         public PlayerAgent Target 
         { 
             get
             {
-                if (_target != null) return _target;
-                _target = GetClosestPlayer();
-                return _target;
+                if (this._target == null)
+                {
+                    this._target = this.GetClosestPlayer();
+                }
+
+                return this._target;
             }
-            private set 
-            {
-                _target = value;
-            } 
+            private set => this._target = value;
         }
         public bool IsSeen { get; private set; }
         public GenericDamageComponent Damage { get; private set; }
         public Interact_Timed Interact { get; private set; }
-        public float Health { get; private set; }
-        public bool IsAngry { get => HealthPercent <= 0.2; }
+        public float MaxHealth { get; private set; }
+        public bool IsAngry => this.HealthPercent <= 0.2;
         public float AttackDamage { get; private set; }
+        public float Health
+        {
+            get => this._health;
+            private set => this._health = Mathf.Clamp(value, 0, this.MaxHealth);
+        }
 
 
-        GameObject Eyebrows;
-        GameObject Smile;
-        GameObject Frown;
-        GameObject Interaction;
+        private GameObject Eyebrows;
+        private GameObject Smile;
+        private GameObject Frown;
+        private GameObject Interaction;
         private SnowmanState _state;
         private PlayerAgent _target;
+        private float _health;
         private float nextClientUpdate;
 
-        void Awake()
+        private void Awake()
         {
-            Smile = transform.Find("Head/smile").gameObject;
-            Frown = transform.Find("Head/sad").gameObject;
-            Eyebrows = transform.Find("Head/angy").gameObject;
-            Interaction = transform.Find("Interaction").gameObject;
-            gameObject.AddComponent<DestroyOnCleanUp>();
-            AttackDamage = BaseAttackDamage;
+            this.Smile = this.transform.Find("Head/smile").gameObject;
+            this.Frown = this.transform.Find("Head/sad").gameObject;
+            this.Eyebrows = this.transform.Find("Head/angy").gameObject;
+            this.Interaction = this.transform.Find("Interaction").gameObject;
+            this.MaxHealth = MAX_HEALTH;
+            this.gameObject.AddComponent<DestroyOnCleanUp>();
+            this.AttackDamage = BaseAttackDamage;
 
-            NetworkAPI.RegisterEvent<PSnowmanState>(typeof(PSnowmanState).Name, OnClientStateUpdate);
-            NetworkAPI.RegisterEvent<PSnowmanHeal>(typeof(PSnowmanHeal).Name, OnClientHeal);
-            NetworkAPI.RegisterEvent<PSnowmanDamage>(typeof(PSnowmanDamage).Name, OnClientDamage);
-            SetupInteraction();
-            SetupDamage();
-            State = SnowmanState.Client;
+            NetworkAPI.RegisterEvent<PSnowmanState>(typeof(PSnowmanState).Name, this.OnClientStateUpdate);
+            NetworkAPI.RegisterEvent<PSnowmanHeal>(typeof(PSnowmanHeal).Name, this.OnClientHeal);
+            NetworkAPI.RegisterEvent<PSnowmanDamage>(typeof(PSnowmanDamage).Name, this.OnClientDamage);
+            this.SetupInteraction();
+            this.SetupDamage();
+            this.State = SnowmanState.Client;
 
-            if (!SNet.IsMaster) return;
-            State = SnowmanState.Idle;
-            StateTimer = 0;
-            Target = GetClosestPlayer();
-            UpdateRotation();
+            if (!SNet.IsMaster)
+            {
+                return;
+            }
+
+            this.State = SnowmanState.Idle;
+            this.StateTimer = 0;
+            this.Target = this.GetClosestPlayer();
+            this.UpdateRotation();
         }
 
-        void SetupDamage()
+        private void SetupDamage()
         {
-            Damage = gameObject.AddComponent<GenericDamageComponent>();
-            Damage.add_OnGenericDamageTaken((Il2CppSystem.Action<float>)OnDamage);
-            Health = MaxHealth;
+            this.Damage = this.gameObject.AddComponent<GenericDamageComponent>();
+            this.Damage.add_OnGenericDamageTaken((Il2CppSystem.Action<float>)this.OnDamage);
+            this.Health = this.MaxHealth;
         }
 
-        void SetupInteraction()
+        private void SetupInteraction()
         {
-            Interaction.layer = LayerManager.LAYER_INTERACTION;
+            this.Interaction.layer = LayerManager.LAYER_INTERACTION;
         }
 
         public void GiveAmmoRel(float ammoStandardRel, float ammoSpecialRel, float ammoClassRel) { }
@@ -114,109 +121,126 @@ namespace TwitchDice.Components
         public void GiveHealth(float health) 
         {
             if (SNet.IsMaster)
-                HealSnowman();
+            {
+                this.HealSnowman();
+            }
             else
+            {
                 NetworkAPI.InvokeEvent(typeof(PSnowmanHeal).Name, new PSnowmanHeal());
+            }
         }
 
-        public bool NeedDisinfection() { return false; }
+        public bool NeedDisinfection() => false;
 
-        public bool NeedHealth() { return Health < MaxHealth; }
+        public bool NeedHealth() => this.Health < this.MaxHealth;
 
-        public bool NeedToolAmmo() { return false; }
+        public bool NeedToolAmmo() => false;
 
-        public bool NeedWeaponAmmo() { return false; }
+        public bool NeedWeaponAmmo() => false;
 
-        public string InteractionName { get { return "Snowfriend :)"; } }
+        public string InteractionName => "Snowfriend :)";
 
-        public bool IsLocallyOwned { get { return false; } }
+        public bool IsLocallyOwned => false;
 
-        void OnClientStateUpdate(ulong sender, PSnowmanState state)
+        private void OnClientStateUpdate(ulong sender, PSnowmanState state)
         {
-            transform.rotation = state.Rotation;
-            transform.position = state.Position;
-            Health = state.Health;
-            Log.Debug($"State Update\n------\nRot: {state.Rotation}, Pos: {state.Position}, Health {Health}");
+            this.transform.rotation = state.Rotation;
+            this.transform.position = state.Position;
+            this.Health = state.Health;
+            Log.Debug($"State Update\n------\nRot: {state.Rotation}, Pos: {state.Position}, Health {this.Health}");
         }
 
-        void OnClientHeal(ulong sender, PSnowmanHeal hela)
+        private void OnClientHeal(ulong sender, PSnowmanHeal hela)
         {
-            HealSnowman();
+            this.HealSnowman();
             Log.Debug("Client Heal");
         }
 
-        void OnClientDamage(ulong sender, PSnowmanDamage damage)
+        private void OnClientDamage(ulong sender, PSnowmanDamage damage)
         {
-            if (!SNet.IsMaster) return;
-            Health -= damage.amount;
-            if (Health < 0) Health = 0;
-            UpdateClientState();
+            if (!SNet.IsMaster)
+            {
+                return;
+            }
+
+            this.Health -= damage.amount;
+
+            this.UpdateClientState();
         }
 
-        void OnDamage(float damage)
+        private void OnDamage(float damage)
         {
             if (SNet.IsMaster)
             {
-                Health -= damage;
-                if (Health < 0) Health = 0;
-                UpdateClientState();
-            } else
+                this.Health -= damage;
+
+                this.UpdateClientState();
+            }
+            else
             {
                 NetworkAPI.InvokeEvent(typeof(PSnowmanDamage).Name, new PSnowmanDamage() { amount = damage });
             }
         }
 
-        void HealSnowman()
+        private void HealSnowman()
         {
-            Health += 20;
-            if (Health > MaxHealth) Health = MaxHealth;
-            AttackDamage /= AttackMulti;
+            this.Health += 20;
+            this.Health += 20;
+            this.AttackDamage /= AttackMulti;
         }
 
-        void Update()
+        private void Update()
         {
-            UpdateVisuals();
-            if (!SNet.IsMaster) return;
-            if (Target == null) return;
-            IsSeen = IsBeingLookedAt();
-            if (!IsSeen)
+            this.UpdateVisuals();
+            if (!SNet.IsMaster)
             {
-                UpdateRotation();
+                return;
             }
 
-            switch (State)
+            if (this.Target == null)
+            {
+                return;
+            }
+
+            this.IsSeen = this.IsBeingLookedAt();
+            if (!this.IsSeen)
+            {
+                this.UpdateRotation();
+            }
+
+            switch (this.State)
             {
                 case SnowmanState.Idle:
-                    if (!IsSeen)
+                    if (!this.IsSeen)
                     {
-                        State = SnowmanState.LookingForNodes;
+                        this.State = SnowmanState.LookingForNodes;
                     }
                     break;
 
                 case SnowmanState.LookingForNodes:
-                    if (IsSeen)
+                    if (this.IsSeen)
                     {
-                        State = SnowmanState.Idle;
+                        this.State = SnowmanState.Idle;
                     }
-                    if (IsAngry)
+                    if (this.IsAngry)
                     {
                         if (SNet.IsMaster)
                         {
-                            Target.Damage.ParasiteDamage(AttackDamage);
-                            Target.Locomotion.AddExternalPushForce(Vector3.forward * 10);
-                            Target.FPSCamera.AddHitReact(AttackDamage / (BaseAttackDamage * 2), Vector3.up, 1, true, true);
-                            Target.Sound.Post(EVENTS.EXPEDITION_FAILED_SCREEN_JUMP_SCARE);
-                            AttackDamage *= AttackMulti;
+                            this.Target.Damage.ParasiteDamage(this.AttackDamage);
+                            this.Target.Locomotion.AddExternalPushForce(Vector3.forward * 10);
+                            this.Target.FPSCamera.AddHitReact(this.AttackDamage / (BaseAttackDamage * 2), Vector3.up, 1, true, true);
+                            this.Target.Sound.Post(EVENTS.EXPEDITION_FAILED_SCREEN_JUMP_SCARE);
+                            this.AttackDamage *= AttackMulti;
                         }
-                        transform.position = Target.Position;
-                        State = SnowmanState.Teleport;
+                        this.transform.position = this.Target.Position;
+                        this.State = SnowmanState.Teleport;
                         break;
                     }
 
-                    List<AIG_INode> validNodes = new List<AIG_INode>();
-                    foreach (var node in Target.CourseNode.m_nodeCluster.m_nodes)
+                    List<AIG_INode> validNodes = new();
+                    foreach (AIG_INode node in this.Target.CourseNode.m_nodeCluster.m_nodes)
                     {
-                        bool validNode = CanPositionBeSeen(node.Position);
+                        bool validNode = this.CanPositionBeSeen(node.Position);
                         if (validNode)
                         {
                             validNodes.Add(node);
@@ -225,47 +249,58 @@ namespace TwitchDice.Components
 
                     if (validNodes.Count > 0)
                     {
-                        var targetNode = validNodes.GetRandomElement<AIG_INode>();
-                        transform.position = targetNode.Position;
-                        UpdateRotation();
-                        State = SnowmanState.Teleport;
+                        AIG_INode targetNode = validNodes.GetRandomElement<AIG_INode>();
+                        this.transform.position = targetNode.Position;
+                        this.UpdateRotation();
+                        this.State = SnowmanState.Teleport;
                     }
                     break;
 
                 case SnowmanState.Teleport:
-                    State = SnowmanState.TeleportCooldown;
-                    StateTimer = Clock.Time + (TeleportCooldown * AttackDamage);
-                    if (!Target.Alive)
+                    this.State = SnowmanState.TeleportCooldown;
+                    this.StateTimer = Clock.Time + (TeleportCooldown * this.AttackDamage);
+                    if (!this.Target.Alive)
                     {
                         if (PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent newTarget, true, null, true))
                         {
-                            Target = newTarget;
+                            this.Target = newTarget;
                         }
-                        else State = SnowmanState.NoTarget;
+                        else
+                        {
+                            this.State = SnowmanState.NoTarget;
+                        }
                     }
-                    UpdateClientState();
+                    this.UpdateClientState();
                     break;
 
                 case SnowmanState.TeleportCooldown:
-                    if (StateTimer > Clock.Time) break;
-                    State = SnowmanState.Idle;
+                    if (this.StateTimer > Clock.Time)
+                    {
+                        break;
+                    }
+
+                    this.State = SnowmanState.Idle;
                     break;
             }
 
-            if (nextClientUpdate < Clock.Time)
+            if (this.nextClientUpdate < Clock.Time)
             {
-                UpdateClientState();
+                this.UpdateClientState();
             }
         }
 
-        PlayerAgent GetClosestPlayer()
+        private PlayerAgent GetClosestPlayer()
         {
-            PlayerAgent target = null;
+            PlayerAgent? target = null;
             float lastDist = float.MaxValue;
-            foreach (var player in PlayerManager.PlayerAgentsInLevel)
+            foreach (PlayerAgent player in PlayerManager.PlayerAgentsInLevel)
             {
-                if (!player.Alive) return null;
-                float dist = Vector3.Distance(player.EyePosition, transform.position);
+                if (!player.Alive)
+                {
+                    continue;
+                }
+
+                float dist = Vector3.Distance(player.EyePosition, this.transform.position);
                 if (dist <= lastDist)
                 {
                     target = player;
@@ -273,65 +308,70 @@ namespace TwitchDice.Components
                 lastDist = dist;
             }
 
+            if (target == null)
+            {
+                throw new Exception("No target player could be found!");
+            }
+
             return target;
         }
 
-        bool IsBeingLookedAt()
-        {
-            return CanPositionBeSeen(transform.position);
-        }
+        private bool IsBeingLookedAt() => this.CanPositionBeSeen(this.transform.position);
 
-        bool CanPositionBeSeen(Vector3 position)
+        private bool CanPositionBeSeen(Vector3 position)
         {
-            foreach (var player in PlayerManager.PlayerAgentsInLevel)
+            foreach (PlayerAgent player in PlayerManager.PlayerAgentsInLevel)
             {
                 Vector3 directionToTarget = player.Position - position;
                 float dis = Vector3.Distance(player.Position, position);
                 float angle = Vector3.Angle(player.transform.forward, directionToTarget);
-                if (angle > 80 || dis < DistFromPlayer) return true;
+                if (angle > 80 || dis < DistFromPlayer)
+                {
+                    return true;
+                }
             }
             return false;
         }
 
-        void UpdateRotation()
+        private void UpdateRotation()
         {
-            Vector3 relativePos = Target.Position - transform.position;
+            Vector3 relativePos = this.Target.Position - this.transform.position;
             relativePos.y = 0;
             Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
-            transform.rotation = rotation;
+            this.transform.rotation = rotation;
         }
 
-        void UpdateVisuals()
+        private void UpdateVisuals()
         {
             bool smile = true;
             bool frown = false;
             bool brows = false;
-            if (HealthPercent < 0.5)
+            if (this.HealthPercent < 0.5)
             {
                 smile = false;
                 frown = true;
             }
 
-            if (HealthPercent < 0.2)
+            if (this.HealthPercent < 0.2)
             {
                 brows = true;
             }
 
-            Smile.SetActive(smile);
-            Frown.SetActive(frown);
-            Eyebrows.SetActive(brows);
+            this.Smile.SetActive(smile);
+            this.Frown.SetActive(frown);
+            this.Eyebrows.SetActive(brows);
         }
 
-        void UpdateClientState()
+        private void UpdateClientState()
         {
             PSnowmanState state = new PSnowmanState()
             {
-                Health = Health,
-                Position = transform.position,
-                Rotation = transform.rotation
+                Health = this.Health,
+                Position = this.transform.position,
+                Rotation = this.transform.rotation
             };
             NetworkAPI.InvokeEvent(typeof(PSnowmanState).Name, state);
-            nextClientUpdate = Clock.Time + 1;
+            this.nextClientUpdate = Clock.Time + 1;
         }
     }
 
@@ -361,5 +401,9 @@ namespace TwitchDice.Components
     public struct PSnowmanDamage
     {
         public float amount;
+        public PSnowmanDamage(float amount)
+        {
+            this.amount = amount;
+        }
     }
 }

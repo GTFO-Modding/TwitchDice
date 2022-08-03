@@ -3,27 +3,194 @@ using GameData;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using LevelGeneration;
 using Player;
+using SNetwork;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using TwitchDice.Extensions;
-using TwitchDice.Utilities;
 using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D20
 {
-    public class AddRandomPuzzleToAlarm : DiceEvent<ARPTA>
+    public class AddRandomPuzzleToAlarm : DiceEventWithConfig<ARPTA, AddRandomPuzzleToAlarm.RundownConfig>
     {
         public override string EventName => "Additional Trouble";
-
+        public override string EventDescription => "Adds an additional chained puzzle to an alarm.";
         public override string EventID => "addPuzzle";
 
         protected override DiceTier DiceTier => DiceTier.D20;
 
-        private List<LG_SecurityDoor> m_fetchedDoors;
+        public sealed class RundownConfig : DiceEventRundownConfig
+        {
+            // example config
+            public List<LevelRestrictions> Levels { get; set; } = new()
+            {
+                new LevelRestrictions()
+                {
+                    ExcludeSecurityDoors = new()
+                    {
+                        new DoorRestriction()
+                        {
+                            Dimension = eDimensionIndex.Dimension_20,
+                            Layer = LG_LayerType.ThirdLayer,
+                            Zone = eLocalZoneIndex.Zone_20
+                        }
+                    },
+                    ExpeditionIndex = 9,
+                    Tier = eRundownTier.TierA
+                }
+            };
+
+            protected override void InitImpl(IDiceEvent diceEvent)
+            {
+                if (this.Levels == null)
+                {
+                    this.Levels = new();
+                }
+
+                this.Levels.RemoveAll((level) => level == null);
+
+                foreach (LevelRestrictions level in this.Levels)
+                {
+                    level.Init();
+                }
+            }
+
+            public bool Allowed(LG_SecurityDoor door, List<uint> puzzleIDs)
+            {
+                if (this.Levels == null)
+                {
+                    return true;
+                }
+
+                foreach (LevelRestrictions level in this.Levels)
+                {
+                    if (!level.Allowed(door, puzzleIDs))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        public sealed class LevelRestrictions
+        {
+            public List<DoorRestriction> ExcludeSecurityDoors { get; set; } = new();
+            public List<uint> ExcludePuzzles { get; set; } = new();
+            public eRundownTier Tier { get; set; }
+            public int ExpeditionIndex { get; set; }
+
+            public void Init()
+            {
+                if (this.ExcludeSecurityDoors == null)
+                {
+                    this.ExcludeSecurityDoors = new();
+                }
+
+                if (this.ExcludePuzzles == null)
+                {
+                    this.ExcludePuzzles = new();
+                }
+
+                this.ExcludeSecurityDoors.RemoveAll((door) => door == null);
+
+                foreach (DoorRestriction restriction in this.ExcludeSecurityDoors)
+                {
+                    restriction.Init();
+                }
+            }
+
+            public bool Allowed(LG_SecurityDoor door, List<uint> chainedPuzzleIDs)
+            {
+                pActiveExpedition exp = SNet.GetLocalCustomData<pActiveExpedition>();
+
+                if (exp.expeditionIndex != this.ExpeditionIndex || exp.tier != this.Tier)
+                {
+                    if (this.ExcludePuzzles != null)
+                    {
+                        foreach (uint puzzleID in this.ExcludePuzzles)
+                        {
+                            chainedPuzzleIDs.Remove(puzzleID);
+                        }
+                    }
+
+                    return true;
+                }
+
+                if (this.ExcludeSecurityDoors == null)
+                {
+                    if (this.ExcludePuzzles != null)
+                    {
+                        foreach (uint puzzleID in this.ExcludePuzzles)
+                        {
+                            chainedPuzzleIDs.Remove(puzzleID);
+                        }
+                    }
+
+                    return true;
+                }
+
+                foreach (DoorRestriction restriction in this.ExcludeSecurityDoors)
+                {
+                    if (!restriction.Allowed(door))
+                    {
+                        return false;
+                    }
+                }
+
+                if (this.ExcludePuzzles != null)
+                {
+                    foreach (uint puzzleID in this.ExcludePuzzles)
+                    {
+                        chainedPuzzleIDs.Remove(puzzleID);
+                    }
+                }
+                return true;
+            }
+        }
+
+        public sealed class DoorRestriction
+        {
+            public eDimensionIndex Dimension { get; set; }
+            public LG_LayerType Layer { get; set; }
+            public eLocalZoneIndex Zone { get; set; }
+
+            public void Init()
+            { }
+
+            public bool Allowed(LG_SecurityDoor door)
+            {
+                LG_Zone zone = door.Gate.m_linksTo.m_zone;
+                LG_Layer layer = zone.Layer;
+                Dimension dimension = layer.m_dimension;
+
+                if (this.Dimension != dimension.DimensionIndex)
+                {
+                    return true;
+                }
+
+                if (this.Layer != layer.m_type)
+                {
+                    return true;
+                }
+
+                if (this.Zone != zone.LocalIndex)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+
+        }
+
+        private readonly List<LG_SecurityDoor> m_fetchedDoors = new();
 
         public override bool CanBeTriggered()
         {
-            this.m_fetchedDoors = FetchSecurityDoors();
+            this.FetchSecurityDoors();
             return this.m_fetchedDoors != null;
         }
 
@@ -42,14 +209,15 @@ namespace TwitchDice.Twitch.Events.D20
             int seed = Main.rnd.Next(short.MinValue, short.MaxValue);
 
             List<uint> ids = new List<uint>();
-            foreach (var puzzleComp in ChainedPuzzleManager.Current.m_puzzleComponentPrefabs.Keys)
+            foreach (uint puzzleComp in ChainedPuzzleManager.Current.m_puzzleComponentPrefabs.Keys)
             {
                 ids.Add(puzzleComp);
             }
 
+            this.m_fetchedDoors.RemoveAll((door) => !this.RundownCfg.Allowed(door, ids));
             uint type = ids.GetRandomElement<uint>();
 
-            var door = this.m_fetchedDoors.GetRandomElement<LG_SecurityDoor>();
+            LG_SecurityDoor door = this.m_fetchedDoors.GetRandomElement<LG_SecurityDoor>();
 
             this.TriggerClient(new ARPTA(door, seed, type));
             this.TriggerCommon(door, seed, type);
@@ -58,33 +226,32 @@ namespace TwitchDice.Twitch.Events.D20
 
         #region Door Fetching
 
-        private static List<LG_SecurityDoor> FetchSecurityDoors()
+        private void FetchSecurityDoors()
         {
-            var doors = new List<LG_SecurityDoor>();
-            foreach (var zone in Builder.CurrentFloor.GetAllZones())
+            this.m_fetchedDoors.Clear();
+            foreach (LG_Zone zone in Builder.CurrentFloor.GetAllZones())
             {
-                FetchSecurityDoors(zone, doors);
+                this.FetchSecurityDoors(zone);
             }
-            return doors;
         }
 
 
-        private static void FetchSecurityDoors(LG_Zone zone, List<LG_SecurityDoor> doors)
+        private void FetchSecurityDoors(LG_Zone zone)
         {
-            var door = zone.m_sourceGate?.SpawnedDoor?.TryCast<LG_SecurityDoor>();
+            LG_SecurityDoor? door = zone.m_sourceGate?.SpawnedDoor?.TryCast<LG_SecurityDoor>();
             if (door != null && 
                 door.m_locks.ChainedPuzzleToSolve != null // adding chain puzzles aren't allowed 
-                && !doors.Contains(door) &&
+                && !this.m_fetchedDoors.Contains(door) &&
                 door.m_locks.ChainedPuzzleToSolve.Data.TriggerAlarmOnActivate)
             {
-                var state = door.m_sync.GetCurrentSyncState().status;
+                eDoorStatus state = door.m_sync.GetCurrentSyncState().status;
 
                 switch (state)
                 {
                     case eDoorStatus.Open:
                         break;
                     default:
-                        doors.Add(door);
+                        this.m_fetchedDoors.Add(door);
                         break;
                 }
             }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Runtime.InteropServices;
-using GameData;
 using Globals;
 using LevelGeneration;
 using TwitchDice.Utilities;
@@ -12,7 +10,7 @@ namespace TwitchDice.Twitch.Events.D100
     public class RebuildLevel : DiceEvent<RL>
     {
         public override string EventName => "RL";
-
+        public override string EventDescription => "Rebuilds the entire level.";
         public override string EventID => "rebuildlevel";
 
         protected override DiceTier DiceTier => DiceTier.D100;

@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ChainedPuzzles;
+﻿using System.Collections.Generic;
+using AIGraph;
 using GameData;
 using Player;
-using TwitchDice.Utilities;
+using TwitchDice.Extensions;
+using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D100
 {
+#warning TODO: Add config for alarm restrictions.
     public class EnableErrorAlarm : DiceEvent
     {
         public override string EventName => "Alarm Malfunction";
+
+        public override string EventDescription => "Activates a random error alarm.";
 
         public override string EventID => "errorAlarm";
 
@@ -19,7 +21,7 @@ namespace TwitchDice.Twitch.Events.D100
         public override void TriggerHost()
         {
             var errorAlarms = new List<ChainedPuzzleDataBlock>();
-            foreach (var chainedPuzzle in ChainedPuzzleDataBlock.GetAllBlocks())
+            foreach (ChainedPuzzleDataBlock? chainedPuzzle in ChainedPuzzleDataBlock.GetAllBlocks())
             {
                 if (!chainedPuzzle.DisableSurvivalWaveOnComplete)
                 {
@@ -29,13 +31,13 @@ namespace TwitchDice.Twitch.Events.D100
 
             Log.Debug($"Found {errorAlarms.Count} alarms to chose from...");
 
-            var alarm = errorAlarms.GetRandomElement<ChainedPuzzleDataBlock>();
+            ChainedPuzzleDataBlock alarm = errorAlarms.GetRandomElement<ChainedPuzzleDataBlock>();
 
             Log.Debug($"Chose alarm '{alarm.name}' with persistenID {alarm.persistentID}");
 
-            var localPlayer = PlayerManager.GetLocalPlayerAgent();
-            var node = localPlayer.CourseNode;
-            var pos = node.GetRandomPositionInside();
+            PlayerAgent localPlayer = PlayerManager.GetLocalPlayerAgent();
+            AIG_CourseNode node = localPlayer.CourseNode;
+            Vector3 pos = node.GetRandomPositionInside();
 
             Mastermind.Current.TriggerSurvivalWave(
                 localPlayer.CourseNode,

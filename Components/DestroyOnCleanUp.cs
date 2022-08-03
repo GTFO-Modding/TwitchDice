@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace TwitchDice.Components
@@ -9,7 +7,7 @@ namespace TwitchDice.Components
     {
         public DestroyOnCleanUp(IntPtr intPtr) : base(intPtr) { }
 
-        void Awake()
+        private void Awake()
         {
             Hooks.Cleanup += Hooks_Cleanup;
         }

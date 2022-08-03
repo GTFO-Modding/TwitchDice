@@ -1,35 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using AIGraph;
 using Enemies;
 using Player;
+using TwitchDice.Extensions;
 using TwitchDice.Utilities;
+using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D100
 {
-    public class Bob : DiceEvent<BobData>
+    public class Bob : DiceEventWithConfig<BobData, Bob.RundownConfig>
     {
         public override string EventName => "Bob";
-
+        public override string EventDescription => "Spawns an invicible giant charger";
         public override string EventID => "bob";
 
         protected override DiceTier DiceTier => DiceTier.D100;
+
+        public sealed class RundownConfig : DiceEventRundownConfig
+        {
+            public uint GiantChargerID { get; set; } = 39U;
+        }
 
         public override void ReceiveClient(ulong sender, BobData packet)
         {
             ushort enemyID = packet.GlobalID;
             int nodeID = packet.NodeID;
 
-            foreach (var player in PlayerManager.PlayerAgentsInLevel)
+            foreach (PlayerAgent player in PlayerManager.PlayerAgentsInLevel)
             {
-                var spawnCenter = player.CourseNode;
-                foreach (var portal in spawnCenter.m_portals)
+                AIG_CourseNode spawnCenter = player.CourseNode;
+                foreach (AIG_CoursePortal portal in spawnCenter.m_portals)
                 {
-                    var oppositeNode = portal.GetOppositeNode(spawnCenter);
+                    AIG_CourseNode oppositeNode = portal.GetOppositeNode(spawnCenter);
                     if (oppositeNode.NodeID == nodeID)
                     {
-                        foreach (var enemy in oppositeNode.m_enemiesInNode)
+                        foreach (EnemyAgent enemy in oppositeNode.m_enemiesInNode)
                         {
                             if (enemy.GlobalID == enemyID)
                             {
@@ -44,20 +49,20 @@ namespace TwitchDice.Twitch.Events.D100
         public override void TriggerHost()
         {
             PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent localPlayer);
-            var spawnCenter = localPlayer.CourseNode;
+            AIG_CourseNode spawnCenter = localPlayer.CourseNode;
 
             var potentialSpawns = new List<AIG_CourseNode>();
-            foreach (var item in spawnCenter.m_portals)
+            foreach (AIG_CoursePortal item in spawnCenter.m_portals)
             {
                 potentialSpawns.Add(item.GetOppositeNode(spawnCenter));
             }
 
-            var spawnNode = potentialSpawns.GetRandomElement<AIG_CourseNode>();
-            var spawnPosition = spawnNode.GetRandomPositionInside();
+            AIG_CourseNode spawnNode = potentialSpawns.GetRandomElement<AIG_CourseNode>();
+            Vector3 spawnPosition = spawnNode.GetRandomPositionInside();
 
 
-            var enemy = EnemyAllocator.Current.SpawnEnemy(
-                Config.GIANT_CHARGER_ID,
+            EnemyAgent? enemy = EnemyAllocator.Current.SpawnEnemy(
+                this.RundownCfg.GiantChargerID,
                 spawnNode,
                 Agents.AgentMode.Agressive,
                 spawnPosition,
@@ -65,7 +70,7 @@ namespace TwitchDice.Twitch.Events.D100
 
             enemy.Damage.Health = float.MaxValue;
 
-            TriggerClient(new BobData() { GlobalID = enemy.GlobalID, NodeID = spawnNode.NodeID });
+            this.TriggerClient(new BobData() { GlobalID = enemy.GlobalID, NodeID = spawnNode.NodeID });
         }
     }
 

@@ -2,6 +2,7 @@
 using Player;
 using System;
 using System.Collections.Generic;
+using TwitchDice.Extensions;
 using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D6

@@ -1,16 +1,16 @@
 ﻿using Player;
-using System;
 using System.Collections.Generic;
 using System.Text;
+using TwitchDice.Extensions;
 using TwitchDice.Utilities;
 using UnityEngine;
 
 namespace TwitchDice.Twitch.Events.D12
 {
-    public class SwapPlayerPositions : DiceEvent<SwapTargetPosition>
+    public class SwapPlayerPositions : DiceEvent<JsonVector3>
     {
         public override string EventName => "Swap!";
-
+        public override string EventDescription => "Swaps with another random player.";
         public override string EventID => "swap";
 
         protected override DiceTier DiceTier => DiceTier.D12;
@@ -20,15 +20,15 @@ namespace TwitchDice.Twitch.Events.D12
             return PlayerUtil.PlayerCount > 1;
         }
 
-        public override void ReceiveClient(ulong sender, SwapTargetPosition packet)
+        public override void ReceiveClient(ulong sender, JsonVector3 packet)
         {
-            PlayerUtil.TeleportToPosition(PlayerUtil.LocalPlayerAgent, new Vector3(packet.x, packet.y, packet.z));
+            PlayerUtil.TeleportToPosition(PlayerUtil.LocalPlayerAgent, packet.Convert());
         }
 
         public override void TriggerHost()
         {
             List<PlayerCard> playerCards = new List<PlayerCard>();
-            foreach (var player in PlayerManager.PlayerAgentsInLevel)
+            foreach (PlayerAgent player in PlayerManager.PlayerAgentsInLevel)
             {
                 playerCards.Add(new PlayerCard(player, player.IsLocallyOwned, player.Position));
             }
@@ -49,7 +49,7 @@ namespace TwitchDice.Twitch.Events.D12
                     }
                 }
 
-                foreach (var player in playerCards)
+                foreach (PlayerCard player in playerCards)
                 {
                     if (player.IsHost)
                     {
@@ -57,10 +57,11 @@ namespace TwitchDice.Twitch.Events.D12
                     }
                     else
                     {
-                        TriggerClient(new SwapTargetPosition(player.Position));
+                        this.TriggerClient(new JsonVector3(player.Position));
                     }
                 }
-            } catch
+            } 
+            catch
             {
                 Log.Error("it's still fucked");
             }
@@ -74,23 +75,10 @@ namespace TwitchDice.Twitch.Events.D12
 
             public PlayerCard(PlayerAgent player, bool isHost, Vector3 position)
             {
-                Player = player;
-                IsHost = isHost;
-                Position = position;
+                this.Player = player;
+                this.IsHost = isHost;
+                this.Position = position;
             }
         }
-    }
-
-    public struct SwapTargetPosition
-    {
-        public SwapTargetPosition(Vector3 pos)
-        {
-            x = pos.x;
-            y = pos.y;
-            z = pos.z;
-        }
-        public float x;
-        public float y;
-        public float z;
     }
 }

@@ -1,8 +1,5 @@
 ﻿using AK;
 using Player;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch.Events.D12
@@ -10,7 +7,7 @@ namespace TwitchDice.Twitch.Events.D12
     public class FullyInfectAPlayer : DiceEvent<Splat>
     {
         public override string EventName => "Infect-o-Matic!";
-
+        public override string EventDescription => "Fully infects a random player.";
         public override string EventID => "infect";
 
         protected override DiceTier DiceTier => DiceTier.D12;
@@ -28,12 +25,16 @@ namespace TwitchDice.Twitch.Events.D12
             }
 
             if (target.IsLocallyOwned)
+            {
                 PlaySplat();
+            }
             else
-                TriggerClient(new Splat(), target.Owner);
+            {
+                this.TriggerClient(new Splat(), target.Owner);
+            }
         }
 
-        private void PlaySplat()
+        private static void PlaySplat()
         {
             if (ScreenLiquidManager.TryApply(ScreenLiquidSettingName.spitterJizz, PlayerUtil.LocalPlayerAgent.Position, 10))
             {

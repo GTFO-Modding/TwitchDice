@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TwitchDice.Extensions;
 using TwitchDice.Utilities;
 
 namespace TwitchDice.Twitch

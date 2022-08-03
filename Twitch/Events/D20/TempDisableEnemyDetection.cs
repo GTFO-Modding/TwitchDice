@@ -1,6 +1,4 @@
-﻿
-
-using Globals;
+﻿using Globals;
 using System;
 using System.Collections;
 using TwitchDice.Utilities;
@@ -11,7 +9,7 @@ namespace TwitchDice.Twitch.Events.D20
     public class TempDisableEnemyDetection : DiceEvent
     {
         public override string EventName => "Silent and Sneaky";
-
+        public override string EventDescription => "Temporarily disabled enemy detection.";
         public override string EventID => "nodetect";
 
         protected override DiceTier DiceTier => DiceTier.D20;

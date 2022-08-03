@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TwitchDice.Utilities;
+﻿using TwitchDice.Utilities;
 using Player;
 using System.Threading.Tasks;
 using UnityEngine.Diagnostics;
@@ -13,22 +10,21 @@ namespace TwitchDice.Twitch.Events.D100
     {
         public override string EventName => "Unity Moment";
 
+        public override string EventDescription => "Crashes a random player.";
+
         public override string EventID => "crashPlayer";
 
         protected override DiceTier DiceTier => DiceTier.D100;
 
-        private bool Activated = true;
-
-        public override bool CanBeTriggered() => !Activated && PlayerUtil.PlayerCount > 1;
+        public override bool CanBeTriggered() => PlayerUtil.PlayerCount > 1;
 
         public override void TriggerHost()
         {
             PlayerUtil.TryGetRandomPlayerAgent(out PlayerAgent player, false);
-            Activated = true;
-            TriggerClient(new CrashPlayer() { Slot = player.PlayerSlotIndex });
+            this.TriggerClient(new CrashPlayer() { Slot = player.PlayerSlotIndex });
         }
 
-        private void CrashPlayer()
+        private static void CrashPlayer()
         {
             unsafe
             {

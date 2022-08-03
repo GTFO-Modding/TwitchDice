@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Gear;
-using GTFO.API;
-using TwitchDice.Components;
-using TwitchDice.Utilities;
-using UnityEngine;
-
-namespace TwitchDice.Twitch.Events.D100
+﻿namespace TwitchDice.Twitch.Events.D100
 {
     //public class SnowFriend : DiceEvent<sFriend>
     //{
