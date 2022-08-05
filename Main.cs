@@ -99,6 +99,7 @@ namespace TwitchDice
             EventManager = new EventManager();
             EnemyRespawnManager.Init();
             ResourceLoader.Init();
+            IconManager.Init();
         }
 
         public bool TryGetDiceTier(int bit, out DiceTierConfigEntry config)
@@ -166,6 +167,7 @@ namespace TwitchDice
             ClassInjector.RegisterTypeInIl2Cpp<EventTimerManager>();
             ClassInjector.RegisterTypeInIl2Cpp<EventTimer>();
             ClassInjector.RegisterTypeInIl2Cpp<NoiseMaker>();
+            ClassInjector.RegisterTypeInIl2Cpp<DiceActivationAnimator>();
 
             InterfaceInjector.InjectWithInterface<SnowmanAI>();
 

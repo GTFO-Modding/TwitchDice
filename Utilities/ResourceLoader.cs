@@ -10,12 +10,10 @@ namespace TwitchDice.Utilities
 {
     public static class ResourceLoader
     {
-        private static List<(string, byte[])> s_banksToLoad;
+        private static List<(string, byte[])> s_banksToLoad = new();
 
         internal static void Init()
         {
-            s_banksToLoad = new List<(string, byte[])>();
-
             InitBankResource("TwitchDice");
             InitAssetBundle("snowman");
 
@@ -26,7 +24,7 @@ namespace TwitchDice.Utilities
         {
             var assembly = Assembly.GetExecutingAssembly();
             byte[] result;
-            using (var stream = assembly.GetManifestResourceStream($"TwitchDice.Assets.{bankName}.bnk"))
+            using (System.IO.Stream stream = assembly.GetManifestResourceStream($"TwitchDice.Assets.{bankName}.bnk")!)
             {
                 result = new byte[stream.Length - stream.Position];
                 stream.Read(result);
@@ -39,7 +37,7 @@ namespace TwitchDice.Utilities
         {
             var assembly = Assembly.GetExecutingAssembly();
             byte[] result;
-            using (var stream = assembly.GetManifestResourceStream($"TwitchDice.Assets.Bundle.{assetBundleName}"))
+            using (System.IO.Stream stream = assembly.GetManifestResourceStream($"TwitchDice.Assets.Bundle.{assetBundleName}")!)
             {
                 result = new byte[stream.Length - stream.Position];
                 stream.Read(result);
