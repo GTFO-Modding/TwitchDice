@@ -16,7 +16,7 @@ namespace TwitchDice.Utilities
                 DiceTier.D20 => Main.COLOR_D20,
                 DiceTier.D50 => Main.COLOR_D50,
                 DiceTier.D100 => Main.COLOR_D100,
-                _ => "",
+                _ => "#ff00ff", // bright pink
             };
         }
     }
