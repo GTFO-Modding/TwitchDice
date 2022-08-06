@@ -150,13 +150,13 @@ namespace TwitchDice.Components
                         .SetPivot(0.5f, 0.5f)
                         .SetSizeDelta(350f, 250f);
 
-                    iconGO.GetOrAddComponent<RectTransform>()
+                    _ = iconGO.GetOrAddComponent<RectTransform>()
                         .SetAnchor(0.5f, 1f)
                         .SetAnchoredPosition(0f, 0f)
                         .SetPivot(0.5f, 1f)
                         .SetSizeDelta(94f, 107.25f);
 
-                    infoTextGO.GetOrAddComponent<RectTransform>()
+                    _ = infoTextGO.GetOrAddComponent<RectTransform>()
                         .SetAnchorMin(0f, 0f)
                         .SetAnchorMax(1f, 0f)
                         .SetAnchoredPosition(0f, 0f)
