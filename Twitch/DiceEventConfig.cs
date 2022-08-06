@@ -166,8 +166,8 @@ namespace TwitchDice.Twitch
             this.m_diceTierEntry.DefaultValue = diceEvent.Tier;
 
             ConfigFile config = Main.Instance.Config;
-            this.m_enabledEntry.Bind(config, diceEvent);
-            this.m_diceTierEntry.Bind(config, diceEvent);
+            // this.m_enabledEntry.Bind(config, diceEvent);
+            // this.m_diceTierEntry.Bind(config, diceEvent);
 
             foreach (IConfigEntry entry in this.m_entries.Values)
             {
