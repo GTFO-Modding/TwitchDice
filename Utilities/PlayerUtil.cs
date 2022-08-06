@@ -41,24 +41,24 @@ namespace TwitchDice.Utilities
         {
             playerAgent = null;
             var list = new List<PlayerAgent>();
-            foreach (PlayerAgent item in PlayerManager.PlayerAgentsInLevel)
+            foreach (PlayerAgent agent in PlayerManager.PlayerAgentsInLevel)
             {
-                if (!IncludeHost && item.IsLocallyOwned)
+                if (!IncludeHost && agent.IsLocallyOwned)
                 {
                     continue;
                 }
 
-                if (excludeDead && !item.Alive)
+                if (excludeDead && !agent.Alive)
                 {
                     continue;
                 }
 
-                if (exclude != null && exclude.Contains(item))
+                if (exclude != null && exclude.Contains(agent))
                 {
                     continue;
                 }
 
-                list.Add(item);
+                list.Add(agent);
             }
 
             if (list.Count == 0)
