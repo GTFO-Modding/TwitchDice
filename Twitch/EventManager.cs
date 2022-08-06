@@ -86,9 +86,10 @@ namespace TwitchDice.Twitch
             return true;
         }
 
-        public bool TryActivateEventOfTier(DiceTier tier, string? activator = null)
+        public bool TryGetEventOfTier(DiceTier tier, out IDiceEvent? outDiceEvent)
         {
             IEnumerable<IDiceEvent> events = this.TierLookup[tier];
+            outDiceEvent = null;
             events = events.Where(e => e.CanBeTriggered());
             if (!events.Any())
             {
@@ -96,12 +97,11 @@ namespace TwitchDice.Twitch
                 return false;
             }
 
-            IDiceEvent diceEvent = events.ToList().GetRandomElement<IDiceEvent>();
-            ActivateEvent(diceEvent, activator);
+            outDiceEvent = events.ToList().GetRandomElement<IDiceEvent>();
             return true;
         }
 
-        private static void ActivateEvent(IDiceEvent diceEvent, string? activator = null)
+        public static void ActivateEvent(IDiceEvent diceEvent, string? activator = null)
         {
             if (activator == null)
             {
