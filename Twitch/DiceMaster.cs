@@ -101,8 +101,15 @@ namespace TwitchDice.Twitch
             PlayerChatManager.add_OnIncomingChatMessage((Action<string, SNetwork.SNet_Player, SNetwork.SNet_Player>)((data, player, _) =>
             {
                 Log.Debug("Incoming chat message");
-                if (State != DiceMasterState.InLevel || !this.IsHost || Main.Instance.TwitchEnabled) return;
-                Main.EventManager.TryActivateEvent(data, player.NickName);
+                if (State != DiceMasterState.InLevel || !this.IsHost || Main.Instance.TwitchEnabled)
+                {
+                    Log.Debug("Skipped activation");
+                    return;
+                }
+                if (!Main.EventManager.TryActivateEvent(data, player.NickName))
+                {
+                    Log.Warning($"Unable to find event with ID {data}");
+                }
             }));
             #endregion
         }
