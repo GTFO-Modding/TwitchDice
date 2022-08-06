@@ -68,6 +68,7 @@ namespace TwitchDice
         public static EventManager EventManager;
         public static System.Random rnd = new System.Random();
         public static Secrets Secret;
+        public static bool Verbose = true;
 
         public string Channel => configChannel.Value;
         public string Username => configUsername.Value;

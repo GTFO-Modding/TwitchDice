@@ -6,6 +6,10 @@ namespace TwitchDice
 {
     public static class Log
     {
+        public static void Verbose(object msg)
+        {
+            if (Main.Verbose) Main.log.LogDebug(msg);
+        }
         public static void Debug(object msg)
         {
             Main.log.LogDebug(msg);

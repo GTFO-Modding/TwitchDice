@@ -162,7 +162,7 @@ namespace TwitchDice.Twitch
             {
                 return;
             }
-
+            Log.Verbose($"Init called on event config {diceEvent.EventID}");
             this.m_diceTierEntry.DefaultValue = diceEvent.Tier;
 
             ConfigFile config = Main.Instance.Config;
@@ -229,6 +229,7 @@ namespace TwitchDice.Twitch
                     this.Key,
                     this.DefaultValue,
                     FormatStr(this.Description, diceEvent));
+                Log.Verbose($"Bound entry with key {Key} on event with ID {diceEvent.EventID}");
             }
 
             object? IConfigEntry.GetValue() => this.GetValue();
