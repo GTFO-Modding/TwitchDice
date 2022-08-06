@@ -13,6 +13,8 @@ namespace TwitchDice.Twitch.Events.D12
         public override string EventDescription => "Swaps with another random player.";
         public override string EventID => "swap";
 
+        // broken
+        protected override bool ForceDisable => true;
         protected override DiceTier DiceTier => DiceTier.D12;
 
         public override bool CanBeTriggered()
