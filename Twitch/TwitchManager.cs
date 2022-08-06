@@ -42,6 +42,26 @@ namespace TwitchDice
             DebugLogs = false;
         }
 
+        public void Mock_BitsReceived(string username, int bits)
+        {
+            var arg = new OnBitsReceivedArgs()
+            {
+                Username = username,
+                BitsUsed = bits
+            };
+            OnBitsReceived?.Invoke(this, arg);
+        }
+
+        public void Mock_RewardRedeemed(string username, string rewardName)
+        {
+            var arg = new OnRewardRedeemedArgs()
+            {
+                DisplayName = username,
+                RewardTitle = rewardName
+            };
+            OnRewardRedeemed?.Invoke(this, arg);
+        }
+
         public void Connect(Secrets secrets)
         {
             Connect(secrets.Channel, secrets.ImplicitOAuth, secrets.Username, secrets.ClientID);
