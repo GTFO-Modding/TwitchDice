@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using TwitchDice.Extensions;
 using TwitchDice.Twitch;
+using UnityEngine;
 
 namespace TwitchDice.Components
 {
@@ -69,6 +70,10 @@ namespace TwitchDice.Components
                 this.m_state = QueuedDiceEventState.FadeIn;
                 this.m_activated = true;
                 this.animator.m_icon.sprite = this.animator.m_iconMap[this.@event.Tier];
+                if (ColorUtility.TryParseHtmlString(Utilities.ColorUtil.GetDiceColorForTier(this.@event.Tier), out Color col))
+                {
+                    this.animator.m_icon.color = col;
+                }
 
                 StringBuilder messageBuilder = new();
 
