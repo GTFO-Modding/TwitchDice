@@ -34,7 +34,7 @@ namespace TwitchDice.Twitch
         /// Delay between event activations
         /// </summary>
         private double EventCooldown = 0;
-        private const double EventCooldownTime = 15;
+        private const double EventCooldownTime = 5;
         private DiceMasterState State
         {
             get
