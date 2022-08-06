@@ -159,7 +159,7 @@ namespace TwitchDice.Twitch
         protected virtual void InitializeImpl()
         { }
 
-        public DiceTier Tier => this.Config.ClientConfig.DiceTier;
+        public DiceTier Tier => this.Config.ClientConfig.Initialized ? Config.ClientConfig.DiceTier : DiceTier;
         public bool Enabled => !this.ForceDisable && this.m_successfulInit && this.Config.ClientConfig.Enabled;
 
         public virtual int Time => 0;
