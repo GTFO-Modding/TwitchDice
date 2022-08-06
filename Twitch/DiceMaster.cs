@@ -6,6 +6,8 @@ using TwitchLib.Client.Models;
 using UnityEngine;
 using SNetwork;
 using Steamworks;
+using System.Collections;
+using TwitchDice.Components;
 
 namespace TwitchDice.Twitch
 {
@@ -177,13 +179,13 @@ namespace TwitchDice.Twitch
                     {
                         Log.Debug("Dequeueing event...");
                         EventInfo info = this.EventQueue.Dequeue();
-                        if (!Main.EventManager.TryActivateEventOfTier(info.Tier, info.ActivatorUsername))
+                        if (Main.EventManager.TryGetEventOfTier(info.Tier, out IDiceEvent? diceEvent))
                         {
-                            Log.Warning("Failed to activate event!");
-                        } else
-                        {
+                            DiceActivationAnimator.QueueAnimation(diceEvent, info.ActivatorUsername);
+                            EventManager.ActivateEvent(diceEvent, info.ActivatorUsername);
                             Log.Debug("Activated event");
-                        }
+                            
+                        } else Log.Warning("Failed to activate event!");
                         EventCooldown = EventCooldownTime;
                     }
                     if (EventCooldown > 0)
@@ -199,6 +201,11 @@ namespace TwitchDice.Twitch
                     Destroy(this);
                     break;
             }
+        }
+
+        private IEnumerator RollDieOfTier(DiceTier tier)
+        {
+            yield break;
         }
         private void Hooks_OnLobbyLeave()
         {
