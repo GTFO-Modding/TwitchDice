@@ -103,25 +103,20 @@ namespace TwitchDice
             IconManager.Init();
         }
 
-        public bool TryGetDiceTier(int bit, out DiceTierConfigEntry config)
+        public bool TryGetDiceTier(int bits, out DiceTierConfigEntry? config)
         {
-            Log.LogDebug($"Getting event tier for {bit} bits...");
+            Log.LogDebug($"Getting event tier for {bits} bits...");
             config = null;
+            int highestBits = 0;
             foreach (DiceTierConfigEntry entry in TierConfigs)
             {
-                if (config == null)
+                // don't go over the bit amount donated & ignore low bit entries
+                if (entry.BitAmount > highestBits && entry.BitAmount <= bits)
                 {
-                    Log.LogDebug("Tier unset");
-                } else
-                {
-                    Log.LogDebug($"Tier {config.Tier}");
+                    config = entry;
+                    highestBits = entry.BitAmount;
+                    continue;
                 }
-                if (bit <= entry.BitAmount)
-                {
-                    continue; // continue if the bit amount is to big
-                }
-
-                config = entry;
             }
             return config != null;
         }
