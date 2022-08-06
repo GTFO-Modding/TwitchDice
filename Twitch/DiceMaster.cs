@@ -101,19 +101,22 @@ namespace TwitchDice.Twitch
             PlayerChatManager.add_OnIncomingChatMessage((Action<string, SNetwork.SNet_Player, SNetwork.SNet_Player>)((data, player, _) =>
             {
                 Log.Debug("Incoming chat message");
-                if (State != DiceMasterState.InLevel || !this.IsHost || Main.Instance.TwitchEnabled)
-                {
-                    Log.Debug("Skipped activation");
-                    return;
-                }
 
                 if (data.StartsWith('.'))
                 {
                     string bitValue = data[1..];
+                    Log.Debug(bitValue);
                     if (int.TryParse(bitValue, out int bits))
                     {
-                        TwitchManager.Mock_BitsReceived(player.NickName, bits);
+                        Log.Verbose($"Parsed as {bits}");
+                        TwitchManager?.Mock_BitsReceived(player.NickName, bits);
                     }
+                    return;
+                }
+
+                if (State != DiceMasterState.InLevel || !this.IsHost || Main.Instance.TwitchEnabled)
+                {
+                    Log.Debug("Skipped activation");
                     return;
                 }
 
