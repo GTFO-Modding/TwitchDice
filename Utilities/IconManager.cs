@@ -10,11 +10,14 @@ namespace TwitchDice.Utilities
     {
         private static readonly IconInfo[] s_iconPaths = new IconInfo[]
         {
-            new("Icons.D3.png", 376, 430),
-            new("Icons.D4.png", 376, 430),
-            new("Icons.D6.png", 376, 430),
-            new("Icons.D8.png", 376, 430),
-            new("Icons.D12.png", 376, 430)
+            new("Icons.D3.png", 430, 430),
+            new("Icons.D4.png", 430, 430),
+            new("Icons.D6.png", 430, 430),
+            new("Icons.D8.png", 430, 430),
+            new("Icons.D12.png", 430, 430),
+            new("Icons.D20.png", 430, 430),
+            new("Icons.D50.png", 430, 430),
+            new("Icons.D100.png", 430, 430)
         };
         private static readonly Dictionary<string, Sprite> s_iconMap = new();
 
