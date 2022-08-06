@@ -43,11 +43,13 @@ namespace TwitchDice.Twitch
 
                     if (!diceEvent.Enabled)
                     {
+                        Log.Debug($"Event {diceEvent.EventID} is not enabled, skipping...");
                         continue;
                     }
 
                     this.Events.Add(diceEvent.EventID, diceEvent);
                     diceEvent.Register();
+                    Log.Debug($"Registered event with ID {diceEvent.EventID}");
                 }
                 catch (Exception ex)
                 {
