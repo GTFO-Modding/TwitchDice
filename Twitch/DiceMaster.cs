@@ -106,6 +106,17 @@ namespace TwitchDice.Twitch
                     Log.Debug("Skipped activation");
                     return;
                 }
+
+                if (data.StartsWith('.'))
+                {
+                    string bitValue = data[1..];
+                    if (int.TryParse(bitValue, out int bits))
+                    {
+                        TwitchManager.Mock_BitsReceived(player.NickName, bits);
+                    }
+                    return;
+                }
+
                 if (!Main.EventManager.TryActivateEvent(data, player.NickName))
                 {
                     Log.Warning($"Unable to find event with ID {data}");
