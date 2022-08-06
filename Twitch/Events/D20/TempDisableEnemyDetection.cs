@@ -15,7 +15,7 @@ namespace TwitchDice.Twitch.Events.D20
         protected override DiceTier DiceTier => DiceTier.D20;
 
         private int _time = 0;
-        public override int Time => base.Time;
+        public override int Time => _time;
 
         private static float GetRandomActivationTime() // 15sec - 30sec
         {
@@ -27,6 +27,7 @@ namespace TwitchDice.Twitch.Events.D20
             Global.EnemyPlayerDetectionEnabled = false;
             yield return new WaitForSeconds(seconds);
             Global.EnemyPlayerDetectionEnabled = true;
+            yield break;
         }
 
         public override void TriggerHost()
