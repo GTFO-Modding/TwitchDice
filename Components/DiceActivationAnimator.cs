@@ -145,7 +145,7 @@ namespace TwitchDice.Components
                     text.fontSize = 24f;
 
                     RectTransform panel = activationPanelGO.GetOrAddComponent<RectTransform>()
-                        .SetAnchor(0.5f, 0.5f)
+                        .SetAnchor(0.5f, 0.8f)
                         .SetAnchoredPosition(0f, 0f)
                         .SetPivot(0.5f, 0.5f)
                         .SetSizeDelta(350f, 250f);
