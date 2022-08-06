@@ -15,18 +15,15 @@ namespace TwitchDice.Twitch
             else
                 Log.Error("Created a duplicate TimedEventManager!");
         }
-        public static EventTimerManager Instance { get; private set; }
+        public static EventTimerManager? Instance { get; private set; }
 
-        public void Awake()
-        {
-            Hooks.InventorySlotsUpdated += RecalculateAll;
-        }
+        public void Awake() => Hooks.InventorySlotsUpdated += RecalculateAll;
 
-        private readonly List<EventTimer> ActiveTimedEvents = new List<EventTimer>();
+        private readonly List<EventTimer> ActiveTimedEvents = new();
 
         public void RemoveTimedInstance(EventTimer eventTimer)
         {
-            ActiveTimedEvents.Remove(eventTimer);
+            _ = ActiveTimedEvents.Remove(eventTimer);
             RecalculateAll();
         }
 
@@ -64,7 +61,7 @@ namespace TwitchDice.Twitch
             return false;
         }
 
-        private float CalcVanilla(PUI_Inventory inventory)
+        private static float CalcVanilla(PUI_Inventory inventory)
         {
             float startPos = inventory.m_invSlotStartPos.y;
 
@@ -128,10 +125,7 @@ namespace TwitchDice.Twitch
             color = ColorUtil.GetDiceColorForTier(diceEvent.Tier);
         }
 
-        public void ResetTime()
-        {
-            End = DateTime.Now.AddSeconds(Time);
-        }
+        public void ResetTime() => End = DateTime.Now.AddSeconds(Time);
 
         void Update()
         {
@@ -144,7 +138,7 @@ namespace TwitchDice.Twitch
                 Item.SetArchetypeName($"<color={color}>{EventName}</color>: {remaining}");
             } else
             {
-                EventTimerManager.Instance.RemoveTimedInstance(this);
+                EventTimerManager.Instance?.RemoveTimedInstance(this);
                 Destroy(transform.gameObject);
                 Destroy(Item);
             }
