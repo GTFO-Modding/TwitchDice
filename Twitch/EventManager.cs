@@ -40,6 +40,7 @@ namespace TwitchDice.Twitch
 
                     if (diceType is not IDiceEvent diceEvent) { Log.Error("Tried to register an invalid dice event!"); continue; }
                     diceEventID = diceEvent.EventID;
+                    diceEvent.Initialize();
 
                     if (!diceEvent.Enabled)
                     {
