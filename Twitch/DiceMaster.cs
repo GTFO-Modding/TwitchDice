@@ -32,7 +32,7 @@ namespace TwitchDice.Twitch
         /// Delay between event activations
         /// </summary>
         private double EventCooldown = 0;
-        private const double EventCooldownTime = 30;
+        private const double EventCooldownTime = 15;
         private DiceMasterState State
         {
             get
@@ -169,7 +169,7 @@ namespace TwitchDice.Twitch
             switch(this.State)
             {
                 case DiceMasterState.InLobby:
-                    EventCooldown = EventCooldownTime;
+                    EventCooldown = 5;
                     break;
 
                 case DiceMasterState.InLevel:
