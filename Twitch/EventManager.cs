@@ -36,7 +36,7 @@ namespace TwitchDice.Twitch
 
                     object? diceType = Activator.CreateInstance(item);
 
-                    if (diceType == null) { Log.Warning("Unable to instantiate type"); return; }
+                    if (diceType == null) { Log.Warning("Unable to instantiate type"); continue; }
 
                     if (diceType is not IDiceEvent diceEvent) { Log.Error("Tried to register an invalid dice event!"); continue; }
                     diceEventID = diceEvent.EventID;
