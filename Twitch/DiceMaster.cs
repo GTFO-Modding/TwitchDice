@@ -28,6 +28,11 @@ namespace TwitchDice.Twitch
         public TwitchManager TwitchManager;
         private readonly Queue<EventInfo> EventQueue = new Queue<EventInfo>();
         private DiceMasterState _state = DiceMasterState.InLobbySetup;
+        /// <summary>
+        /// Delay between event activations
+        /// </summary>
+        private double EventCooldown = 0;
+        private const double EventCooldownTime = 30;
         private DiceMasterState State
         {
             get
@@ -143,10 +148,11 @@ namespace TwitchDice.Twitch
             switch(this.State)
             {
                 case DiceMasterState.InLobby:
+                    EventCooldown = EventCooldownTime;
                     break;
 
                 case DiceMasterState.InLevel:
-                    while(this.EventQueue.Count > 0)
+                    while(this.EventQueue.Count > 0 && EventCooldown <= 0)
                     {
                         Log.Debug("Dequeueing event...");
                         EventInfo info = this.EventQueue.Dequeue();
@@ -157,7 +163,11 @@ namespace TwitchDice.Twitch
                         {
                             Log.Debug("Activated event");
                         }
-
+                        EventCooldown = EventCooldownTime;
+                    }
+                    if (EventCooldown > 0)
+                    {
+                        EventCooldown -= 1 * Time.deltaTime;
                     }
                     break;
 
