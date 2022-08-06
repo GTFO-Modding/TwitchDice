@@ -26,9 +26,12 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <None Remove="Assets\Icons\D100.png" />
     <None Remove="Assets\Icons\D12.png" />
+    <None Remove="Assets\Icons\D20.png" />
     <None Remove="Assets\Icons\D3.png" />
     <None Remove="Assets\Icons\D4.png" />
+    <None Remove="Assets\Icons\D50.png" />
     <None Remove="Assets\Icons\D6.png" />
     <None Remove="Assets\Icons\D8.png" />
     <None Remove="Assets\TwitchDice.bnk" />
@@ -37,9 +40,12 @@
   
   <ItemGroup>
     <EmbeddedResource Include="Assets\Bundle\snowman" />
+    <EmbeddedResource Include="Assets\Icons\D100.png" />
     <EmbeddedResource Include="Assets\Icons\D12.png" />
+    <EmbeddedResource Include="Assets\Icons\D20.png" />
     <EmbeddedResource Include="Assets\Icons\D3.png" />
     <EmbeddedResource Include="Assets\Icons\D4.png" />
+    <EmbeddedResource Include="Assets\Icons\D50.png" />
     <EmbeddedResource Include="Assets\Icons\D6.png" />
     <EmbeddedResource Include="Assets\Icons\D8.png" />
     <EmbeddedResource Include="Assets\TwitchDice.bnk" />
